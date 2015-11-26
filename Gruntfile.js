@@ -115,6 +115,7 @@ module.exports = function (grunt) {
     },
     rollup: {
       options: {
+        sourceMap: true,
         plugins: [
           babel({
             exclude: 'node_modules/**'

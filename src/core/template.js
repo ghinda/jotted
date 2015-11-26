@@ -4,19 +4,24 @@
 export function container () {
   return `
     <ul class="jotted-nav">
-      <li>
+      <li class="jotted-nav-result">
         <a href="#">
           Result
         </a>
       </li>
-      <li>
+      <li class="jotted-nav-html">
         <a href="#">
           HTML
         </a>
       </li>
-      <li>
+      <li class="jotted-nav-css">
         <a href="#">
           CSS
+        </a>
+      </li>
+      <li class="jotted-nav-js">
+        <a href="#">
+          JavaScript
         </a>
       </li>
     </ul>
@@ -29,12 +34,24 @@ export function container () {
   `
 }
 
-export function editorClass (type, id) {
-  return `jotted-editor-${type} jotted-editor-${type}--${id}`
+export function containerClass () {
+  return `jotted`
 }
 
-export function editorContent () {
+export function showBlankClass () {
+  return `jotted-show-blank`
+}
+
+export function hasFileClass (type) {
+  return `jotted-has-${type}`
+}
+
+export function editorClass (type) {
+  return `jotted-editor-${type}`
+}
+
+export function editorContent (type, file) {
   return `
-    <textarea></textarea>
+    <textarea data-type="${type}" data-file="${file}"></textarea>
   `
 }

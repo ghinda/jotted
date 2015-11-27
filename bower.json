@@ -1,0 +1,27 @@
+{
+  "name": "jotted",
+  "version": "0.0.1",
+  "authors": [
+    "Ionut Colceriu <contact@ghinda.net>"
+  ],
+  "description": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/ghinda/jotted.git"
+  },
+  "ignore": [
+    "**/*",
+    "!jotted*",
+    "!LICENSE",
+    "!README.md"
+  ],
+  "main": [
+    "jotted.css",
+    "jotted.js"
+  ],
+  "devDependencies": {
+    "ace-builds": "~1.2.2"
+  },
+  "dependencies": {}
+}

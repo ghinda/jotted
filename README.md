@@ -32,7 +32,7 @@ Jotted is an environment for showcasing HTML, CSS and JavaScript, with editable 
 
 ## Plugins
 
-* `ace`: Uses the `Ace` code editor if it's available.
+* `ace`: Uses the `Ace` code editor if it's available. **WIP**
 * `share`: Creates a shareable URL of the edited snapshot. **WIP**
 * `store`: Stores the edited code in `localStorage`. **WIP**
 * `coffeescript`: Compiles [CoffeeScript](). **WIP**

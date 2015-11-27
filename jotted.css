@@ -81,3 +81,11 @@
   padding: 1em;
   background: #fff;
 }
+/* plugins
+ */
+.jotted-plugin-ace .jotted-editor > textarea {
+  display: none;
+}
+.jotted-editor .ace_editor {
+  height: 100%;
+}

@@ -32,7 +32,7 @@ function register (id, plugin) {
 // parallel init all plugins
 function init () {
   for (let id in this.options.plugins) {
-    find(id).init(this.options.plugins[id])
+    find(id).init.call(this, this.options.plugins[id])
   }
 }
 

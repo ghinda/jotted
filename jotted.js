@@ -183,7 +183,7 @@
   // parallel init all plugins
   function init() {
     for (var id in this.options.plugins) {
-      find(id).init(this.options.plugins[id]);
+      find(id).init.call(this, this.options.plugins[id]);
     }
   }
 
@@ -209,6 +209,9 @@
     });
   }
 
+  var editor;
+  var $textarea;
+
   var PluginAce = (function () {
     function PluginAce() {
       babelHelpers.classCallCheck(this, PluginAce);
@@ -219,7 +222,46 @@
     babelHelpers.createClass(PluginAce, [{
       key: 'init',
       value: function init(opts) {
-        this.options = extend(opts, {});
+        var _this = this;
+
+        this.pluginOptions = extend(opts, {});
+
+        // check if ace is loaded
+        if (typeof window.ace === 'undefined') {
+          return;
+        }
+
+        this.$container.classList.add('jotted-plugin-ace');
+
+        var $aceHTML = document.createElement('div');
+
+        var $editor = this.$html.querySelector('.jotted-editor');
+
+        $editor.appendChild($aceHTML);
+        editor = window.ace.edit($aceHTML);
+        editor.setOptions({
+          mode: 'ace/mode/html'
+        });
+
+        $textarea = $editor.querySelector('textarea');
+
+        this.$container.removeEventListener('change', this.debounceChange);
+        this.$container.removeEventListener('keyup', this.debounceChange);
+
+        editor.on('change', function () {
+          console.log('change');
+          $textarea.value = editor.getValue();
+
+          _this.change({
+            target: $textarea
+          });
+
+          //       $textarea.change()
+        });
+
+        //     editor.setValue($textarea.value)
+
+        //     editor.getSession().setValue('tesgfhfghfghfghgfht')
 
         // `this` is the jotted instance
         //     console.log(this)
@@ -229,7 +271,7 @@
     }, {
       key: 'html',
       value: function html(params, callback) {
-        params.content = 'ACE' + params.content;
+        editor.setValue($textarea.value);
 
         setTimeout(function () {
           callback(null, params);

@@ -10,6 +10,7 @@ class Jotted {
   constructor ($editor, opts) {
     this.options = util.extend(opts, {
       showBlank: false,
+      pane: 'result',
       debounce: 250,
       plugins: {
         ace: {}
@@ -23,6 +24,10 @@ class Jotted {
     if (this.options.showEmpty) {
       this.$container.classList.add(template.showBlankClass())
     }
+
+    // default pane
+    this.paneActive = this.options.pane
+    this.$container.classList.add(template.paneActiveClass(this.paneActive))
 
     this.$result = $editor.querySelector('.jotted-pane-result')
     this.$html = $editor.querySelector('.jotted-pane-html')
@@ -41,6 +46,9 @@ class Jotted {
     // change events
     this.$container.addEventListener('change', util.debounce(this.change.bind(this), this.options.debounce))
     this.$container.addEventListener('keyup', util.debounce(this.change.bind(this), this.options.debounce))
+
+    // pane change
+    this.$container.addEventListener('click', this.pane.bind(this))
 
     // init plugins
     plugin.init.call(this)
@@ -76,15 +84,15 @@ class Jotted {
   }
 
   change (e) {
-    if (e.target.tagName.toLowerCase() !== 'textarea') {
+    if (!e.target.dataset.jottedType) {
       return
     }
 
-    var type = e.target.dataset.type
+    var type = e.target.dataset.jottedType
 
     // run all plugins, then do magic
     plugin.run.call(this, type, {
-      name: e.target.dataset.file,
+      name: e.target.dataset.jottedFile,
       content: e.target.value
     }, (err, res) => {
       if (err) {
@@ -107,6 +115,18 @@ class Jotted {
         return
       }
     })
+  }
+
+  pane (e) {
+    if (!e.target.dataset.jottedType) {
+      return
+    }
+
+    this.$container.classList.remove(template.paneActiveClass(this.paneActive))
+    this.paneActive = e.target.dataset.jottedType
+    this.$container.classList.add(template.paneActiveClass(this.paneActive))
+
+    e.preventDefault()
   }
 }
 

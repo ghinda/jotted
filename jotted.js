@@ -31,6 +31,37 @@
   })();
 
   babelHelpers;
+  /* template
+   */
+
+  function container() {
+    return "\n    <ul class=\"jotted-nav\">\n      <li class=\"jotted-nav-item jotted-nav-item-result\">\n        <a href=\"#\" data-jotted-type=\"result\">\n          Result\n        </a>\n      </li>\n      <li class=\"jotted-nav-item jotted-nav-item-html\">\n        <a href=\"#\" data-jotted-type=\"html\">\n          HTML\n        </a>\n      </li>\n      <li class=\"jotted-nav-item jotted-nav-item-css\">\n        <a href=\"#\" data-jotted-type=\"css\">\n          CSS\n        </a>\n      </li>\n      <li class=\"jotted-nav-item jotted-nav-item-js\">\n        <a href=\"#\" data-jotted-type=\"js\">\n          JavaScript\n        </a>\n      </li>\n    </ul>\n    <div class=\"jotted-pane jotted-pane-result\">\n      <iframe></iframe>\n    </div>\n    <div class=\"jotted-pane jotted-pane-html\"></div>\n    <div class=\"jotted-pane jotted-pane-css\"></div>\n    <div class=\"jotted-pane jotted-pane-js\"></div>\n  ";
+  }
+
+  function paneActiveClass(type) {
+    return "jotted-pane-active-" + type;
+  }
+
+  function containerClass() {
+    return "jotted";
+  }
+
+  function showBlankClass() {
+    return "jotted-show-blank";
+  }
+
+  function hasFileClass(type) {
+    return "jotted-has-" + type;
+  }
+
+  function editorClass(type) {
+    return "jotted-editor jotted-editor-" + type;
+  }
+
+  function editorContent(type, file) {
+    return "\n    <textarea data-jotted-type=\"" + type + "\" data-jotted-file=\"" + file + "\"></textarea>\n  ";
+  }
+
   /* util
    */
 
@@ -178,33 +209,6 @@
     });
   }
 
-  /* template
-   */
-
-  function container() {
-    return "\n    <ul class=\"jotted-nav\">\n      <li class=\"jotted-nav-result\">\n        <a href=\"#\">\n          Result\n        </a>\n      </li>\n      <li class=\"jotted-nav-html\">\n        <a href=\"#\">\n          HTML\n        </a>\n      </li>\n      <li class=\"jotted-nav-css\">\n        <a href=\"#\">\n          CSS\n        </a>\n      </li>\n      <li class=\"jotted-nav-js\">\n        <a href=\"#\">\n          JavaScript\n        </a>\n      </li>\n    </ul>\n    <div class=\"jotted-pane jotted-pane-result\">\n      <iframe></iframe>\n    </div>\n    <div class=\"jotted-pane jotted-pane-html\"></div>\n    <div class=\"jotted-pane jotted-pane-css\"></div>\n    <div class=\"jotted-pane jotted-pane-js\"></div>\n  ";
-  }
-
-  function containerClass() {
-    return "jotted";
-  }
-
-  function showBlankClass() {
-    return "jotted-show-blank";
-  }
-
-  function hasFileClass(type) {
-    return "jotted-has-" + type;
-  }
-
-  function editorClass(type) {
-    return "jotted-editor-" + type;
-  }
-
-  function editorContent(type, file) {
-    return "\n    <textarea data-type=\"" + type + "\" data-file=\"" + file + "\"></textarea>\n  ";
-  }
-
   var PluginAce = (function () {
     function PluginAce() {
       babelHelpers.classCallCheck(this, PluginAce);
@@ -241,6 +245,7 @@
 
       this.options = extend(opts, {
         showBlank: false,
+        pane: 'result',
         debounce: 250,
         plugins: {
           ace: {}
@@ -254,6 +259,10 @@
       if (this.options.showEmpty) {
         this.$container.classList.add(showBlankClass());
       }
+
+      // default pane
+      this.paneActive = this.options.pane;
+      this.$container.classList.add(paneActiveClass(this.paneActive));
 
       this.$result = $editor.querySelector('.jotted-pane-result');
       this.$html = $editor.querySelector('.jotted-pane-html');
@@ -272,6 +281,9 @@
       // change events
       this.$container.addEventListener('change', debounce(this.change.bind(this), this.options.debounce));
       this.$container.addEventListener('keyup', debounce(this.change.bind(this), this.options.debounce));
+
+      // pane change
+      this.$container.addEventListener('click', this.pane.bind(this));
 
       // init plugins
       init.call(this);
@@ -314,15 +326,15 @@
       value: function change(e) {
         var _this2 = this;
 
-        if (e.target.tagName.toLowerCase() !== 'textarea') {
+        if (!e.target.dataset.jottedType) {
           return;
         }
 
-        var type = e.target.dataset.type;
+        var type = e.target.dataset.jottedType;
 
         // run all plugins, then do magic
         run.call(this, type, {
-          name: e.target.dataset.file,
+          name: e.target.dataset.jottedFile,
           content: e.target.value
         }, function (err, res) {
           if (err) {
@@ -345,6 +357,19 @@
             return;
           }
         });
+      }
+    }, {
+      key: 'pane',
+      value: function pane(e) {
+        if (!e.target.dataset.jottedType) {
+          return;
+        }
+
+        this.$container.classList.remove(paneActiveClass(this.paneActive));
+        this.paneActive = e.target.dataset.jottedType;
+        this.$container.classList.add(paneActiveClass(this.paneActive));
+
+        e.preventDefault();
       }
     }]);
     return Jotted;

@@ -4,23 +4,23 @@
 export function container () {
   return `
     <ul class="jotted-nav">
-      <li class="jotted-nav-result">
-        <a href="#">
+      <li class="jotted-nav-item jotted-nav-item-result">
+        <a href="#" data-jotted-type="result">
           Result
         </a>
       </li>
-      <li class="jotted-nav-html">
-        <a href="#">
+      <li class="jotted-nav-item jotted-nav-item-html">
+        <a href="#" data-jotted-type="html">
           HTML
         </a>
       </li>
-      <li class="jotted-nav-css">
-        <a href="#">
+      <li class="jotted-nav-item jotted-nav-item-css">
+        <a href="#" data-jotted-type="css">
           CSS
         </a>
       </li>
-      <li class="jotted-nav-js">
-        <a href="#">
+      <li class="jotted-nav-item jotted-nav-item-js">
+        <a href="#" data-jotted-type="js">
           JavaScript
         </a>
       </li>
@@ -32,6 +32,10 @@ export function container () {
     <div class="jotted-pane jotted-pane-css"></div>
     <div class="jotted-pane jotted-pane-js"></div>
   `
+}
+
+export function paneActiveClass (type) {
+  return `jotted-pane-active-${type}`
 }
 
 export function containerClass () {
@@ -47,11 +51,11 @@ export function hasFileClass (type) {
 }
 
 export function editorClass (type) {
-  return `jotted-editor-${type}`
+  return `jotted-editor jotted-editor-${type}`
 }
 
 export function editorContent (type, file) {
   return `
-    <textarea data-type="${type}" data-file="${file}"></textarea>
+    <textarea data-jotted-type="${type}" data-jotted-file="${file}"></textarea>
   `
 }

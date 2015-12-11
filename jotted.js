@@ -315,12 +315,16 @@
           cmChange = true;
           $textarea$1.value = editor$1.getValue();
 
-          var change = new Event('change', {
+          // TODO replace with .trigger
+          var change = new window.Event('change', {
             bubbles: true
           });
           $textarea$1.dispatchEvent(change);
         });
       }
+
+      // TODO replace with .on
+
     }, {
       key: 'html',
       value: function html(params, callback) {
@@ -482,6 +486,7 @@
   };
 
   // register bundled plugins
+  // TODO create a new instance of each plugin on init
   Jotted.plugin('ace', new PluginAce());
   Jotted.plugin('codemirror', new PluginCodeMirror());
 

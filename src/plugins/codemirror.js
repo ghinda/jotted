@@ -33,13 +33,15 @@ export default class PluginCodeMirror {
       cmChange = true
       $textarea.value = editor.getValue()
 
-      var change = new Event('change', {
+      // TODO replace with .trigger
+      var change = new window.Event('change', {
         bubbles: true
       })
       $textarea.dispatchEvent(change)
     })
   }
 
+  // TODO replace with .on
   html (params, callback) {
     // TODO check if the event was triggered from the codemirror change
     if (!cmChange) {

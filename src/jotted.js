@@ -137,6 +137,7 @@ Jotted.plugin = function () {
 }
 
 // register bundled plugins
+// TODO create a new instance of each plugin on init
 Jotted.plugin('ace', new PluginAce())
 Jotted.plugin('codemirror', new PluginCodeMirror())
 

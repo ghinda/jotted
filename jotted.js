@@ -245,8 +245,8 @@
 
         $textarea = $editor.querySelector('textarea');
 
-        this.$container.removeEventListener('change', this.debounceChange);
-        this.$container.removeEventListener('keyup', this.debounceChange);
+        //     this.$container.removeEventListener('change', this.debounceChange)
+        //     this.$container.removeEventListener('keyup', this.debounceChange)
 
         editor.on('change', function () {
           console.log('change');
@@ -279,6 +279,64 @@
       }
     }]);
     return PluginAce;
+  })();
+
+  var editor$1;
+  var $textarea$1;
+  var cmChange = false;
+
+  var PluginCodeMirror = (function () {
+    function PluginCodeMirror() {
+      babelHelpers.classCallCheck(this, PluginCodeMirror);
+
+      this.priority = 99;
+    }
+
+    babelHelpers.createClass(PluginCodeMirror, [{
+      key: 'init',
+      value: function init(opts) {
+        this.pluginOptions = extend(opts, {});
+
+        // check if CodeMirror is loaded
+        if (typeof window.CodeMirror === 'undefined') {
+          return;
+        }
+
+        this.$container.classList.add('jotted-plugin-codemirror');
+
+        var $editor = this.$html.querySelector('.jotted-editor');
+        $textarea$1 = $editor.querySelector('textarea');
+
+        editor$1 = window.CodeMirror.fromTextArea($editor.querySelector('textarea'), {
+          lineNumbers: true
+        });
+
+        editor$1.on('change', function () {
+          cmChange = true;
+          $textarea$1.value = editor$1.getValue();
+
+          var change = new Event('change', {
+            bubbles: true
+          });
+          $textarea$1.dispatchEvent(change);
+        });
+      }
+    }, {
+      key: 'html',
+      value: function html(params, callback) {
+        // TODO check if the event was triggered from the codemirror change
+        if (!cmChange) {
+          editor$1.setValue($textarea$1.value);
+        }
+
+        setTimeout(function () {
+          cmChange = false;
+          params.content = editor$1.getValue();
+          callback(null, params);
+        }, 500);
+      }
+    }]);
+    return PluginCodeMirror;
   })();
 
   var Jotted = (function () {
@@ -425,6 +483,7 @@
 
   // register bundled plugins
   Jotted.plugin('ace', new PluginAce());
+  Jotted.plugin('codemirror', new PluginCodeMirror());
 
   return Jotted;
 

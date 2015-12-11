@@ -32,7 +32,6 @@ module.exports = function (grunt) {
           'test/{,*/}*.js'
         ],
         tasks: [
-          'standard',
           'rollup'
         ]
       },

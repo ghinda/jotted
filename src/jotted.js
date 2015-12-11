@@ -5,6 +5,7 @@ import * as util from './core/util.js'
 import * as template from './core/template.js'
 import * as plugin from './core/plugin.js'
 import PluginAce from './plugins/ace.js'
+import PluginCodeMirror from './plugins/codemirror.js'
 
 class Jotted {
   constructor ($editor, opts) {
@@ -137,5 +138,6 @@ Jotted.plugin = function () {
 
 // register bundled plugins
 Jotted.plugin('ace', new PluginAce())
+Jotted.plugin('codemirror', new PluginCodeMirror())
 
 export default Jotted

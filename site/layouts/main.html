@@ -26,7 +26,9 @@
 
   <div id="test" data-html="index.html"></div>
 
-  <script src="bower_components/ace-builds/src/ace.js"></script>
+  <link rel="stylesheet" href="bower_components/codemirror/lib/codemirror.css">
+  <script src="bower_components/codemirror/lib/codemirror.js"></script>
+
   <script src="jotted.js"></script>
   <script>
     Jotted.plugin('test', {
@@ -37,7 +39,7 @@
 
     var jot = new Jotted(document.getElementById('test'), {
       plugins: {
-        ace: {},
+        codemirror: {},
         test: {}
       }
     });

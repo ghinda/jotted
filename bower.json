@@ -21,7 +21,8 @@
     "jotted.js"
   ],
   "devDependencies": {
-    "ace-builds": "~1.2.2"
+    "ace-builds": "~1.2.2",
+    "codemirror": "~5.9.0"
   },
   "dependencies": {}
 }

@@ -70,7 +70,8 @@
  */
 
 .jotted-pane {
-  display: none;
+  position: absolute;
+  visibility: hidden;
   height: 12em;
 }
 
@@ -78,7 +79,8 @@
 .jotted-pane-active-html .jotted-pane-html,
 .jotted-pane-active-css .jotted-pane-css,
 .jotted-pane-active-js .jotted-pane-js {
-  display: block;
+  position: relative;
+  visibility: visible;
 }
 
 /* editor

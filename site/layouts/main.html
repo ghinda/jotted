@@ -31,10 +31,8 @@
 
   <script src="jotted.js"></script>
   <script>
-    Jotted.plugin('test', {
-      init: function(opts) {
-        console.log('test init')
-      }
+    Jotted.plugin('test', function () {
+      console.log('test init')
     });
 
     var jot = new Jotted(document.getElementById('test'), {

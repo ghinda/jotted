@@ -4,7 +4,8 @@
 import * as util from './core/util.js'
 import * as template from './core/template.js'
 import * as plugin from './core/plugin.js'
-import PluginAce from './plugins/ace.js'
+import * as pubsoup from './core/pubsoup.js'
+
 import PluginCodeMirror from './plugins/codemirror.js'
 
 class Jotted {
@@ -17,6 +18,8 @@ class Jotted {
         ace: {}
       }
     })
+
+    this.plugins = {}
 
     this.$container = $editor
     this.$container.innerHTML = template.container()
@@ -53,6 +56,8 @@ class Jotted {
 
     // init plugins
     plugin.init.call(this)
+
+    this.on('change', this.changeCallback.bind(this), 999)
   }
 
   markup (type, $parent) {
@@ -89,33 +94,29 @@ class Jotted {
       return
     }
 
-    var type = e.target.dataset.jottedType
-
-    // run all plugins, then do magic
-    plugin.run.call(this, type, {
+    this.trigger('change', {
+      type: e.target.dataset.jottedType,
       name: e.target.dataset.jottedFile,
       content: e.target.value
-    }, (err, res) => {
-      if (err) {
-        return err
-      }
-
-      if (type === 'html') {
-        this.$resultFrame.contentWindow.document.body.innerHTML = res.content
-        return
-      }
-
-      if (type === 'css') {
-        this.$styleInject.textContent = res.content
-        return
-      }
-
-      if (type === 'js') {
-        // TODO plugin to show errors
-        this.$resultFrame.contentWindow.eval(res.content)
-        return
-      }
     })
+  }
+
+  changeCallback (params, callback) {
+    if (params.type === 'html') {
+      this.$resultFrame.contentWindow.document.body.innerHTML = params.content
+      return
+    }
+
+    if (params.type === 'css') {
+      this.$styleInject.textContent = params.content
+      return
+    }
+
+    if (params.type === 'js') {
+      // TODO plugin to show errors
+      this.$resultFrame.contentWindow.eval(params.content)
+      return
+    }
   }
 
   pane (e) {
@@ -129,6 +130,18 @@ class Jotted {
 
     e.preventDefault()
   }
+
+  on () {
+    pubsoup.subscribe.apply(this, arguments)
+  }
+
+  off () {
+    pubsoup.unsubscribe.apply(this, arguments)
+  }
+
+  trigger () {
+    pubsoup.publish.apply(this, arguments)
+  }
 }
 
 // register plugins
@@ -137,8 +150,6 @@ Jotted.plugin = function () {
 }
 
 // register bundled plugins
-// TODO create a new instance of each plugin on init
-Jotted.plugin('ace', new PluginAce())
-Jotted.plugin('codemirror', new PluginCodeMirror())
+Jotted.plugin('codemirror', PluginCodeMirror)
 
 export default Jotted

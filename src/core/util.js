@@ -45,7 +45,7 @@ function seqRunner (index, params, arr, callback) {
   })
 }
 
-function seq (arr, params, callback) {
+function seq (arr, params, callback = function () {}) {
   if (!arr.length) {
     return callback(null, params)
   }
@@ -65,9 +65,14 @@ function debounce (fn, delay) {
   }
 }
 
+function log () {
+  console.log(arguments)
+}
+
 export {
   extend,
   fetch,
   seq,
-  debounce
+  debounce,
+  log
 }

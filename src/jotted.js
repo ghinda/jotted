@@ -6,6 +6,7 @@ import * as template from './core/template.js'
 import * as plugin from './core/plugin.js'
 import * as pubsoup from './core/pubsoup.js'
 
+import PluginAce from './plugins/ace.js'
 import PluginCodeMirror from './plugins/codemirror.js'
 import PluginLess from './plugins/less.js'
 
@@ -152,6 +153,7 @@ Jotted.plugin = function () {
 
 // register bundled plugins
 Jotted.plugin('codemirror', PluginCodeMirror)
+Jotted.plugin('ace', PluginAce)
 Jotted.plugin('less', PluginLess)
 
 export default Jotted

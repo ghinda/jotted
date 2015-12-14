@@ -3,65 +3,96 @@
 
 import * as util from '../core/util.js'
 
-var editor
-var $textarea
-
 export default class PluginAce {
-  constructor () {
-    this.priority = 99
-  }
+  constructor (jotted, options) {
+    var priority = 1
+    var i
 
-  init (opts) {
-    this.pluginOptions = util.extend(opts, {})
+    this.editor = {}
 
-    // check if ace is loaded
+    this.modemap = {
+      'html': 'html',
+      'css': 'css',
+      'less': 'less',
+      'js': 'javascript'
+    }
+
+    options = util.extend(options, {
+      lineNumbers: true
+    })
+
+    // check if Ace is loaded
     if (typeof window.ace === 'undefined') {
       return
     }
 
-    this.$container.classList.add('jotted-plugin-ace')
+    jotted.$container.classList.add('jotted-plugin-ace')
 
-    var $aceHTML = document.createElement('div')
+    var $editors = jotted.$container.querySelectorAll('.jotted-editor')
 
-    var $editor = this.$html.querySelector('.jotted-editor')
+    for (i = 0; i < $editors.length; i++) {
+      let $textarea = $editors[i].querySelector('textarea')
+      let type = $textarea.dataset.jottedType
+      let file = $textarea.dataset.jottedFile
 
-    $editor.appendChild($aceHTML)
-    editor = window.ace.edit($aceHTML)
-    editor.setOptions({
-      mode: 'ace/mode/html'
-    })
+      let $aceContainer = document.createElement('div')
+      $editors[i].appendChild($aceContainer)
 
-    $textarea = $editor.querySelector('textarea')
+      this.editor[type] = window.ace.edit($aceContainer)
+      let editor = this.editor[type]
 
-//     this.$container.removeEventListener('change', this.debounceChange)
-//     this.$container.removeEventListener('keyup', this.debounceChange)
+      let editorOptions = util.extend(options)
 
-    editor.on('change', () => {
-      console.log('change')
-      $textarea.value = editor.getValue()
+      editor.getSession().setMode(this.aceMode(type, file))
+      editor.getSession().setOptions(editorOptions)
 
-      this.change({
-        target: $textarea
+      editor.on('change', () => {
+        $textarea.value = editor.getValue()
+
+        // trigger a change event
+        jotted.trigger('change', {
+          aceEditor: editor,
+          type: type,
+          file: file,
+          content: $textarea.value
+        })
       })
+    }
 
-//       $textarea.change()
-    })
+    jotted.on('change', util.debounce(this.change.bind(this), jotted.options.debounce), priority)
 
-//     editor.setValue($textarea.value)
-
-//     editor.getSession().setValue('tesgfhfghfghfghgfht')
-
-    // `this` is the jotted instance
-//     console.log(this)
-
-    // TODO check if ace is loaded, if it is, use it on the textareas
   }
 
-  html (params, callback) {
-    editor.setValue($textarea.value)
+  change (params, callback) {
+    var editor = this.editor[params.type]
 
-    setTimeout(function () {
-      callback(null, params)
-    }, 500)
+    // if the event is not started by the ace change
+    if (!params.aceEditor) {
+      editor.setValue(params.content, -1)
+    }
+
+    // manipulate the params and pass them on
+    params.content = editor.getValue()
+    callback(null, params)
+  }
+
+  aceMode (type, file) {
+    var mode = 'ace/mode/'
+
+    // try the file extension
+    for(let key in this.modemap) {
+      if (file.indexOf('.' + key) !== -1) {
+        return mode + this.modemap[key]
+      }
+    }
+
+    // try the file type (html/css/js)
+    for(let key in this.modemap) {
+      if (type === key) {
+        return mode + this.modemap[key]
+      }
+    }
+
+    return mode + type
   }
 }

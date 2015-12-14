@@ -29,9 +29,13 @@
   <link rel="stylesheet" href="bower_components/codemirror/lib/codemirror.css">
   <script src="bower_components/codemirror/lib/codemirror.js"></script>
 
-  <script src="jotted.js"></script>
+  <script src="bower_components/ace-builds/src-min/ace.js"></script>
 
   <script src="bower_components/less/dist/less.js"></script>
+
+
+  <script src="jotted.js"></script>
+
 
 
   <script>
@@ -41,7 +45,8 @@
 
     var jot = new Jotted(document.getElementById('test'), {
       plugins: {
-        codemirror: {},
+//         codemirror: {},
+        ace: {},
         less: {},
         test: {}
       }

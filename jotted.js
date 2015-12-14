@@ -316,6 +316,112 @@
     return PluginCodeMirror;
   })();
 
+  var PluginAce = (function () {
+    function PluginAce(jotted, options) {
+      var _this = this;
+
+      babelHelpers.classCallCheck(this, PluginAce);
+
+      var priority = 1;
+      var i;
+
+      this.editor = {};
+
+      this.modemap = {
+        'html': 'html',
+        'css': 'css',
+        'less': 'less',
+        'js': 'javascript'
+      };
+
+      options = extend(options, {
+        lineNumbers: true
+      });
+
+      // check if Ace is loaded
+      if (typeof window.ace === 'undefined') {
+        return;
+      }
+
+      jotted.$container.classList.add('jotted-plugin-ace');
+
+      var $editors = jotted.$container.querySelectorAll('.jotted-editor');
+
+      var _loop = function _loop() {
+        var $textarea = $editors[i].querySelector('textarea');
+        var type = $textarea.dataset.jottedType;
+        var file = $textarea.dataset.jottedFile;
+
+        var $aceContainer = document.createElement('div');
+        $editors[i].appendChild($aceContainer);
+
+        _this.editor[type] = window.ace.edit($aceContainer);
+        var editor = _this.editor[type];
+
+        var editorOptions = extend(options);
+
+        editor.getSession().setMode(_this.aceMode(type, file));
+        editor.getSession().setOptions(editorOptions);
+
+        editor.on('change', function () {
+          $textarea.value = editor.getValue();
+
+          // trigger a change event
+          jotted.trigger('change', {
+            aceEditor: editor,
+            type: type,
+            file: file,
+            content: $textarea.value
+          });
+        });
+      };
+
+      for (i = 0; i < $editors.length; i++) {
+        _loop();
+      }
+
+      jotted.on('change', debounce(this.change.bind(this), jotted.options.debounce), priority);
+    }
+
+    babelHelpers.createClass(PluginAce, [{
+      key: 'change',
+      value: function change(params, callback) {
+        var editor = this.editor[params.type];
+
+        // if the event is not started by the ace change
+        if (!params.aceEditor) {
+          editor.setValue(params.content, -1);
+        }
+
+        // manipulate the params and pass them on
+        params.content = editor.getValue();
+        callback(null, params);
+      }
+    }, {
+      key: 'aceMode',
+      value: function aceMode(type, file) {
+        var mode = 'ace/mode/';
+
+        // try the file extension
+        for (var key in this.modemap) {
+          if (file.indexOf('.' + key) !== -1) {
+            return mode + this.modemap[key];
+          }
+        }
+
+        // try the file type (html/css/js)
+        for (var key in this.modemap) {
+          if (type === key) {
+            return mode + this.modemap[key];
+          }
+        }
+
+        return mode + type;
+      }
+    }]);
+    return PluginAce;
+  })();
+
   var PluginLess = (function () {
     function PluginLess(jotted, options) {
       babelHelpers.classCallCheck(this, PluginLess);
@@ -534,6 +640,7 @@
 
   // register bundled plugins
   Jotted.plugin('codemirror', PluginCodeMirror);
+  Jotted.plugin('ace', PluginAce);
   Jotted.plugin('less', PluginLess);
 
   return Jotted;

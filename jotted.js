@@ -316,6 +316,66 @@
     return PluginCodeMirror;
   })();
 
+  var PluginLess = (function () {
+    function PluginLess(jotted, options) {
+      babelHelpers.classCallCheck(this, PluginLess);
+
+      var priority = 20;
+      var i;
+
+      this.editor = {};
+
+      options = extend(options, {});
+
+      // check if less is loaded
+      if (typeof window.less === 'undefined') {
+        return;
+      }
+
+      jotted.$container.classList.add('jotted-plugin-less');
+
+      // change CSS link label to Less
+      jotted.$container.querySelector('a[data-jotted-type="css"]').innerHTML = 'Less';
+
+      jotted.on('change', debounce(this.change.bind(this), jotted.options.debounce), priority);
+    }
+
+    babelHelpers.createClass(PluginLess, [{
+      key: 'isLess',
+      value: function isLess(params) {
+        if (params.type !== 'css') {
+          return false;
+        }
+
+        return params.file.indexOf('.less') !== -1 || params.file === '';
+      }
+    }, {
+      key: 'change',
+      value: function change(params, callback) {
+        // only parse .less and blank files
+        if (this.isLess(params)) {
+          window.less.render(params.content, this.options, function (err, res) {
+            if (err) {
+              // TODO render error
+              // TODO create a jotted.error(type, message) method
+              console.log(err);
+            } else {
+              // replace the content with the parsed less
+              params.content = res.css;
+            }
+
+            callback(null, params);
+          });
+        } else {
+          // make sure we callback either way,
+          // to not break the pubsoup
+          callback(null, params);
+        }
+      }
+    }]);
+    return PluginLess;
+  })();
+
   var Jotted = (function () {
     function Jotted($editor, opts) {
       babelHelpers.classCallCheck(this, Jotted);
@@ -474,6 +534,7 @@
 
   // register bundled plugins
   Jotted.plugin('codemirror', PluginCodeMirror);
+  Jotted.plugin('less', PluginLess);
 
   return Jotted;
 

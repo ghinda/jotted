@@ -22,7 +22,8 @@
   ],
   "devDependencies": {
     "ace-builds": "~1.2.2",
-    "codemirror": "~5.9.0"
+    "codemirror": "~5.9.0",
+    "less": "~2.5.3"
   },
   "dependencies": {}
 }

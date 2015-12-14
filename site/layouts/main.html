@@ -30,6 +30,10 @@
   <script src="bower_components/codemirror/lib/codemirror.js"></script>
 
   <script src="jotted.js"></script>
+
+  <script src="bower_components/less/dist/less.js"></script>
+
+
   <script>
     Jotted.plugin('test', function () {
       console.log('test init')
@@ -38,6 +42,7 @@
     var jot = new Jotted(document.getElementById('test'), {
       plugins: {
         codemirror: {},
+        less: {},
         test: {}
       }
     });

@@ -7,6 +7,7 @@ import * as plugin from './core/plugin.js'
 import * as pubsoup from './core/pubsoup.js'
 
 import PluginCodeMirror from './plugins/codemirror.js'
+import PluginLess from './plugins/less.js'
 
 class Jotted {
   constructor ($editor, opts) {
@@ -151,5 +152,6 @@ Jotted.plugin = function () {
 
 // register bundled plugins
 Jotted.plugin('codemirror', PluginCodeMirror)
+Jotted.plugin('less', PluginLess)
 
 export default Jotted

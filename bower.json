@@ -23,7 +23,9 @@
   "devDependencies": {
     "ace-builds": "~1.2.2",
     "codemirror": "~5.9.0",
-    "less": "~2.5.3"
+    "less": "~2.5.3",
+    "jasmine-core": "jasmine#~2.4.1",
+    "jasmine-jsreporter": "~0.1.2"
   },
   "dependencies": {}
 }

@@ -1,0 +1,39 @@
+{
+  "name": "jasmine-jsreporter",
+  "main": "jasmine-jsreporter.js",
+  "version": "0.1.2",
+  "homepage": "https://github.com/RobinQu/jasmine-jsreporter",
+  "authors": [
+    "RobinQu <robinqu@gmail.com>"
+  ],
+  "description": "Port of jasmine jsreporter",
+  "moduleType": [
+    "globals"
+  ],
+  "keywords": [
+    "jasmine",
+    "js"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "components-jasmine": "~2.0.0"
+  },
+  "_release": "0.1.2",
+  "_resolution": {
+    "type": "version",
+    "tag": "0.1.2",
+    "commit": "23c1c3206c2b1c153c1af20f6bab899f84eb9d94"
+  },
+  "_source": "git://github.com/RobinQu/jasmine-jsreporter.git",
+  "_target": "~0.1.2",
+  "_originalSource": "jasmine-jsreporter",
+  "_direct": true
+}

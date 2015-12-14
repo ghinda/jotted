@@ -252,19 +252,14 @@
 
       babelHelpers.classCallCheck(this, PluginCodeMirror);
 
-      var priority = 90;
+      var priority = 1;
       var i;
-      this.chChange = false;
 
-      this.editorHTML = {};
-      this.editorCSS = {};
-      this.editorJS = {};
+      this.editor = {};
 
-      this.textareaHTML = {};
-      this.textareaCSS = {};
-      this.textareaJS = {};
-
-      options = extend(options, {});
+      options = extend(options, {
+        lineNumbers: true
+      });
 
       // check if CodeMirror is loaded
       if (typeof window.CodeMirror === 'undefined') {
@@ -276,74 +271,46 @@
       var $editors = jotted.$container.querySelectorAll('.jotted-editor');
 
       var _loop = function _loop() {
-        var $editor = $editors[i];
-        var $textarea = $editor.querySelector('textarea');
+        var $textarea = $editors[i].querySelector('textarea');
         var type = $textarea.dataset.jottedType;
+        var file = $textarea.dataset.jottedFile;
 
-        editor = window.CodeMirror.fromTextArea($editor.querySelector('textarea'), {
-          lineNumbers: true
-        });
+        _this.editor[type] = window.CodeMirror.fromTextArea($textarea, options);
+        var editor = _this.editor[type];
 
         editor.on('change', function () {
-          _this.cmChange = true;
           $textarea.value = editor.getValue();
 
-          // TODO get real data form the editor
+          // trigger a change event
           jotted.trigger('change', {
-            type: 'html',
-            name: 'test.html',
+            cmEditor: editor,
+            type: type,
+            file: file,
             content: $textarea.value
           });
         });
-
-        if (type === 'html') {
-          _this.editorHTML = editor;
-          _this.$textareaHTML = $textarea;
-        }
-
-        if (type === 'css') {
-          _this.editorCSS = editor;
-          _this.$textareaCSS = $textarea;
-        }
-
-        if (type === 'js') {
-          _this.editorJS = editor;
-          _this.$textareaJS = $textarea;
-        }
       };
 
       for (i = 0; i < $editors.length; i++) {
-        var editor;
-
         _loop();
       }
 
-      jotted.on('change', this.change.bind(this), priority);
+      jotted.on('change', debounce(this.change.bind(this), jotted.options.debounce), priority);
     }
 
     babelHelpers.createClass(PluginCodeMirror, [{
       key: 'change',
       value: function change(params, callback) {
-        var editor = this.editorHTML;
+        var editor = this.editor[params.type];
 
-        if (params.type === 'css') {
-          editor = this.editorCSS;
-        }
-
-        if (params.type === 'js') {
-          editor = this.editorJS;
-        }
-
-        // TODO check if the event was triggered from the codemirror change
-        if (!this.cmChange) {
+        // if the event is not started by the codemirror change
+        if (!params.cmEditor) {
           editor.setValue(params.content);
         }
 
-        setTimeout(function () {
-          this.cmChange = false;
-          params.content = editor.getValue();
-          callback(null, params);
-        }, 500);
+        // manipulate the params and pass them on
+        params.content = editor.getValue();
+        callback(null, params);
       }
     }]);
     return PluginCodeMirror;
@@ -444,7 +411,7 @@
 
         this.trigger('change', {
           type: e.target.dataset.jottedType,
-          name: e.target.dataset.jottedFile,
+          file: e.target.dataset.jottedFile,
           content: e.target.value
         });
       }

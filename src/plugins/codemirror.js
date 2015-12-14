@@ -5,19 +5,14 @@ import * as util from '../core/util.js'
 
 export default class PluginCodeMirror {
   constructor (jotted, options) {
-    var priority = 90
+    var priority = 1
     var i
-    this.chChange = false
 
-    this.editorHTML = {}
-    this.editorCSS = {}
-    this.editorJS = {}
+    this.editor = {}
 
-    this.textareaHTML = {}
-    this.textareaCSS = {}
-    this.textareaJS = {}
-
-    options = util.extend(options, {})
+    options = util.extend(options, {
+      lineNumbers: true
+    })
 
     // check if CodeMirror is loaded
     if (typeof window.CodeMirror === 'undefined') {
@@ -29,65 +24,39 @@ export default class PluginCodeMirror {
     var $editors = jotted.$container.querySelectorAll('.jotted-editor')
 
     for (i = 0; i < $editors.length; i++) {
-      let $editor = $editors[i]
-      let $textarea = $editor.querySelector('textarea')
+      let $textarea = $editors[i].querySelector('textarea')
       let type = $textarea.dataset.jottedType
+      let file = $textarea.dataset.jottedFile
 
-      var editor = window.CodeMirror.fromTextArea($editor.querySelector('textarea'), {
-        lineNumbers: true
-      })
+      this.editor[type] = window.CodeMirror.fromTextArea($textarea, options)
+      let editor = this.editor[type]
 
       editor.on('change', () => {
-        this.cmChange = true
         $textarea.value = editor.getValue()
 
-        // TODO get real data form the editor
+        // trigger a change event
         jotted.trigger('change', {
-          type: 'html',
-          name: 'test.html',
+          cmEditor: editor,
+          type: type,
+          file: file,
           content: $textarea.value
         })
       })
-
-      if (type === 'html') {
-        this.editorHTML = editor
-        this.$textareaHTML = $textarea
-      }
-
-      if (type === 'css') {
-        this.editorCSS = editor
-        this.$textareaCSS = $textarea
-      }
-
-      if (type === 'js') {
-        this.editorJS = editor
-        this.$textareaJS = $textarea
-      }
     }
 
-    jotted.on('change', this.change.bind(this), priority)
+    jotted.on('change', util.debounce(this.change.bind(this), jotted.options.debounce), priority)
   }
 
   change (params, callback) {
-    var editor = this.editorHTML
+    var editor = this.editor[params.type]
 
-    if (params.type === 'css') {
-      editor = this.editorCSS
-    }
-
-    if (params.type === 'js') {
-      editor = this.editorJS
-    }
-
-    // TODO check if the event was triggered from the codemirror change
-    if (!this.cmChange) {
+    // if the event is not started by the codemirror change
+    if (!params.cmEditor) {
       editor.setValue(params.content)
     }
 
-    setTimeout(function () {
-      this.cmChange = false
-      params.content = editor.getValue()
-      callback(null, params)
-    }, 500)
+    // manipulate the params and pass them on
+    params.content = editor.getValue()
+    callback(null, params)
   }
 }

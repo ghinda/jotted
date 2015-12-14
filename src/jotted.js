@@ -96,7 +96,7 @@ class Jotted {
 
     this.trigger('change', {
       type: e.target.dataset.jottedType,
-      name: e.target.dataset.jottedFile,
+      file: e.target.dataset.jottedFile,
       content: e.target.value
     })
   }

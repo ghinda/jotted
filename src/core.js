@@ -124,6 +124,9 @@ class Jotted {
 
     if (params.type === 'js') {
       // TODO plugin to show errors
+      // catch js errors
+
+
       this.$resultFrame.contentWindow.eval(params.content)
       return
     }
@@ -157,15 +160,15 @@ class Jotted {
     pubsoup.done.apply(this, arguments)
   }
 
-  error (err, params) {
-    if (!err.length) {
+  error (errors, params) {
+    if (!errors.length) {
       return this.clearError(params)
     }
 
     this.$container.classList.add(`jotted-error-active-${params.type}`)
 
     var markup = ''
-    for (let e of err) {
+    for (let err of errors) {
       markup += template.errorMessage(err)
     }
 

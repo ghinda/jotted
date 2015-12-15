@@ -145,6 +145,8 @@
   }
 
   var topics = {};
+  var callbacks = {};
+
   function find$1(query) {
     topics[query] = topics[query] || [];
     return topics[query];
@@ -196,15 +198,47 @@
       runList.push(subscriber);
     });
 
-    done[topic] = done[topic] || function () {};
-    seq(runList, params, done[topic]);
+    seq(runList, params, runCallbacks(topic));
+  }
+
+  // parallel run all .done callbacks
+  function runCallbacks(topic) {
+    return function () {
+      callbacks[topic] = callbacks[topic] || [];
+
+      var _iteratorNormalCompletion = true;
+      var _didIteratorError = false;
+      var _iteratorError = undefined;
+
+      try {
+        for (var _iterator = callbacks[topic][Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var c = _step.value;
+
+          c.apply(this, arguments);
+        }
+      } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion && _iterator.return) {
+            _iterator.return();
+          }
+        } finally {
+          if (_didIteratorError) {
+            throw _iteratorError;
+          }
+        }
+      }
+    };
   }
 
   // attach a callback when a publish[topic] is done
   function done(topic) {
     var callback = arguments.length <= 1 || arguments[1] === undefined ? function () {} : arguments[1];
 
-    done[topic] = callback;
+    callbacks[topic] = callbacks[topic] || [];
+    callbacks[topic].push(callback);
   }
 
   /* plugin
@@ -620,6 +654,8 @@
 
         if (params.type === 'js') {
           // TODO plugin to show errors
+          // catch js errors
+
           this.$resultFrame.contentWindow.eval(params.content);
           return;
         }
@@ -659,8 +695,8 @@
       }
     }, {
       key: 'error',
-      value: function error(err, params) {
-        if (!err.length) {
+      value: function error(errors, params) {
+        if (!errors.length) {
           return this.clearError(params);
         }
 
@@ -672,8 +708,8 @@
         var _iteratorError = undefined;
 
         try {
-          for (var _iterator = err[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-            var e = _step.value;
+          for (var _iterator = errors[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+            var err = _step.value;
 
             markup += errorMessage(err);
           }

@@ -44,7 +44,7 @@ export default class PluginAce {
       editor.getSession().setMode(this.aceMode(type, file))
       editor.getSession().setOptions(editorOptions)
 
-      editor.$blockScrolling = Infinity;
+      editor.$blockScrolling = Infinity
 
       editor.on('change', () => {
         $textarea.value = editor.getValue()

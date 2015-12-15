@@ -109,7 +109,9 @@
 /* errors
  */
 
-.jotted-error-active-css .jotted-pane-css {
+.jotted-error-active-html .jotted-pane-html,
+.jotted-error-active-css .jotted-pane-css,
+.jotted-error-active-js .jotted-pane-js {
   padding-bottom: 1.5em;
 }
 
@@ -118,8 +120,8 @@
   bottom: 0;
   left: 0;
   width: 100%;
-  padding: 0 1em;
-  background: #F1A9A0;
+  padding: 0 .6em;
+  background: #FFCCBC;
 
   line-height: 1.5em;
 }
@@ -128,6 +130,26 @@
   margin: 0;
 
   font-size: .8em;
+}
+
+.jotted-error p:before {
+  content: 'X';
+  position: relative;
+  display: inline-block;
+  width: 1.4em;
+  height: 1.4em;
+  margin-right: .8em;
+  margin-bottom: .4em;
+  border-radius: 100%;
+  background: #C0392B;
+
+  color: #fff;
+  font-size: .8em;
+  font-family: monospace;
+  font-weight: bold;
+  line-height: 1.4em;
+  text-align: center;
+  vertical-align: middle;
 }
 
 /* plugins

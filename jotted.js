@@ -653,10 +653,15 @@
         }
 
         if (params.type === 'js') {
-          // TODO plugin to show errors
-          // catch js errors
+          // show js errors
+          try {
+            this.$resultFrame.contentWindow.eval(params.content);
+          } catch (err) {
+            this.error([err.message], {
+              type: 'js'
+            });
+          }
 
-          this.$resultFrame.contentWindow.eval(params.content);
           return;
         }
       }

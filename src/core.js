@@ -1,10 +1,10 @@
 /* jotted
  */
 
-import * as util from './core/util.js'
-import * as template from './core/template.js'
-import * as plugin from './core/plugin.js'
-import * as pubsoup from './core/pubsoup.js'
+import * as util from './util.js'
+import * as template from './template.js'
+import * as plugin from './plugin.js'
+import * as pubsoup from './pubsoup.js'
 
 import PluginAce from './plugins/ace.js'
 import PluginCodeMirror from './plugins/codemirror.js'
@@ -36,13 +36,15 @@ class Jotted {
     this.$container.classList.add(template.paneActiveClass(this.paneActive))
 
     this.$result = $editor.querySelector('.jotted-pane-result')
-    this.$html = $editor.querySelector('.jotted-pane-html')
-    this.$css = $editor.querySelector('.jotted-pane-css')
-    this.$js = $editor.querySelector('.jotted-pane-js')
+    this.$pane = {}
+    this.$error = {}
 
-    this.markup('html', this.$html)
-    this.markup('css', this.$css)
-    this.markup('js', this.$js)
+    for (let type of [ 'html', 'css', 'js' ]) {
+      this.$pane[type] = $editor.querySelector(`.jotted-pane-${type}`)
+      this.markup(type, this.$pane[type])
+
+      this.$error[type] = this.$pane[type].querySelector('.jotted-error')
+    }
 
     this.$resultFrame = this.$result.querySelector('iframe')
 
@@ -59,7 +61,9 @@ class Jotted {
     // init plugins
     plugin.init.call(this)
 
-    this.on('change', this.changeCallback.bind(this), 999)
+//     this.on('change', this.changeCallback.bind(this), 999)
+
+    this.done('change', this.changeCallback.bind(this))
   }
 
   markup (type, $parent) {
@@ -103,7 +107,11 @@ class Jotted {
     })
   }
 
-  changeCallback (params, callback) {
+  changeCallback (err, params) {
+    if (err) {
+      this.error(err, params)
+    }
+
     if (params.type === 'html') {
       this.$resultFrame.contentWindow.document.body.innerHTML = params.content
       return
@@ -143,6 +151,30 @@ class Jotted {
 
   trigger () {
     pubsoup.publish.apply(this, arguments)
+  }
+
+  done () {
+    pubsoup.done.apply(this, arguments)
+  }
+
+  error (err, params) {
+    if (!err.length) {
+      return this.clearError(params)
+    }
+
+    this.$container.classList.add(`jotted-error-active-${params.type}`)
+
+    var markup = ''
+    for (let e of err) {
+      markup += template.errorMessage(err)
+    }
+
+    this.$error[params.type].innerHTML = markup
+  }
+
+  clearError (params) {
+    this.$container.classList.remove(`jotted-error-active-${params.type}`)
+    this.$error[params.type].innerHTML = ''
   }
 }
 

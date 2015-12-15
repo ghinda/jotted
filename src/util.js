@@ -30,27 +30,29 @@ function fetch (file, callback) {
   xhr.send()
 }
 
-function seqRunner (index, params, arr, callback) {
+function seqRunner (index, params, arr, errors, callback) {
   arr[index](params, function (err, res) {
     if (err) {
-      return console.log(err)
+      errors.push(err)
     }
 
     index++
     if (index === arr.length) {
-      callback(err, res)
+      callback(errors, res)
     } else {
-      seqRunner(index, res, arr, callback)
+      seqRunner(index, res, arr, errors, callback)
     }
   })
 }
 
 function seq (arr, params, callback = function () {}) {
+  var errors = []
+
   if (!arr.length) {
-    return callback(null, params)
+    return callback(errors, params)
   }
 
-  seqRunner(0, params, arr, callback)
+  seqRunner(0, params, arr, errors, callback)
 }
 
 function debounce (fn, delay) {

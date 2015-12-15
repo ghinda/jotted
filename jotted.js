@@ -31,6 +31,41 @@
   })();
 
   babelHelpers;
+  /* template
+   */
+
+  function container() {
+    return "\n    <ul class=\"jotted-nav\">\n      <li class=\"jotted-nav-item jotted-nav-item-result\">\n        <a href=\"#\" data-jotted-type=\"result\">\n          Result\n        </a>\n      </li>\n      <li class=\"jotted-nav-item jotted-nav-item-html\">\n        <a href=\"#\" data-jotted-type=\"html\">\n          HTML\n        </a>\n      </li>\n      <li class=\"jotted-nav-item jotted-nav-item-css\">\n        <a href=\"#\" data-jotted-type=\"css\">\n          CSS\n        </a>\n      </li>\n      <li class=\"jotted-nav-item jotted-nav-item-js\">\n        <a href=\"#\" data-jotted-type=\"js\">\n          JavaScript\n        </a>\n      </li>\n    </ul>\n    <div class=\"jotted-pane jotted-pane-result\">\n      <iframe></iframe>\n    </div>\n    <div class=\"jotted-pane jotted-pane-html\"></div>\n    <div class=\"jotted-pane jotted-pane-css\"></div>\n    <div class=\"jotted-pane jotted-pane-js\"></div>\n  ";
+  }
+
+  function paneActiveClass(type) {
+    return "jotted-pane-active-" + type;
+  }
+
+  function containerClass() {
+    return "jotted";
+  }
+
+  function showBlankClass() {
+    return "jotted-show-blank";
+  }
+
+  function hasFileClass(type) {
+    return "jotted-has-" + type;
+  }
+
+  function editorClass(type) {
+    return "jotted-editor jotted-editor-" + type;
+  }
+
+  function editorContent(type, file) {
+    return "\n    <textarea data-jotted-type=\"" + type + "\" data-jotted-file=\"" + file + "\"></textarea>\n    <div class=\"jotted-error\"></div>\n  ";
+  }
+
+  function errorMessage(err) {
+    return "\n    <p>" + err + "</p>\n  ";
+  }
+
   /* util
    */
 
@@ -66,17 +101,17 @@
     xhr.send();
   }
 
-  function seqRunner(index, params, arr, callback) {
+  function seqRunner(index, params, arr, errors, callback) {
     arr[index](params, function (err, res) {
       if (err) {
-        return console.log(err);
+        errors.push(err);
       }
 
       index++;
       if (index === arr.length) {
-        callback(err, res);
+        callback(errors, res);
       } else {
-        seqRunner(index, res, arr, callback);
+        seqRunner(index, res, arr, errors, callback);
       }
     });
   }
@@ -84,11 +119,13 @@
   function seq(arr, params) {
     var callback = arguments.length <= 2 || arguments[2] === undefined ? function () {} : arguments[2];
 
+    var errors = [];
+
     if (!arr.length) {
-      return callback(null, params);
+      return callback(errors, params);
     }
 
-    seqRunner(0, params, arr, callback);
+    seqRunner(0, params, arr, errors, callback);
   }
 
   function debounce(fn, delay) {
@@ -108,7 +145,6 @@
   }
 
   var topics = {};
-
   function find$1(query) {
     topics[query] = topics[query] || [];
     return topics[query];
@@ -160,38 +196,15 @@
       runList.push(subscriber);
     });
 
-    seq(runList, params);
+    done[topic] = done[topic] || function () {};
+    seq(runList, params, done[topic]);
   }
 
-  /* template
-   */
+  // attach a callback when a publish[topic] is done
+  function done(topic) {
+    var callback = arguments.length <= 1 || arguments[1] === undefined ? function () {} : arguments[1];
 
-  function container() {
-    return "\n    <ul class=\"jotted-nav\">\n      <li class=\"jotted-nav-item jotted-nav-item-result\">\n        <a href=\"#\" data-jotted-type=\"result\">\n          Result\n        </a>\n      </li>\n      <li class=\"jotted-nav-item jotted-nav-item-html\">\n        <a href=\"#\" data-jotted-type=\"html\">\n          HTML\n        </a>\n      </li>\n      <li class=\"jotted-nav-item jotted-nav-item-css\">\n        <a href=\"#\" data-jotted-type=\"css\">\n          CSS\n        </a>\n      </li>\n      <li class=\"jotted-nav-item jotted-nav-item-js\">\n        <a href=\"#\" data-jotted-type=\"js\">\n          JavaScript\n        </a>\n      </li>\n    </ul>\n    <div class=\"jotted-pane jotted-pane-result\">\n      <iframe></iframe>\n    </div>\n    <div class=\"jotted-pane jotted-pane-html\"></div>\n    <div class=\"jotted-pane jotted-pane-css\"></div>\n    <div class=\"jotted-pane jotted-pane-js\"></div>\n  ";
-  }
-
-  function paneActiveClass(type) {
-    return "jotted-pane-active-" + type;
-  }
-
-  function containerClass() {
-    return "jotted";
-  }
-
-  function showBlankClass() {
-    return "jotted-show-blank";
-  }
-
-  function hasFileClass(type) {
-    return "jotted-has-" + type;
-  }
-
-  function editorClass(type) {
-    return "jotted-editor jotted-editor-" + type;
-  }
-
-  function editorContent(type, file) {
-    return "\n    <textarea data-jotted-type=\"" + type + "\" data-jotted-file=\"" + file + "\"></textarea>\n  ";
+    done[topic] = callback;
   }
 
   /* plugin
@@ -334,9 +347,7 @@
         'js': 'javascript'
       };
 
-      options = extend(options, {
-        lineNumbers: true
-      });
+      options = extend(options, {});
 
       // check if Ace is loaded
       if (typeof window.ace === 'undefined') {
@@ -362,6 +373,8 @@
 
         editor.getSession().setMode(_this.aceMode(type, file));
         editor.getSession().setOptions(editorOptions);
+
+        editor.$blockScrolling = Infinity;
 
         editor.on('change', function () {
           $textarea.value = editor.getValue();
@@ -390,7 +403,7 @@
 
         // if the event is not started by the ace change
         if (!params.aceEditor) {
-          editor.setValue(params.content, -1);
+          editor.getSession().setValue(params.content);
         }
 
         // manipulate the params and pass them on
@@ -427,7 +440,6 @@
       babelHelpers.classCallCheck(this, PluginLess);
 
       var priority = 20;
-      var i;
 
       this.editor = {};
 
@@ -464,7 +476,9 @@
             if (err) {
               // TODO render error
               // TODO create a jotted.error(type, message) method
-              console.log(err);
+              //           this.jotted.error(params.type, err.message)
+
+              return callback(err, params);
             } else {
               // replace the content with the parsed less
               params.content = res.css;
@@ -510,13 +524,17 @@
       this.$container.classList.add(paneActiveClass(this.paneActive));
 
       this.$result = $editor.querySelector('.jotted-pane-result');
-      this.$html = $editor.querySelector('.jotted-pane-html');
-      this.$css = $editor.querySelector('.jotted-pane-css');
-      this.$js = $editor.querySelector('.jotted-pane-js');
+      this.$pane = {};
+      this.$error = {};
 
-      this.markup('html', this.$html);
-      this.markup('css', this.$css);
-      this.markup('js', this.$js);
+      var _arr = ['html', 'css', 'js'];
+      for (var _i = 0; _i < _arr.length; _i++) {
+        var type = _arr[_i];
+        this.$pane[type] = $editor.querySelector('.jotted-pane-' + type);
+        this.markup(type, this.$pane[type]);
+
+        this.$error[type] = this.$pane[type].querySelector('.jotted-error');
+      }
 
       this.$resultFrame = this.$result.querySelector('iframe');
 
@@ -533,7 +551,9 @@
       // init plugins
       init.call(this);
 
-      this.on('change', this.changeCallback.bind(this), 999);
+      //     this.on('change', this.changeCallback.bind(this), 999)
+
+      this.done('change', this.changeCallback.bind(this));
     }
 
     babelHelpers.createClass(Jotted, [{
@@ -583,7 +603,11 @@
       }
     }, {
       key: 'changeCallback',
-      value: function changeCallback(params, callback) {
+      value: function changeCallback(err, params) {
+        if (err) {
+          this.error(err, params);
+        }
+
         if (params.type === 'html') {
           this.$resultFrame.contentWindow.document.body.innerHTML = params.content;
           return;
@@ -627,6 +651,54 @@
       key: 'trigger',
       value: function trigger() {
         publish.apply(this, arguments);
+      }
+    }, {
+      key: 'done',
+      value: function done$$() {
+        done.apply(this, arguments);
+      }
+    }, {
+      key: 'error',
+      value: function error(err, params) {
+        if (!err.length) {
+          return this.clearError(params);
+        }
+
+        this.$container.classList.add('jotted-error-active-' + params.type);
+
+        var markup = '';
+        var _iteratorNormalCompletion = true;
+        var _didIteratorError = false;
+        var _iteratorError = undefined;
+
+        try {
+          for (var _iterator = err[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+            var e = _step.value;
+
+            markup += errorMessage(err);
+          }
+        } catch (err) {
+          _didIteratorError = true;
+          _iteratorError = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion && _iterator.return) {
+              _iterator.return();
+            }
+          } finally {
+            if (_didIteratorError) {
+              throw _iteratorError;
+            }
+          }
+        }
+
+        this.$error[params.type].innerHTML = markup;
+      }
+    }, {
+      key: 'clearError',
+      value: function clearError(params) {
+        this.$container.classList.remove('jotted-error-active-' + params.type);
+        this.$error[params.type].innerHTML = '';
       }
     }]);
     return Jotted;

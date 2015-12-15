@@ -47,5 +47,13 @@
     "grunt-umd": "^2.3.5",
     "matchdep": "^0.1.2",
     "rollup-plugin-babel": "^2.1.0"
+  },
+  "standard": {
+    "globals": [
+      "describe",
+      "beforeAll",
+      "it",
+      "expect"
+    ]
   }
 }

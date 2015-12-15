@@ -1,12 +1,11 @@
 /* less plugin
  */
 
-import * as util from '../core/util.js'
+import * as util from '../util.js'
 
 export default class PluginLess {
   constructor (jotted, options) {
     var priority = 20
-    var i
 
     this.editor = {}
 
@@ -20,7 +19,7 @@ export default class PluginLess {
     jotted.$container.classList.add('jotted-plugin-less')
 
     // change CSS link label to Less
-    jotted.$container.querySelector('a[data-jotted-type="css"]').innerHTML = 'Less';
+    jotted.$container.querySelector('a[data-jotted-type="css"]').innerHTML = 'Less'
 
     jotted.on('change', util.debounce(this.change.bind(this), jotted.options.debounce), priority)
   }
@@ -36,11 +35,13 @@ export default class PluginLess {
   change (params, callback) {
     // only parse .less and blank files
     if (this.isLess(params)) {
-      window.less.render(params.content, this.options, function (err, res) {
+      window.less.render(params.content, this.options, (err, res) => {
         if (err) {
           // TODO render error
           // TODO create a jotted.error(type, message) method
-          console.log(err)
+//           this.jotted.error(params.type, err.message)
+
+          return callback(err, params)
         } else {
           // replace the content with the parsed less
           params.content = res.css

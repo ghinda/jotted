@@ -1,7 +1,7 @@
 /* coremirror plugin
  */
 
-import * as util from '../core/util.js'
+import * as util from '../util.js'
 
 export default class PluginCodeMirror {
   constructor (jotted, options) {

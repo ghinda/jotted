@@ -4,6 +4,7 @@
 // TODO make pubsoup keep the events on the instance
 import * as util from './util.js'
 var topics = {}
+var done = {}
 
 function find (query) {
   topics[query] = topics[query] || []
@@ -52,11 +53,18 @@ function publish (topic, params = {}) {
     runList.push(subscriber)
   })
 
-  util.seq(runList, params)
+  done[topic] = done[topic] || function () {}
+  util.seq(runList, params, done[topic])
+}
+
+// attach a callback when a publish[topic] is done
+function done (topic, callback = function () {}) {
+  done[topic] = callback
 }
 
 export {
   subscribe,
   unsubscribe,
-  publish
+  publish,
+  done
 }

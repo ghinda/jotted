@@ -1,7 +1,7 @@
 /* ace plugin
  */
 
-import * as util from '../core/util.js'
+import * as util from '../util.js'
 
 export default class PluginAce {
   constructor (jotted, options) {
@@ -17,9 +17,7 @@ export default class PluginAce {
       'js': 'javascript'
     }
 
-    options = util.extend(options, {
-      lineNumbers: true
-    })
+    options = util.extend(options, {})
 
     // check if Ace is loaded
     if (typeof window.ace === 'undefined') {
@@ -46,6 +44,8 @@ export default class PluginAce {
       editor.getSession().setMode(this.aceMode(type, file))
       editor.getSession().setOptions(editorOptions)
 
+      editor.$blockScrolling = Infinity;
+
       editor.on('change', () => {
         $textarea.value = editor.getValue()
 
@@ -60,7 +60,6 @@ export default class PluginAce {
     }
 
     jotted.on('change', util.debounce(this.change.bind(this), jotted.options.debounce), priority)
-
   }
 
   change (params, callback) {
@@ -68,7 +67,7 @@ export default class PluginAce {
 
     // if the event is not started by the ace change
     if (!params.aceEditor) {
-      editor.setValue(params.content, -1)
+      editor.getSession().setValue(params.content)
     }
 
     // manipulate the params and pass them on
@@ -80,14 +79,14 @@ export default class PluginAce {
     var mode = 'ace/mode/'
 
     // try the file extension
-    for(let key in this.modemap) {
+    for (let key in this.modemap) {
       if (file.indexOf('.' + key) !== -1) {
         return mode + this.modemap[key]
       }
     }
 
     // try the file type (html/css/js)
-    for(let key in this.modemap) {
+    for (let key in this.modemap) {
       if (type === key) {
         return mode + this.modemap[key]
       }

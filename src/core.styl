@@ -9,6 +9,7 @@
 }
 
 .jotted {
+  position: relative;
   overflow: hidden;
   border: 1px solid rgba(#333, .24);
   border-radius: 2px;
@@ -105,8 +106,31 @@
   background: #fff;
 }
 
+/* errors
+ */
+
+.jotted-error-active-css .jotted-pane-css {
+  padding-bottom: 1.5em;
+}
+
+.jotted-error {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 0 1em;
+  background: #F1A9A0;
+
+  line-height: 1.5em;
+}
+
+.jotted-error p {
+  margin: 0;
+
+  font-size: .8em;
+}
+
 /* plugins
  */
 
 @import 'plugins/*';
-

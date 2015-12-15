@@ -90,7 +90,7 @@ module.exports = function (grunt) {
       },
       server: {
         src: [
-          'src/{,*/}*.js'
+          '{src,test}/{,*/}*.js'
         ]
       }
     },
@@ -100,7 +100,7 @@ module.exports = function (grunt) {
       },
       server: {
         files: {
-          'jotted.css': 'src/jotted.styl'
+          'jotted.css': 'src/core.styl'
         }
       },
       dist: {
@@ -108,7 +108,7 @@ module.exports = function (grunt) {
           compress: true,
         },
         files: {
-          'jotted.min.css': 'src/jotted.styl'
+          'jotted.min.css': 'src/core.styl'
         }
       }
     },
@@ -124,7 +124,7 @@ module.exports = function (grunt) {
         moduleName: 'Jotted'
       },
       files: {
-        src: 'src/jotted.js',
+        src: 'src/core.js',
         dest: 'jotted.js'
       }
     },

@@ -57,5 +57,12 @@ export function editorClass (type) {
 export function editorContent (type, file) {
   return `
     <textarea data-jotted-type="${type}" data-jotted-file="${file}"></textarea>
+    <div class="jotted-error"></div>
+  `
+}
+
+export function errorMessage (err) {
+  return `
+    <p>${err}</p>
   `
 }

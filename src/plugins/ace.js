@@ -59,7 +59,7 @@ export default class PluginAce {
       })
     }
 
-    jotted.on('change', util.debounce(this.change.bind(this), jotted.options.debounce), priority)
+    jotted.on('change', this.change.bind(this), priority)
   }
 
   change (params, callback) {

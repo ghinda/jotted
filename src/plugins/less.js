@@ -21,7 +21,7 @@ export default class PluginLess {
     // change CSS link label to Less
     jotted.$container.querySelector('a[data-jotted-type="css"]').innerHTML = 'Less'
 
-    jotted.on('change', util.debounce(this.change.bind(this), jotted.options.debounce), priority)
+    jotted.on('change', this.change.bind(this), priority)
   }
 
   isLess (params) {
@@ -37,10 +37,6 @@ export default class PluginLess {
     if (this.isLess(params)) {
       window.less.render(params.content, this.options, (err, res) => {
         if (err) {
-          // TODO render error
-          // TODO create a jotted.error(type, message) method
-//           this.jotted.error(params.type, err.message)
-
           return callback(err, params)
         } else {
           // replace the content with the parsed less

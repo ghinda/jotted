@@ -1,0 +1,38 @@
+{
+  "name": "coffee-script",
+  "version": "1.10.0",
+  "main": [
+    "lib/coffee-script/coffee-script.js"
+  ],
+  "description": "Unfancy JavaScript",
+  "keywords": [
+    "javascript",
+    "language",
+    "coffeescript",
+    "compiler"
+  ],
+  "devDependencies": {
+    "uglify-js": "~2.2",
+    "jison": ">=0.2.0",
+    "highlight.js": "~8.0.0",
+    "underscore": "~1.5.2",
+    "docco": "~0.6.2"
+  },
+  "author": {
+    "name": "Jeremy Ashkenas"
+  },
+  "ignore": [
+    "test"
+  ],
+  "homepage": "https://github.com/jashkenas/coffeescript",
+  "_release": "1.10.0",
+  "_resolution": {
+    "type": "version",
+    "tag": "1.10.0",
+    "commit": "f26d33d418dcdcfcc6ad3ab774d9cabbf7af659c"
+  },
+  "_source": "git://github.com/jashkenas/coffeescript.git",
+  "_target": "~1.10.0",
+  "_originalSource": "coffeescript",
+  "_direct": true
+}

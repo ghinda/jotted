@@ -188,17 +188,24 @@
   }
 
   // sequentially runs a method on all plugins
-  function publish(topic) {
-    var params = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+  // TODO when triggering a new change event,
+  // stop the previous `change` run somehow.
+  // create a sort of run queue, that is cleared on each publish
+  function publish(options) {
+    return function (topic) {
+      var params = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
-    var foundTopic = find$1(topic);
-    var runList = [];
+      var foundTopic = find$1(topic);
+      var runList = [];
 
-    foundTopic.forEach(function (subscriber) {
-      runList.push(subscriber);
-    });
+      foundTopic.forEach(function (subscriber) {
+        // debounce each function with the delay in options
+        // so we don't have to use debounce in each individual plugin
+        runList.push(debounce(subscriber, options.debounce));
+      });
 
-    seq(runList, params, runCallbacks(topic));
+      seq(runList, params, runCallbacks(topic));
+    };
   }
 
   // parallel run all .done callbacks
@@ -342,7 +349,7 @@
         _loop();
       }
 
-      jotted.on('change', debounce(this.change.bind(this), jotted.options.debounce), priority);
+      jotted.on('change', this.change.bind(this), priority);
     }
 
     babelHelpers.createClass(PluginCodeMirror, [{
@@ -427,7 +434,7 @@
         _loop();
       }
 
-      jotted.on('change', debounce(this.change.bind(this), jotted.options.debounce), priority);
+      jotted.on('change', this.change.bind(this), priority);
     }
 
     babelHelpers.createClass(PluginAce, [{
@@ -489,7 +496,7 @@
       // change CSS link label to Less
       jotted.$container.querySelector('a[data-jotted-type="css"]').innerHTML = 'Less';
 
-      jotted.on('change', debounce(this.change.bind(this), jotted.options.debounce), priority);
+      jotted.on('change', this.change.bind(this), priority);
     }
 
     babelHelpers.createClass(PluginLess, [{
@@ -508,10 +515,6 @@
         if (this.isLess(params)) {
           window.less.render(params.content, this.options, function (err, res) {
             if (err) {
-              // TODO render error
-              // TODO create a jotted.error(type, message) method
-              //           this.jotted.error(params.type, err.message)
-
               return callback(err, params);
             } else {
               // replace the content with the parsed less
@@ -528,6 +531,56 @@
       }
     }]);
     return PluginLess;
+  })();
+
+  var PluginCoffeeScript = (function () {
+    function PluginCoffeeScript(jotted, options) {
+      babelHelpers.classCallCheck(this, PluginCoffeeScript);
+
+      var priority = 20;
+
+      this.editor = {};
+
+      options = extend(options, {});
+
+      // check if coffeescript is loaded
+      if (typeof window.CoffeeScript === 'undefined') {
+        return;
+      }
+
+      jotted.$container.classList.add('jotted-plugin-less');
+
+      // change JS link label to Less
+      jotted.$container.querySelector('a[data-jotted-type="js"]').innerHTML = 'CoffeeScript';
+
+      jotted.on('change', this.change.bind(this), priority);
+    }
+
+    babelHelpers.createClass(PluginCoffeeScript, [{
+      key: 'isCoffee',
+      value: function isCoffee(params) {
+        if (params.type !== 'js') {
+          return false;
+        }
+
+        return params.file.indexOf('.coffee') !== -1 || params.file === '';
+      }
+    }, {
+      key: 'change',
+      value: function change(params, callback) {
+        // only parse .less and blank files
+        if (this.isCoffee(params)) {
+          try {
+            params.content = window.CoffeeScript.compile(params.content);
+          } catch (err) {
+            return callback(err, params);
+          }
+        }
+
+        callback(null, params);
+      }
+    }]);
+    return PluginCoffeeScript;
   })();
 
   var Jotted = (function () {
@@ -653,7 +706,7 @@
         }
 
         if (params.type === 'js') {
-          // show js errors
+          // catch and show js errors
           try {
             this.$resultFrame.contentWindow.eval(params.content);
           } catch (err) {
@@ -691,7 +744,10 @@
     }, {
       key: 'trigger',
       value: function trigger() {
-        publish.apply(this, arguments);
+        // TODO add the instance options here,
+        // so we can use debounce in jotted, instead of having to
+        // use it manually in plugins
+        publish(this.options).apply(this, arguments);
       }
     }, {
       key: 'done',
@@ -751,10 +807,10 @@
     return register.apply(this, arguments);
   };
 
-  // register bundled plugins
   Jotted.plugin('codemirror', PluginCodeMirror);
   Jotted.plugin('ace', PluginAce);
   Jotted.plugin('less', PluginLess);
+  Jotted.plugin('coffescript', PluginCoffeeScript);
 
   return Jotted;
 

@@ -6,9 +6,11 @@ import * as template from './template.js'
 import * as plugin from './plugin.js'
 import * as pubsoup from './pubsoup.js'
 
+// register bundled plugins
 import PluginAce from './plugins/ace.js'
 import PluginCodeMirror from './plugins/codemirror.js'
 import PluginLess from './plugins/less.js'
+import PluginCoffeeScript from './plugins/coffeescript.js'
 
 class Jotted {
   constructor ($editor, opts) {
@@ -123,10 +125,10 @@ class Jotted {
     }
 
     if (params.type === 'js') {
-      // show js errors
+      // catch and show js errors
       try {
         this.$resultFrame.contentWindow.eval(params.content)
-      } catch(err) {
+      } catch (err) {
         this.error([ err.message ], {
           type: 'js'
         })
@@ -157,7 +159,10 @@ class Jotted {
   }
 
   trigger () {
-    pubsoup.publish.apply(this, arguments)
+    // TODO add the instance options here,
+    // so we can use debounce in jotted, instead of having to
+    // use it manually in plugins
+    pubsoup.publish(this.options).apply(this, arguments)
   }
 
   done () {
@@ -190,9 +195,9 @@ Jotted.plugin = function () {
   return plugin.register.apply(this, arguments)
 }
 
-// register bundled plugins
 Jotted.plugin('codemirror', PluginCodeMirror)
 Jotted.plugin('ace', PluginAce)
 Jotted.plugin('less', PluginLess)
+Jotted.plugin('coffescript', PluginCoffeeScript)
 
 export default Jotted

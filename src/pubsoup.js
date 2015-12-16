@@ -45,15 +45,22 @@ function unsubscribe (topic, subscriber) {
 }
 
 // sequentially runs a method on all plugins
-function publish (topic, params = {}) {
-  var foundTopic = find(topic)
-  var runList = []
+// TODO when triggering a new change event,
+// stop the previous `change` run somehow.
+// create a sort of run queue, that is cleared on each publish
+function publish (options) {
+  return function (topic, params = {}) {
+    var foundTopic = find(topic)
+    var runList = []
 
-  foundTopic.forEach(function (subscriber) {
-    runList.push(subscriber)
-  })
+    foundTopic.forEach(function (subscriber) {
+      // debounce each function with the delay in options
+      // so we don't have to use debounce in each individual plugin
+      runList.push(util.debounce(subscriber, options.debounce))
+    })
 
-  util.seq(runList, params, runCallbacks(topic))
+    util.seq(runList, params, runCallbacks(topic))
+  }
 }
 
 // parallel run all .done callbacks

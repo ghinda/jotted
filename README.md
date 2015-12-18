@@ -11,7 +11,8 @@ Jotted is an environment for showcasing HTML, CSS and JavaScript, with editable 
 
 * **Lightweight:** No dependencies, uses `textareas` for editing by default.
 * **Plugins:** Everything is a plugin. Include only what you need.
-* **Preprocessors:** Support for preprocessors (CoffeeScript, LESS, Stylus, etc.)
+* **Code editors:** Has plugins for code editors like [Ace]() and [CodeMirror]().
+* **Preprocessors:** Support for preprocessors (CoffeeScript, Less, Stylus, etc.)
 * **Themes and Layouts:**: Customize the look and layout.
 * **Share edits:** Edit exiting code, and share it with others.
 
@@ -32,13 +33,23 @@ Jotted is an environment for showcasing HTML, CSS and JavaScript, with editable 
 
 ## Plugins
 
-* `ace`: Uses the `Ace` code editor if it's available. **WIP**
-* `share`: Creates a shareable URL of the edited snapshot. **WIP**
-* `store`: Stores the edited code in `localStorage`. **WIP**
-* `coffeescript`: Compiles [CoffeeScript](). **WIP**
+### Editors
+
+* `ace`: Uses the `Ace` code editor if it's available.
+* `codemirror`: Uses the `CodeMirror` code editor if it's available.
+
+### Preprocessors
+
+* `coffeescript`: Compiles [CoffeeScript]().
+* `less`: Compiles [Less]().
 * `stylus`: Compiles [Stylus](). **WIP**
 
-### Custom plugins
+### Other
+
+* `share`: Creates a shareable URL of the edited snapshot. **WIP**
+* `store`: Stores the edited code in `localStorage`. **WIP**
+
+## Plugin API
 
 `TODO`
 

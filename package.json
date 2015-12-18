@@ -46,7 +46,8 @@
     "grunt-standard": "^2.0.0",
     "grunt-umd": "^2.3.5",
     "matchdep": "^0.1.2",
-    "rollup-plugin-babel": "^2.1.0"
+    "rollup-plugin-babel": "^2.1.0",
+    "stylus": "^0.53.0"
   },
   "standard": {
     "globals": [

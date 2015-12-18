@@ -20,7 +20,11 @@ function fetch (file, callback) {
   xhr.responseType = 'text'
 
   xhr.onload = function () {
-    callback(null, xhr.response)
+    if (xhr.status === 200) {
+      callback(null, xhr.response)
+    } else {
+      callback(xhr)
+    }
   }
 
   xhr.onerror = function (err) {
@@ -30,8 +34,8 @@ function fetch (file, callback) {
   xhr.send()
 }
 
-function seqRunner (index, params, arr, errors, callback) {
-  arr[index](params, function (err, res) {
+function runCallback (index, params, arr, errors, callback) {
+  return function (err, res) {
     if (err) {
       errors.push(err)
     }
@@ -42,7 +46,12 @@ function seqRunner (index, params, arr, errors, callback) {
     } else {
       seqRunner(index, res, arr, errors, callback)
     }
-  })
+  }
+}
+
+function seqRunner (index, params, arr, errors, callback) {
+  // async
+  arr[index](params, runCallback.apply(this, arguments))
 }
 
 function seq (arr, params, callback = function () {}) {
@@ -58,11 +67,11 @@ function seq (arr, params, callback = function () {}) {
 function debounce (fn, delay) {
   var timer = null
   return function () {
-    var context = this
     var args = arguments
     clearTimeout(timer)
-    timer = setTimeout(function () {
-      fn.apply(context, args)
+
+    timer = setTimeout(() => {
+      fn.apply(this, args)
     }, delay)
   }
 }

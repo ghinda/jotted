@@ -91,7 +91,11 @@
     xhr.responseType = 'text';
 
     xhr.onload = function () {
-      callback(null, xhr.response);
+      if (xhr.status === 200) {
+        callback(null, xhr.response);
+      } else {
+        callback(xhr);
+      }
     };
 
     xhr.onerror = function (err) {
@@ -101,8 +105,8 @@
     xhr.send();
   }
 
-  function seqRunner(index, params, arr, errors, callback) {
-    arr[index](params, function (err, res) {
+  function runCallback(index, params, arr, errors, callback) {
+    return function (err, res) {
       if (err) {
         errors.push(err);
       }
@@ -113,7 +117,12 @@
       } else {
         seqRunner(index, res, arr, errors, callback);
       }
-    });
+    };
+  }
+
+  function seqRunner(index, params, arr, errors, callback) {
+    // async
+    arr[index](params, runCallback.apply(this, arguments));
   }
 
   function seq(arr, params) {
@@ -131,121 +140,19 @@
   function debounce(fn, delay) {
     var timer = null;
     return function () {
-      var context = this;
+      var _this = this;
+
       var args = arguments;
       clearTimeout(timer);
+
       timer = setTimeout(function () {
-        fn.apply(context, args);
+        fn.apply(_this, args);
       }, delay);
     };
   }
 
   function log() {
     console.log(arguments);
-  }
-
-  var topics = {};
-  var callbacks = {};
-
-  function find$1(query) {
-    topics[query] = topics[query] || [];
-    return topics[query];
-  }
-
-  function subscribe(topic, subscriber) {
-    var priority = arguments.length <= 2 || arguments[2] === undefined ? 90 : arguments[2];
-
-    var foundTopic = find$1(topic);
-    subscriber._priority = priority;
-    foundTopic.push(subscriber);
-
-    // sort subscribers on priority
-    foundTopic.sort(function (a, b) {
-      return a._priority > b._priority ? 1 : b._priority > a._priority ? -1 : 0;
-    });
-  }
-
-  function unsubscribe(topic, subscriber) {
-    var foundTopic = find$1(topic);
-    foundTopic.forEach(function (t) {
-      // if no subscriber is specified
-      // remove all subscribers
-      if (!subscriber) {
-        t.length = 0;
-        return;
-      }
-
-      // find the subscriber in the topic
-      var index = [].indexOf.call(t, subscriber);
-
-      // show an error if we didn't find the subscriber
-      if (index === -1) {
-        return log('Subscriber not found in topic');
-      }
-
-      t.splice(index, 1);
-    });
-  }
-
-  // sequentially runs a method on all plugins
-  // TODO when triggering a new change event,
-  // stop the previous `change` run somehow.
-  // create a sort of run queue, that is cleared on each publish
-  function publish(options) {
-    return function (topic) {
-      var params = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-
-      var foundTopic = find$1(topic);
-      var runList = [];
-
-      foundTopic.forEach(function (subscriber) {
-        // debounce each function with the delay in options
-        // so we don't have to use debounce in each individual plugin
-        runList.push(debounce(subscriber, options.debounce));
-      });
-
-      seq(runList, params, runCallbacks(topic));
-    };
-  }
-
-  // parallel run all .done callbacks
-  function runCallbacks(topic) {
-    return function () {
-      callbacks[topic] = callbacks[topic] || [];
-
-      var _iteratorNormalCompletion = true;
-      var _didIteratorError = false;
-      var _iteratorError = undefined;
-
-      try {
-        for (var _iterator = callbacks[topic][Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-          var c = _step.value;
-
-          c.apply(this, arguments);
-        }
-      } catch (err) {
-        _didIteratorError = true;
-        _iteratorError = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion && _iterator.return) {
-            _iterator.return();
-          }
-        } finally {
-          if (_didIteratorError) {
-            throw _iteratorError;
-          }
-        }
-      }
-    };
-  }
-
-  // attach a callback when a publish[topic] is done
-  function done(topic) {
-    var callback = arguments.length <= 1 || arguments[1] === undefined ? function () {} : arguments[1];
-
-    callbacks[topic] = callbacks[topic] || [];
-    callbacks[topic].push(callback);
   }
 
   /* plugin
@@ -300,74 +207,287 @@
     }
   }
 
-  var PluginCodeMirror = (function () {
-    function PluginCodeMirror(jotted, options) {
-      var _this = this;
+  var PubSoup = (function () {
+    function PubSoup() {
+      babelHelpers.classCallCheck(this, PubSoup);
 
-      babelHelpers.classCallCheck(this, PluginCodeMirror);
+      this.topics = {};
+      this.callbacks = {};
+    }
 
-      var priority = 1;
-      var i;
+    babelHelpers.createClass(PubSoup, [{
+      key: 'find',
+      value: function find(query) {
+        this.topics[query] = this.topics[query] || [];
+        return this.topics[query];
+      }
+    }, {
+      key: 'subscribe',
+      value: function subscribe(topic, subscriber) {
+        var priority = arguments.length <= 2 || arguments[2] === undefined ? 90 : arguments[2];
+
+        var foundTopic = this.find(topic);
+        subscriber._priority = priority;
+        foundTopic.push(subscriber);
+
+        // sort subscribers on priority
+        foundTopic.sort(function (a, b) {
+          return a._priority > b._priority ? 1 : b._priority > a._priority ? -1 : 0;
+        });
+      }
+    }, {
+      key: 'unsubscribe',
+      value: function unsubscribe(topic, subscriber) {
+        var foundTopic = this.find(topic);
+        foundTopic.forEach(function (t) {
+          // if no subscriber is specified
+          // remove all subscribers
+          if (!subscriber) {
+            t.length = 0;
+            return;
+          }
+
+          // find the subscriber in the topic
+          var index = [].indexOf.call(t, subscriber);
+
+          // show an error if we didn't find the subscriber
+          if (index === -1) {
+            return log('Subscriber not found in topic');
+          }
+
+          t.splice(index, 1);
+        });
+      }
+
+      // sequentially runs a method on all plugins
+
+    }, {
+      key: 'publish',
+      value: function publish(topic) {
+        var params = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+
+        var foundTopic = this.find(topic);
+        var runList = [];
+
+        foundTopic.forEach(function (subscriber) {
+          runList.push(subscriber);
+        });
+
+        seq(runList, params, this.runCallbacks(topic));
+      }
+
+      // parallel run all .done callbacks
+
+    }, {
+      key: 'runCallbacks',
+      value: function runCallbacks(topic) {
+        var pub = this;
+        return function () {
+          pub.callbacks[topic] = pub.callbacks[topic] || [];
+
+          var _iteratorNormalCompletion = true;
+          var _didIteratorError = false;
+          var _iteratorError = undefined;
+
+          try {
+            for (var _iterator = pub.callbacks[topic][Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+              var c = _step.value;
+
+              c.apply(this, arguments);
+            }
+          } catch (err) {
+            _didIteratorError = true;
+            _iteratorError = err;
+          } finally {
+            try {
+              if (!_iteratorNormalCompletion && _iterator.return) {
+                _iterator.return();
+              }
+            } finally {
+              if (_didIteratorError) {
+                throw _iteratorError;
+              }
+            }
+          }
+        };
+      }
+
+      // attach a callback when a publish[topic] is done
+
+    }, {
+      key: 'done',
+      value: function done(topic) {
+        var callback = arguments.length <= 1 || arguments[1] === undefined ? function () {} : arguments[1];
+
+        this.callbacks[topic] = this.callbacks[topic] || [];
+        this.callbacks[topic].push(callback);
+      }
+    }]);
+    return PubSoup;
+  })();
+
+  var PluginStylus = (function () {
+    function PluginStylus(jotted, options) {
+      babelHelpers.classCallCheck(this, PluginStylus);
+
+      var priority = 20;
 
       this.editor = {};
 
-      options = extend(options, {
-        lineNumbers: true
-      });
+      options = extend(options, {});
 
-      // check if CodeMirror is loaded
-      if (typeof window.CodeMirror === 'undefined') {
+      // check if stylus is loaded
+      if (typeof window.stylus === 'undefined') {
         return;
       }
 
-      jotted.$container.classList.add('jotted-plugin-codemirror');
+      jotted.$container.classList.add('jotted-plugin-stylus');
 
-      var $editors = jotted.$container.querySelectorAll('.jotted-editor');
-
-      var _loop = function _loop() {
-        var $textarea = $editors[i].querySelector('textarea');
-        var type = $textarea.dataset.jottedType;
-        var file = $textarea.dataset.jottedFile;
-
-        _this.editor[type] = window.CodeMirror.fromTextArea($textarea, options);
-        var editor = _this.editor[type];
-
-        editor.on('change', function () {
-          $textarea.value = editor.getValue();
-
-          // trigger a change event
-          jotted.trigger('change', {
-            cmEditor: editor,
-            type: type,
-            file: file,
-            content: $textarea.value
-          });
-        });
-      };
-
-      for (i = 0; i < $editors.length; i++) {
-        _loop();
-      }
+      // change CSS link label to Stylus
+      jotted.$container.querySelector('a[data-jotted-type="css"]').innerHTML = 'Stylus';
 
       jotted.on('change', this.change.bind(this), priority);
     }
 
-    babelHelpers.createClass(PluginCodeMirror, [{
-      key: 'change',
-      value: function change(params, callback) {
-        var editor = this.editor[params.type];
-
-        // if the event is not started by the codemirror change
-        if (!params.cmEditor) {
-          editor.setValue(params.content);
+    babelHelpers.createClass(PluginStylus, [{
+      key: 'isStylus',
+      value: function isStylus(params) {
+        if (params.type !== 'css') {
+          return false;
         }
 
-        // manipulate the params and pass them on
-        params.content = editor.getValue();
+        return params.file.indexOf('.styl') !== -1 || params.file === '';
+      }
+    }, {
+      key: 'change',
+      value: function change(params, callback) {
+        // only parse .styl and blank files
+        if (this.isStylus(params)) {
+          window.stylus(params.content, this.options).render(function (err, res) {
+            if (err) {
+              return callback(err, params);
+            } else {
+              // replace the content with the parsed less
+              params.content = res;
+            }
+
+            callback(null, params);
+          });
+        } else {
+          // make sure we callback either way,
+          // to not break the pubsoup
+          callback(null, params);
+        }
+      }
+    }]);
+    return PluginStylus;
+  })();
+
+  var PluginCoffeeScript = (function () {
+    function PluginCoffeeScript(jotted, options) {
+      babelHelpers.classCallCheck(this, PluginCoffeeScript);
+
+      var priority = 20;
+
+      this.editor = {};
+
+      options = extend(options, {});
+
+      // check if coffeescript is loaded
+      if (typeof window.CoffeeScript === 'undefined') {
+        return;
+      }
+
+      jotted.$container.classList.add('jotted-plugin-less');
+
+      // change JS link label to Less
+      jotted.$container.querySelector('a[data-jotted-type="js"]').innerHTML = 'CoffeeScript';
+
+      jotted.on('change', this.change.bind(this), priority);
+    }
+
+    babelHelpers.createClass(PluginCoffeeScript, [{
+      key: 'isCoffee',
+      value: function isCoffee(params) {
+        if (params.type !== 'js') {
+          return false;
+        }
+
+        return params.file.indexOf('.coffee') !== -1 || params.file === '';
+      }
+    }, {
+      key: 'change',
+      value: function change(params, callback) {
+        // only parse .less and blank files
+        if (this.isCoffee(params)) {
+          try {
+            params.content = window.CoffeeScript.compile(params.content);
+          } catch (err) {
+            return callback(err, params);
+          }
+        }
+
         callback(null, params);
       }
     }]);
-    return PluginCodeMirror;
+    return PluginCoffeeScript;
+  })();
+
+  var PluginLess = (function () {
+    function PluginLess(jotted, options) {
+      babelHelpers.classCallCheck(this, PluginLess);
+
+      var priority = 20;
+
+      this.editor = {};
+
+      options = extend(options, {});
+
+      // check if less is loaded
+      if (typeof window.less === 'undefined') {
+        return;
+      }
+
+      jotted.$container.classList.add('jotted-plugin-less');
+
+      // change CSS link label to Less
+      jotted.$container.querySelector('a[data-jotted-type="css"]').innerHTML = 'Less';
+
+      jotted.on('change', this.change.bind(this), priority);
+    }
+
+    babelHelpers.createClass(PluginLess, [{
+      key: 'isLess',
+      value: function isLess(params) {
+        if (params.type !== 'css') {
+          return false;
+        }
+
+        return params.file.indexOf('.less') !== -1 || params.file === '';
+      }
+    }, {
+      key: 'change',
+      value: function change(params, callback) {
+        // only parse .less and blank files
+        if (this.isLess(params)) {
+          window.less.render(params.content, this.options, function (err, res) {
+            if (err) {
+              return callback(err, params);
+            } else {
+              // replace the content with the parsed less
+              params.content = res.css;
+            }
+
+            callback(null, params);
+          });
+        } else {
+          // make sure we callback either way,
+          // to not break the pubsoup
+          callback(null, params);
+        }
+      }
+    }]);
+    return PluginLess;
   })();
 
   var PluginAce = (function () {
@@ -384,8 +504,9 @@
       this.modemap = {
         'html': 'html',
         'css': 'css',
+        'js': 'javascript',
         'less': 'less',
-        'js': 'javascript'
+        'coffee': 'coffeescript'
       };
 
       options = extend(options, {});
@@ -476,112 +597,83 @@
     return PluginAce;
   })();
 
-  var PluginLess = (function () {
-    function PluginLess(jotted, options) {
-      babelHelpers.classCallCheck(this, PluginLess);
+  var PluginCodeMirror = (function () {
+    function PluginCodeMirror(jotted, options) {
+      var _this = this;
 
-      var priority = 20;
+      babelHelpers.classCallCheck(this, PluginCodeMirror);
+
+      var priority = 1;
+      var i;
 
       this.editor = {};
 
-      options = extend(options, {});
+      options = extend(options, {
+        lineNumbers: true
+      });
 
-      // check if less is loaded
-      if (typeof window.less === 'undefined') {
+      // check if CodeMirror is loaded
+      if (typeof window.CodeMirror === 'undefined') {
         return;
       }
 
-      jotted.$container.classList.add('jotted-plugin-less');
+      jotted.$container.classList.add('jotted-plugin-codemirror');
 
-      // change CSS link label to Less
-      jotted.$container.querySelector('a[data-jotted-type="css"]').innerHTML = 'Less';
+      var $editors = jotted.$container.querySelectorAll('.jotted-editor');
 
-      jotted.on('change', this.change.bind(this), priority);
-    }
+      var _loop = function _loop() {
+        var $textarea = $editors[i].querySelector('textarea');
+        var type = $textarea.dataset.jottedType;
+        var file = $textarea.dataset.jottedFile;
 
-    babelHelpers.createClass(PluginLess, [{
-      key: 'isLess',
-      value: function isLess(params) {
-        if (params.type !== 'css') {
-          return false;
-        }
+        _this.editor[type] = window.CodeMirror.fromTextArea($textarea, options);
+        var editor = _this.editor[type];
 
-        return params.file.indexOf('.less') !== -1 || params.file === '';
-      }
-    }, {
-      key: 'change',
-      value: function change(params, callback) {
-        // only parse .less and blank files
-        if (this.isLess(params)) {
-          window.less.render(params.content, this.options, function (err, res) {
-            if (err) {
-              return callback(err, params);
-            } else {
-              // replace the content with the parsed less
-              params.content = res.css;
-            }
+        editor.on('change', function () {
+          $textarea.value = editor.getValue();
 
-            callback(null, params);
+          // trigger a change event
+          jotted.trigger('change', {
+            cmEditor: editor,
+            type: type,
+            file: file,
+            content: $textarea.value
           });
-        } else {
-          // make sure we callback either way,
-          // to not break the pubsoup
-          callback(null, params);
-        }
+        });
+      };
+
+      for (i = 0; i < $editors.length; i++) {
+        _loop();
       }
-    }]);
-    return PluginLess;
-  })();
-
-  var PluginCoffeeScript = (function () {
-    function PluginCoffeeScript(jotted, options) {
-      babelHelpers.classCallCheck(this, PluginCoffeeScript);
-
-      var priority = 20;
-
-      this.editor = {};
-
-      options = extend(options, {});
-
-      // check if coffeescript is loaded
-      if (typeof window.CoffeeScript === 'undefined') {
-        return;
-      }
-
-      jotted.$container.classList.add('jotted-plugin-less');
-
-      // change JS link label to Less
-      jotted.$container.querySelector('a[data-jotted-type="js"]').innerHTML = 'CoffeeScript';
 
       jotted.on('change', this.change.bind(this), priority);
     }
 
-    babelHelpers.createClass(PluginCoffeeScript, [{
-      key: 'isCoffee',
-      value: function isCoffee(params) {
-        if (params.type !== 'js') {
-          return false;
-        }
-
-        return params.file.indexOf('.coffee') !== -1 || params.file === '';
-      }
-    }, {
+    babelHelpers.createClass(PluginCodeMirror, [{
       key: 'change',
       value: function change(params, callback) {
-        // only parse .less and blank files
-        if (this.isCoffee(params)) {
-          try {
-            params.content = window.CoffeeScript.compile(params.content);
-          } catch (err) {
-            return callback(err, params);
-          }
+        var editor = this.editor[params.type];
+
+        // if the event is not started by the codemirror change
+        if (!params.cmEditor) {
+          editor.setValue(params.content);
         }
 
+        // manipulate the params and pass them on
+        params.content = editor.getValue();
         callback(null, params);
       }
     }]);
-    return PluginCoffeeScript;
+    return PluginCodeMirror;
   })();
+
+  function BundlePlugins(jotted) {
+    jotted.plugin('codemirror', PluginCodeMirror);
+    jotted.plugin('ace', PluginAce);
+    jotted.plugin('less', PluginLess);
+    jotted.plugin('coffescript', PluginCoffeeScript);
+    jotted.plugin('stylus', PluginStylus);
+  }
 
   var Jotted = (function () {
     function Jotted($editor, opts) {
@@ -595,6 +687,8 @@
           ace: {}
         }
       });
+
+      this.pubsoup = new PubSoup();
 
       this.plugins = {};
 
@@ -638,8 +732,11 @@
       // init plugins
       init.call(this);
 
-      //     this.on('change', this.changeCallback.bind(this), 999)
+      // debounced trigger method
+      this.trigger = debounce(this.pubsoup.publish.bind(this.pubsoup), this.options.debounce);
 
+      // done change on all subscribers,
+      // render the results.
       this.done('change', this.changeCallback.bind(this));
     }
 
@@ -734,25 +831,17 @@
     }, {
       key: 'on',
       value: function on() {
-        subscribe.apply(this, arguments);
+        this.pubsoup.subscribe.apply(this.pubsoup, arguments);
       }
     }, {
       key: 'off',
       value: function off() {
-        unsubscribe.apply(this, arguments);
-      }
-    }, {
-      key: 'trigger',
-      value: function trigger() {
-        // TODO add the instance options here,
-        // so we can use debounce in jotted, instead of having to
-        // use it manually in plugins
-        publish(this.options).apply(this, arguments);
+        this.pubsoup.unsubscribe.apply(this.pubsoup, arguments);
       }
     }, {
       key: 'done',
-      value: function done$$() {
-        done.apply(this, arguments);
+      value: function done() {
+        this.pubsoup.done.apply(this.pubsoup, arguments);
       }
     }, {
       key: 'error',
@@ -807,10 +896,7 @@
     return register.apply(this, arguments);
   };
 
-  Jotted.plugin('codemirror', PluginCodeMirror);
-  Jotted.plugin('ace', PluginAce);
-  Jotted.plugin('less', PluginLess);
-  Jotted.plugin('coffescript', PluginCoffeeScript);
+  BundlePlugins(Jotted);
 
   return Jotted;
 

@@ -13,8 +13,9 @@ export default class PluginAce {
     this.modemap = {
       'html': 'html',
       'css': 'css',
+      'js': 'javascript',
       'less': 'less',
-      'js': 'javascript'
+      'coffee': 'coffeescript'
     }
 
     options = util.extend(options, {})

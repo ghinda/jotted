@@ -4,13 +4,7 @@
 import * as util from './util.js'
 import * as template from './template.js'
 import * as plugin from './plugin.js'
-import * as pubsoup from './pubsoup.js'
-
-// register bundled plugins
-import PluginAce from './plugins/ace.js'
-import PluginCodeMirror from './plugins/codemirror.js'
-import PluginLess from './plugins/less.js'
-import PluginCoffeeScript from './plugins/coffeescript.js'
+import PubSoup from './pubsoup.js'
 
 class Jotted {
   constructor ($editor, opts) {
@@ -22,6 +16,8 @@ class Jotted {
         ace: {}
       }
     })
+
+    this.pubsoup = new PubSoup()
 
     this.plugins = {}
 
@@ -63,8 +59,11 @@ class Jotted {
     // init plugins
     plugin.init.call(this)
 
-//     this.on('change', this.changeCallback.bind(this), 999)
+    // debounced trigger method
+    this.trigger = util.debounce(this.pubsoup.publish.bind(this.pubsoup), this.options.debounce)
 
+    // done change on all subscribers,
+    // render the results.
     this.done('change', this.changeCallback.bind(this))
   }
 
@@ -151,22 +150,15 @@ class Jotted {
   }
 
   on () {
-    pubsoup.subscribe.apply(this, arguments)
+    this.pubsoup.subscribe.apply(this.pubsoup, arguments)
   }
 
   off () {
-    pubsoup.unsubscribe.apply(this, arguments)
-  }
-
-  trigger () {
-    // TODO add the instance options here,
-    // so we can use debounce in jotted, instead of having to
-    // use it manually in plugins
-    pubsoup.publish(this.options).apply(this, arguments)
+    this.pubsoup.unsubscribe.apply(this.pubsoup, arguments)
   }
 
   done () {
-    pubsoup.done.apply(this, arguments)
+    this.pubsoup.done.apply(this.pubsoup, arguments)
   }
 
   error (errors, params) {
@@ -195,9 +187,8 @@ Jotted.plugin = function () {
   return plugin.register.apply(this, arguments)
 }
 
-Jotted.plugin('codemirror', PluginCodeMirror)
-Jotted.plugin('ace', PluginAce)
-Jotted.plugin('less', PluginLess)
-Jotted.plugin('coffescript', PluginCoffeeScript)
+// register bundled plugins
+import BundlePlugins from './bundle-plugins.js'
+BundlePlugins(Jotted)
 
 export default Jotted

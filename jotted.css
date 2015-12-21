@@ -39,7 +39,7 @@
   background: rgba(51,51,51,0.04);
 }
 .jotted-nav-item:active {
-  background: rgba(51,51,51,0.16);
+  background: rgba(51,51,51,0.12);
 }
 .jotted-nav-item a {
   display: block;
@@ -99,6 +99,7 @@
   position: absolute;
   bottom: 0;
   left: 0;
+  z-index: 999;
   width: 100%;
   padding: 0 0.6em;
   background: #ffccbc;

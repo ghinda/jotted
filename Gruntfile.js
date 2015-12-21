@@ -21,7 +21,7 @@ module.exports = function (grunt) {
           livereload: LIVERELOAD_PORT
         },
         files: [
-          'build/{,*/}*.html',
+          '.assemble/{,*/}*.html',
           '{,site/**/}*.css',
           '{,test/**/,site/**/,src/}*.js'
         ]
@@ -59,7 +59,7 @@ module.exports = function (grunt) {
             return [
               lrSnippet,
               mountFolder(connect, './site/'),
-              mountFolder(connect, './build/'),
+              mountFolder(connect, './.assemble/'),
               mountFolder(connect, './')
             ];
           }
@@ -202,7 +202,7 @@ module.exports = function (grunt) {
           expand: true,
           cwd: 'site',
           src: '{,*/}*.{hbs,md}',
-          dest: 'build'
+          dest: '.assemble'
         }]
       }
     },
@@ -230,6 +230,13 @@ module.exports = function (grunt) {
             expand: true,
             src: [
               'bower_components/**/*'
+            ],
+            dest: 'build/'
+          },
+          {
+            expand: true,
+            src: [
+              '.assemble/**/*'
             ],
             dest: 'build/'
           },

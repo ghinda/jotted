@@ -1,5 +1,7 @@
 # Jotted
 
+[![Build Status](https://api.travis-ci.org/ghinda/jotted.svg)](https://travis-ci.org/ghinda/jotted)
+
 Jotted is an environment for showcasing HTML, CSS and JavaScript, with editable source. It's like [JS Bin](http://jsbin.com/) for self-hosted demos.
 
 ## Install

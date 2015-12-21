@@ -21,7 +21,7 @@ module.exports = function (grunt) {
           livereload: LIVERELOAD_PORT
         },
         files: [
-          '.assemble/{,*/}*.html',
+          'build/{,*/}*.html',
           '{,site/**/}*.css',
           '{,test/**/,site/**/,src/}*.js'
         ]
@@ -59,7 +59,7 @@ module.exports = function (grunt) {
             return [
               lrSnippet,
               mountFolder(connect, './site/'),
-              mountFolder(connect, './.assemble/'),
+              mountFolder(connect, './build/'),
               mountFolder(connect, './')
             ];
           }
@@ -202,7 +202,7 @@ module.exports = function (grunt) {
           expand: true,
           cwd: 'site',
           src: '{,*/}*.{hbs,md}',
-          dest: '.assemble'
+          dest: 'build'
         }]
       }
     },
@@ -236,7 +236,7 @@ module.exports = function (grunt) {
           {
             expand: true,
             src: [
-              '.assemble/**/*'
+              'build/**/*'
             ],
             dest: 'build/'
           },
@@ -269,6 +269,7 @@ module.exports = function (grunt) {
     if (target === 'dist') {
       return grunt.task.run([
         'default',
+        'copy',
         'connect:dist:keepalive'
       ]);
     }
@@ -281,6 +282,7 @@ module.exports = function (grunt) {
   });
 
   grunt.registerTask('test', [
+    'default',
     'connect:test',
     'saucelabs-jasmine'
   ]);
@@ -291,12 +293,13 @@ module.exports = function (grunt) {
     'rollup',
     'uglify',
     'stylus',
-    'assemble',
-    'copy'
+    'assemble'
   ]);
 
   grunt.registerTask('deploy', [
     'default',
+    'copy',
+    'test',
     'buildcontrol'
   ]);
 

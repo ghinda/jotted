@@ -83,11 +83,12 @@ class Jotted {
 
       util.fetch(file, (err, res) => {
         if (err) {
-          // TODO show load errors
+          // show load errors
           this.error([ err.responseText ], {
             type: type,
             file: file
           })
+
           return
         }
 

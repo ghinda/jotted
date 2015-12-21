@@ -5,7 +5,7 @@
   "main": "jotted.js",
   "scripts": {
     "watch": "grunt server",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node -e \"require('grunt').tasks(['test']);\""
   },
   "repository": {
     "type": "git",

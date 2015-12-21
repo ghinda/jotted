@@ -3,3 +3,43 @@ layout: main.html
 title: ''
 ---
 
+<div id="test" data-html="index.html"></div>
+<div id="test2" data-css="jotted.styl"></div>
+
+<link rel="stylesheet" href="bower_components/codemirror/lib/codemirror.css">
+<script src="bower_components/codemirror/lib/codemirror.js"></script>
+
+<script src="bower_components/ace-builds/src-min/ace.js"></script>
+
+<script src="bower_components/less/dist/less.js"></script>
+
+<script src="bower_components/coffee-script/extras/coffee-script.js"></script>
+
+<script src="http://stylus-lang.com/try/stylus.min.js"></script>
+
+<script src="jotted.js"></script>
+
+
+
+<script>
+  Jotted.plugin('test', function () {
+    console.log('test init')
+  });
+
+  var jot = new Jotted(document.getElementById('test'), {
+    plugins: {
+//         codemirror: {},
+      ace: {},
+      less: {},
+      coffescript: {},
+      test: {}
+    }
+  });
+
+  var jot = new Jotted(document.getElementById('test2'), {
+    plugins: {
+      codemirror: {},
+      stylus: {}
+    }
+  });
+</script>

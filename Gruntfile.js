@@ -95,10 +95,10 @@ module.exports = function (grunt) {
       }
     },
     stylus: {
-      options: {
-        compress: false
-      },
       server: {
+        options: {
+          compress: false
+        },
         files: {
           'jotted.css': 'src/core.styl'
         }
@@ -222,8 +222,21 @@ module.exports = function (grunt) {
             cwd: 'site/',
             src: [
               '**/*',
-              '!**/*.{html,hbs,md}',
+              '!**/*.{html,hbs,md}'
+            ],
+            dest: 'build/'
+          },
+          {
+            expand: true,
+            src: [
               'bower_components/**/*'
+            ],
+            dest: 'build/'
+          },
+          {
+            expand: true,
+            src: [
+              'jotted*'
             ],
             dest: 'build/'
           }
@@ -248,17 +261,13 @@ module.exports = function (grunt) {
   grunt.registerTask('server', function (target) {
     if (target === 'dist') {
       return grunt.task.run([
-        'build',
+        'default',
         'connect:dist:keepalive'
       ]);
     }
 
     grunt.task.run([
-      'clean',
-      'standard',
-      'rollup',
-      'stylus:server',
-      'assemble',
+      'default',
       'connect:livereload',
       'watch'
     ]);
@@ -269,21 +278,18 @@ module.exports = function (grunt) {
     'saucelabs-jasmine'
   ]);
 
-  grunt.registerTask('build', [
+  grunt.registerTask('default', [
+    'clean',
     'standard',
+    'rollup',
     'uglify',
     'stylus',
-    'clean',
     'assemble',
     'copy'
   ]);
 
-  grunt.registerTask('default', [
-    'build'
-  ]);
-
   grunt.registerTask('deploy', [
-    'build',
+    'default',
     'buildcontrol'
   ]);
 

@@ -760,11 +760,12 @@
 
           fetch(file, function (err, res) {
             if (err) {
-              // TODO show load errors
+              // show load errors
               _this.error([err.responseText], {
                 type: type,
                 file: file
               });
+
               return;
             }
 

@@ -65,6 +65,11 @@ class Jotted {
     // done change on all subscribers,
     // render the results.
     this.done('change', this.changeCallback.bind(this))
+
+    // show all tabs, even if empty
+    if (this.options.showBlank) {
+      this.$container.classList.add('jotted-nav-show-blank')
+    }
   }
 
   markup (type, $parent) {

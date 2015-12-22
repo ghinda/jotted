@@ -6,6 +6,10 @@
 
   var babelHelpers = {};
 
+  babelHelpers.typeof = function (obj) {
+    return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj;
+  };
+
   babelHelpers.classCallCheck = function (instance, Constructor) {
     if (!(instance instanceof Constructor)) {
       throw new TypeError("Cannot call a class as a function");
@@ -190,7 +194,7 @@
       }
     }
 
-    throw new Error("Plugin " + id + " is not registered.");
+    throw new Error('Plugin ' + id + ' is not registered.');
   }
 
   function register(id, plugin) {
@@ -201,9 +205,39 @@
 
   // create a new instance of each plugin, on the jotted instance
   function init() {
-    for (var id in this.options.plugins) {
-      var Plugin = find(id);
-      this.plugins[id] = new Plugin(this, this.options.plugins[id]);
+    var _iteratorNormalCompletion2 = true;
+    var _didIteratorError2 = false;
+    var _iteratorError2 = undefined;
+
+    try {
+      for (var _iterator2 = this.options.plugins[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+        var plugin = _step2.value;
+
+        // check if plugin definition is string or object
+        var Plugin = undefined;
+        var pluginOptions = {};
+        if (typeof plugin === 'string') {
+          Plugin = find(plugin);
+        } else if ((typeof plugin === 'undefined' ? 'undefined' : babelHelpers.typeof(plugin)) === 'object') {
+          Plugin = find(plugin.name);
+          pluginOptions = plugin.options || {};
+        }
+
+        this.plugins[plugin] = new Plugin(this, pluginOptions);
+      }
+    } catch (err) {
+      _didIteratorError2 = true;
+      _iteratorError2 = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion2 && _iterator2.return) {
+          _iterator2.return();
+        }
+      } finally {
+        if (_didIteratorError2) {
+          throw _iteratorError2;
+        }
+      }
     }
   }
 
@@ -671,7 +705,7 @@
     jotted.plugin('codemirror', PluginCodeMirror);
     jotted.plugin('ace', PluginAce);
     jotted.plugin('less', PluginLess);
-    jotted.plugin('coffescript', PluginCoffeeScript);
+    jotted.plugin('coffeescript', PluginCoffeeScript);
     jotted.plugin('stylus', PluginStylus);
   }
 
@@ -738,6 +772,11 @@
       // done change on all subscribers,
       // render the results.
       this.done('change', this.changeCallback.bind(this));
+
+      // show all tabs, even if empty
+      if (this.options.showBlank) {
+        this.$container.classList.add('jotted-nav-show-blank');
+      }
     }
 
     babelHelpers.createClass(Jotted, [{

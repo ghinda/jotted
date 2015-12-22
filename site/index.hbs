@@ -19,27 +19,33 @@ title: ''
 
 <script src="jotted.js"></script>
 
-
-
 <script>
-  Jotted.plugin('test', function () {
-    console.log('test init')
+  Jotted.plugin('test', function (jotted, options) {
+    console.log('test', options)
   });
 
   var jot = new Jotted(document.getElementById('test'), {
-    plugins: {
-//         codemirror: {},
-      ace: {},
-      less: {},
-      coffescript: {},
-      test: {}
-    }
+    plugins: [
+      'ace',
+      'less',
+      'coffeescript',
+      {
+        name: 'test',
+        options: {
+          testOption: 'test-option'
+        }
+      }
+    ]
   });
 
   var jot = new Jotted(document.getElementById('test2'), {
-    plugins: {
-      codemirror: {},
-      stylus: {}
-    }
+    showBlank: true,
+    plugins: [
+      {
+        name: 'codemirror',
+        options: {}
+      },
+      'stylus'
+    ]
   });
 </script>

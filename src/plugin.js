@@ -22,9 +22,18 @@ function register (id, plugin) {
 
 // create a new instance of each plugin, on the jotted instance
 function init () {
-  for (let id in this.options.plugins) {
-    var Plugin = find(id)
-    this.plugins[id] = new Plugin(this, this.options.plugins[id])
+  for (let plugin of this.options.plugins) {
+    // check if plugin definition is string or object
+    let Plugin
+    let pluginOptions = {}
+    if (typeof plugin === 'string') {
+      Plugin = find(plugin)
+    } else if (typeof plugin === 'object') {
+      Plugin = find(plugin.name)
+      pluginOptions = plugin.options || {}
+    }
+
+    this.plugins[plugin] = new Plugin(this, pluginOptions)
   }
 }
 

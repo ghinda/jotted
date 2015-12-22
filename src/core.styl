@@ -31,6 +31,7 @@
 }
 
 .jotted-nav-item {
+  display: none;
   float: left;
   border-width: 0 1px;
   border-style: solid;
@@ -69,6 +70,23 @@
   border-color: rgba(#333, .3);
 
   color: #222;
+}
+
+
+/* when using the showBlank options,
+ * and always show the result tab.
+ */
+.jotted-nav-show-blank .jotted-nav-item,
+.jotted-nav-item-result {
+  display: block;
+}
+
+/* show tabs if we have content for them
+ */
+.jotted-has-html .jotted-nav-item-html,
+.jotted-has-css .jotted-nav-item-css,
+.jotted-has-js .jotted-nav-item-js {
+  display: block;
 }
 
 /* pane

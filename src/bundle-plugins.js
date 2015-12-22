@@ -12,6 +12,6 @@ export default function BundlePlugins (jotted) {
   jotted.plugin('codemirror', PluginCodeMirror)
   jotted.plugin('ace', PluginAce)
   jotted.plugin('less', PluginLess)
-  jotted.plugin('coffescript', PluginCoffeeScript)
+  jotted.plugin('coffeescript', PluginCoffeeScript)
   jotted.plugin('stylus', PluginStylus)
 }

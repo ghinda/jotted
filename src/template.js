@@ -54,9 +54,9 @@ export function editorClass (type) {
   return `jotted-editor jotted-editor-${type}`
 }
 
-export function editorContent (type, file) {
+export function editorContent (type, fileUrl = '') {
   return `
-    <textarea data-jotted-type="${type}" data-jotted-file="${file}"></textarea>
+    <textarea data-jotted-type="${type}" data-jotted-file="${fileUrl}"></textarea>
     <div class="jotted-error"></div>
   `
 }

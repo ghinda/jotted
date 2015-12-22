@@ -9,6 +9,7 @@ import PubSoup from './pubsoup.js'
 class Jotted {
   constructor ($editor, opts) {
     this.options = util.extend(opts, {
+      files: [],
       showBlank: false,
       pane: 'result',
       debounce: 250,
@@ -18,6 +19,8 @@ class Jotted {
     })
 
     this.pubsoup = new PubSoup()
+    // debounced trigger method
+    this.trigger = util.debounce(this.pubsoup.publish.bind(this.pubsoup), this.options.debounce)
 
     this.plugins = {}
 
@@ -59,9 +62,6 @@ class Jotted {
     // init plugins
     plugin.init.call(this)
 
-    // debounced trigger method
-    this.trigger = util.debounce(this.pubsoup.publish.bind(this.pubsoup), this.options.debounce)
-
     // done change on all subscribers,
     // render the results.
     this.done('change', this.changeCallback.bind(this))
@@ -72,21 +72,43 @@ class Jotted {
     }
   }
 
+  findFile (type) {
+    var file = {}
+
+    for (let file of this.options.files) {
+      if (file.type === type) {
+        return file
+      }
+    }
+
+    return file
+  }
+
   markup (type, $parent) {
     // create the markup for an editor
-    var file = this.$container.dataset[type] || ''
+    var file = this.findFile(type)
 
     var $editor = document.createElement('div')
-    $editor.innerHTML = template.editorContent(type, file)
+    $editor.innerHTML = template.editorContent(type, file.url)
     $editor.className = template.editorClass(type)
     var $textarea = $editor.querySelector('textarea')
 
     $parent.appendChild($editor)
 
-    if (file !== '') {
-      this.$container.classList.add(template.hasFileClass(type))
+    // if we don't have a file for the current type
+    if (typeof file.url === 'undefined' && typeof file.content === 'undefined') {
+      return
+    }
 
-      util.fetch(file, (err, res) => {
+    // add the has-type class to the container
+    this.$container.classList.add(template.hasFileClass(type))
+
+    // file as string
+    if (typeof file.content !== 'undefined') {
+      this.setValue($textarea, file.content)
+    } else if (typeof file.url !== 'undefined') {
+      // file as url
+      util.fetch(file.url, (err, res) => {
         if (err) {
           // show load errors
           this.error([ err.responseText ], {
@@ -97,14 +119,18 @@ class Jotted {
           return
         }
 
-        $textarea.value = res
-
-        // simulate change event
-        this.change({
-          target: $textarea
-        })
+        this.setValue($textarea, res)
       })
     }
+  }
+
+  setValue ($textarea, val) {
+    $textarea.value = val
+
+    // trigger change event, for initial render
+    this.change({
+      target: $textarea
+    })
   }
 
   change (e) {

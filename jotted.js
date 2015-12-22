@@ -39,35 +39,37 @@
    */
 
   function container() {
-    return "\n    <ul class=\"jotted-nav\">\n      <li class=\"jotted-nav-item jotted-nav-item-result\">\n        <a href=\"#\" data-jotted-type=\"result\">\n          Result\n        </a>\n      </li>\n      <li class=\"jotted-nav-item jotted-nav-item-html\">\n        <a href=\"#\" data-jotted-type=\"html\">\n          HTML\n        </a>\n      </li>\n      <li class=\"jotted-nav-item jotted-nav-item-css\">\n        <a href=\"#\" data-jotted-type=\"css\">\n          CSS\n        </a>\n      </li>\n      <li class=\"jotted-nav-item jotted-nav-item-js\">\n        <a href=\"#\" data-jotted-type=\"js\">\n          JavaScript\n        </a>\n      </li>\n    </ul>\n    <div class=\"jotted-pane jotted-pane-result\">\n      <iframe></iframe>\n    </div>\n    <div class=\"jotted-pane jotted-pane-html\"></div>\n    <div class=\"jotted-pane jotted-pane-css\"></div>\n    <div class=\"jotted-pane jotted-pane-js\"></div>\n  ";
+    return '\n    <ul class="jotted-nav">\n      <li class="jotted-nav-item jotted-nav-item-result">\n        <a href="#" data-jotted-type="result">\n          Result\n        </a>\n      </li>\n      <li class="jotted-nav-item jotted-nav-item-html">\n        <a href="#" data-jotted-type="html">\n          HTML\n        </a>\n      </li>\n      <li class="jotted-nav-item jotted-nav-item-css">\n        <a href="#" data-jotted-type="css">\n          CSS\n        </a>\n      </li>\n      <li class="jotted-nav-item jotted-nav-item-js">\n        <a href="#" data-jotted-type="js">\n          JavaScript\n        </a>\n      </li>\n    </ul>\n    <div class="jotted-pane jotted-pane-result">\n      <iframe></iframe>\n    </div>\n    <div class="jotted-pane jotted-pane-html"></div>\n    <div class="jotted-pane jotted-pane-css"></div>\n    <div class="jotted-pane jotted-pane-js"></div>\n  ';
   }
 
   function paneActiveClass(type) {
-    return "jotted-pane-active-" + type;
+    return 'jotted-pane-active-' + type;
   }
 
   function containerClass() {
-    return "jotted";
+    return 'jotted';
   }
 
   function showBlankClass() {
-    return "jotted-show-blank";
+    return 'jotted-show-blank';
   }
 
   function hasFileClass(type) {
-    return "jotted-has-" + type;
+    return 'jotted-has-' + type;
   }
 
   function editorClass(type) {
-    return "jotted-editor jotted-editor-" + type;
+    return 'jotted-editor jotted-editor-' + type;
   }
 
-  function editorContent(type, file) {
-    return "\n    <textarea data-jotted-type=\"" + type + "\" data-jotted-file=\"" + file + "\"></textarea>\n    <div class=\"jotted-error\"></div>\n  ";
+  function editorContent(type) {
+    var fileUrl = arguments.length <= 1 || arguments[1] === undefined ? '' : arguments[1];
+
+    return '\n    <textarea data-jotted-type="' + type + '" data-jotted-file="' + fileUrl + '"></textarea>\n    <div class="jotted-error"></div>\n  ';
   }
 
   function errorMessage(err) {
-    return "\n    <p>" + err + "</p>\n  ";
+    return '\n    <p>' + err + '</p>\n  ';
   }
 
   /* util
@@ -714,6 +716,7 @@
       babelHelpers.classCallCheck(this, Jotted);
 
       this.options = extend(opts, {
+        files: [],
         showBlank: false,
         pane: 'result',
         debounce: 250,
@@ -723,6 +726,8 @@
       });
 
       this.pubsoup = new PubSoup();
+      // debounced trigger method
+      this.trigger = debounce(this.pubsoup.publish.bind(this.pubsoup), this.options.debounce);
 
       this.plugins = {};
 
@@ -766,9 +771,6 @@
       // init plugins
       init.call(this);
 
-      // debounced trigger method
-      this.trigger = debounce(this.pubsoup.publish.bind(this.pubsoup), this.options.debounce);
-
       // done change on all subscribers,
       // render the results.
       this.done('change', this.changeCallback.bind(this));
@@ -780,24 +782,68 @@
     }
 
     babelHelpers.createClass(Jotted, [{
+      key: 'findFile',
+      value: function findFile(type) {
+        var file = {};
+
+        var _iteratorNormalCompletion = true;
+        var _didIteratorError = false;
+        var _iteratorError = undefined;
+
+        try {
+          for (var _iterator = this.options.files[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+            var _file = _step.value;
+
+            if (_file.type === type) {
+              return _file;
+            }
+          }
+        } catch (err) {
+          _didIteratorError = true;
+          _iteratorError = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion && _iterator.return) {
+              _iterator.return();
+            }
+          } finally {
+            if (_didIteratorError) {
+              throw _iteratorError;
+            }
+          }
+        }
+
+        return file;
+      }
+    }, {
       key: 'markup',
       value: function markup(type, $parent) {
         var _this = this;
 
         // create the markup for an editor
-        var file = this.$container.dataset[type] || '';
+        var file = this.findFile(type);
 
         var $editor = document.createElement('div');
-        $editor.innerHTML = editorContent(type, file);
+        $editor.innerHTML = editorContent(type, file.url);
         $editor.className = editorClass(type);
         var $textarea = $editor.querySelector('textarea');
 
         $parent.appendChild($editor);
 
-        if (file !== '') {
-          this.$container.classList.add(hasFileClass(type));
+        // if we don't have a file for the current type
+        if (typeof file.url === 'undefined' && typeof file.content === 'undefined') {
+          return;
+        }
 
-          fetch(file, function (err, res) {
+        // add the has-type class to the container
+        this.$container.classList.add(hasFileClass(type));
+
+        // file as string
+        if (typeof file.content !== 'undefined') {
+          this.setValue($textarea, file.content);
+        } else if (typeof file.url !== 'undefined') {
+          // file as url
+          fetch(file.url, function (err, res) {
             if (err) {
               // show load errors
               _this.error([err.responseText], {
@@ -808,14 +854,19 @@
               return;
             }
 
-            $textarea.value = res;
-
-            // simulate change event
-            _this.change({
-              target: $textarea
-            });
+            _this.setValue($textarea, res);
           });
         }
+      }
+    }, {
+      key: 'setValue',
+      value: function setValue($textarea, val) {
+        $textarea.value = val;
+
+        // trigger change event, for initial render
+        this.change({
+          target: $textarea
+        });
       }
     }, {
       key: 'change',
@@ -898,27 +949,27 @@
         this.$container.classList.add('jotted-error-active-' + params.type);
 
         var markup = '';
-        var _iteratorNormalCompletion = true;
-        var _didIteratorError = false;
-        var _iteratorError = undefined;
+        var _iteratorNormalCompletion2 = true;
+        var _didIteratorError2 = false;
+        var _iteratorError2 = undefined;
 
         try {
-          for (var _iterator = errors[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-            var err = _step.value;
+          for (var _iterator2 = errors[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+            var err = _step2.value;
 
             markup += errorMessage(err);
           }
         } catch (err) {
-          _didIteratorError = true;
-          _iteratorError = err;
+          _didIteratorError2 = true;
+          _iteratorError2 = err;
         } finally {
           try {
-            if (!_iteratorNormalCompletion && _iterator.return) {
-              _iterator.return();
+            if (!_iteratorNormalCompletion2 && _iterator2.return) {
+              _iterator2.return();
             }
           } finally {
-            if (_didIteratorError) {
-              throw _iteratorError;
+            if (_didIteratorError2) {
+              throw _iteratorError2;
             }
           }
         }

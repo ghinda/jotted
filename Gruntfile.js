@@ -148,41 +148,24 @@ module.exports = function (grunt) {
               browserName: 'firefox',
               platform: 'Linux'
             }, {
-              browserName: 'opera',
-              platform: 'Linux',
-              version: '12.15'
-            }, {
               browserName: 'android',
               platform: 'Linux',
-              version: '4.0'
-            }, {
-              browserName: 'android',
-              platform: 'Linux',
-              version: '5.1'
+              version: '5.0'
             }, {
               browserName: 'internet explorer',
               platform: 'Windows 7',
-              version: '9'
+              version: '9.0'
             }, {
               browserName: 'internet explorer',
               platform: 'Windows 8',
-              version: '10'
+              version: '10.0'
             }, {
               browserName: 'microsoftedge',
               platform: 'Windows 10'
             }, {
               browserName: 'safari',
-              platform: 'OS X 10.10',
-              version: '8'
-            }, {
-              browserName: 'iphone',
-              platform: 'OS X 10.8',
-              version: '5'
-            }, {
-              browserName: 'iphone',
-              deviceName: 'iPhone 4s',
-              platform: 'OS X 10.10',
-              version: '8.0'
+              platform: 'OS X 10.11',
+              version: '9.0'
             }
           ]
         }

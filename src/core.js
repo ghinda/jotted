@@ -1,6 +1,8 @@
 /* jotted
  */
 
+import '../node_modules/babel-polyfill/browser.js'
+
 import * as util from './util.js'
 import * as template from './template.js'
 import * as plugin from './plugin.js'

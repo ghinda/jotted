@@ -362,6 +362,51 @@
     return PubSoup;
   })();
 
+  var PluginMarkdown = (function () {
+    function PluginMarkdown(jotted, options) {
+      babelHelpers.classCallCheck(this, PluginMarkdown);
+
+      var priority = 20;
+
+      this.options = extend(options, {});
+
+      // check if marked is loaded
+      if (typeof window.marked === 'undefined') {
+        return;
+      }
+
+      window.marked.setOptions(options);
+
+      jotted.$container.classList.add('jotted-plugin-markdown');
+
+      // change html link label
+      jotted.$container.querySelector('a[data-jotted-type="html"]').innerHTML = 'Markdown';
+
+      jotted.on('change', this.change.bind(this), priority);
+    }
+
+    babelHelpers.createClass(PluginMarkdown, [{
+      key: 'change',
+      value: function change(params, callback) {
+        // only parse html content
+        if (params.type === 'html') {
+          try {
+            params.content = window.marked(params.content);
+          } catch (err) {
+            return callback(err, params);
+          }
+
+          callback(null, params);
+        } else {
+          // make sure we callback either way,
+          // to not break the pubsoup
+          callback(null, params);
+        }
+      }
+    }]);
+    return PluginMarkdown;
+  })();
+
   var PluginBabel = (function () {
     function PluginBabel(jotted, options) {
       babelHelpers.classCallCheck(this, PluginBabel);
@@ -749,6 +794,7 @@
     jotted.plugin('coffeescript', PluginCoffeeScript);
     jotted.plugin('stylus', PluginStylus);
     jotted.plugin('babel', PluginBabel);
+    jotted.plugin('markdown', PluginMarkdown);
   }
 
   var Jotted = (function () {

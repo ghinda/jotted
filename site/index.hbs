@@ -19,6 +19,8 @@ title: ''
 
 <script src="lib/babel.min.js"></script>
 
+<script src="lib/marked.js"></script>
+
 <script src="jotted.js"></script>
 
 <script>
@@ -45,12 +47,13 @@ title: ''
   });
 
   var jot = new Jotted(document.getElementById('j-css'), {
+    pane: 'html',
     files: [{
       type: 'css',
       url: 'jotted.styl'
     }, {
       type: 'html',
-      content: '<h1>test</h1>'
+      content: '# heading 1'
     }],
     showBlank: true,
     plugins: [
@@ -59,7 +62,8 @@ title: ''
         options: {}
       },
       'stylus',
-      'babel'
+      'babel',
+      'markdown'
     ]
   });
 </script>

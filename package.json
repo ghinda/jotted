@@ -24,7 +24,9 @@
     "url": "https://github.com/ghinda/jotted/issues"
   },
   "homepage": "https://github.com/ghinda/jotted#readme",
-  "dependencies": {},
+  "dependencies": {
+    "marked": "^0.3.5"
+  },
   "devDependencies": {
     "assemble": "^0.4.42",
     "babel-preset-es2015": "^6.1.18",

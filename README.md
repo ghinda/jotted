@@ -14,7 +14,7 @@ Jotted is an environment for showcasing HTML, CSS and JavaScript, with editable 
 * **Lightweight:** No dependencies, uses `textarea`s for editing by default.
 * **Plugins:** Flexible plugin architecture for custom editors, preprocessors or anything else.
 * **Code editors:** Includes plugins for code editors like [Ace](https://ace.c9.io/) and [CodeMirror](https://codemirror.net/).
-* **Preprocessors:** Includes plugins for preprocessors (CoffeeScript, Less, Stylus).
+* **Preprocessors:** Includes plugins for preprocessors (ES6, CoffeeScript, Less, Stylus, Markdown).
 
 ## How to use
 
@@ -132,6 +132,7 @@ new Jotted(document.querySelector('#demo'), {
 * `babel`: Compiles ES6 to ES5 with [Babel](https://babeljs.io/).
 * `coffeescript`: Compiles [CoffeeScript](http://coffeescript.org/).
 * `less`: Compiles [Less](http://lesscss.org/).
+* `markdown`: Compiles Markdown using [marked](https://github.com/chjj/marked).
 * `stylus`: Compiles [Stylus](http://stylus-lang.com/).
 
 ### Other

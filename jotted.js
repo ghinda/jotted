@@ -413,8 +413,6 @@
 
       var priority = 20;
 
-      this.editor = {};
-
       options = extend(options, {});
 
       // check if stylus is loaded
@@ -470,8 +468,6 @@
 
       var priority = 20;
 
-      this.editor = {};
-
       options = extend(options, {});
 
       // check if coffeescript is loaded
@@ -519,8 +515,6 @@
       babelHelpers.classCallCheck(this, PluginLess);
 
       var priority = 20;
-
-      this.editor = {};
 
       options = extend(options, {});
 

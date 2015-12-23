@@ -7,8 +7,6 @@ export default class PluginLess {
   constructor (jotted, options) {
     var priority = 20
 
-    this.editor = {}
-
     options = util.extend(options, {})
 
     // check if less is loaded

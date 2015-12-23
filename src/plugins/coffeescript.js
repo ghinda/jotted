@@ -7,8 +7,6 @@ export default class PluginCoffeeScript {
   constructor (jotted, options) {
     var priority = 20
 
-    this.editor = {}
-
     options = util.extend(options, {})
 
     // check if coffeescript is loaded

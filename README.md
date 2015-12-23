@@ -227,10 +227,25 @@ For a preprocessor plugin, see the [less](src/plugins/less.js) plugin.
 
 For a code editor plugin, see the [codemirror](src/plugins/codemirror.js) plugin.
 
+
 ## Browser support
 
 * Internet Explorer 9+
 * Modern browsers
+
+
+## Contributing
+
+* Install [Node.js](https://nodejs.org/en/) and [npm](https://www.npmjs.com/).
+* Install [grunt-cli](https://www.npmjs.com/package/grunt-cli).
+* Run `npm install` in the project folder.
+* Run `grunt server` for a live-reload server with everything you need.
+
+* Use two spaces for indentation.
+* Follow the [JavaScript Standard Style](https://github.com/feross/standard).
+* Send pull requests.
+* Thank you! :beers:
+
 
 ## License
 

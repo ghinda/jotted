@@ -129,7 +129,7 @@ new Jotted(document.querySelector('#demo'), {
 
 ### Preprocessors
 
-* `babel`: Compiles ES6 to ES5 with [Babel](https://babeljs.io/). **WIP**
+* `babel`: Compiles ES6 to ES5 with [Babel](https://babeljs.io/).
 * `coffeescript`: Compiles [CoffeeScript](http://coffeescript.org/).
 * `less`: Compiles [Less](http://lesscss.org/).
 * `stylus`: Compiles [Stylus](http://stylus-lang.com/).

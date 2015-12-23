@@ -145,10 +145,8 @@ class Jotted {
     })
   }
 
-  changeCallback (err, params) {
-    if (err) {
-      this.error(err, params)
-    }
+  changeCallback (errors, params) {
+    this.error(errors, params)
 
     if (params.type === 'html') {
       this.$resultFrame.contentWindow.document.body.innerHTML = params.content
@@ -165,9 +163,13 @@ class Jotted {
       try {
         this.$resultFrame.contentWindow.eval(params.content)
       } catch (err) {
-        this.error([ err.message ], {
-          type: 'js'
-        })
+        // only show eval errors if we don't have other errors from plugins.
+        // useful for preprocessor error reporting (eg. babel, coffeescript).
+        if (!errors.length) {
+          this.error([ err.message ], {
+            type: 'js'
+          })
+        }
       }
 
       return

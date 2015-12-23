@@ -362,6 +362,51 @@
     return PubSoup;
   })();
 
+  var PluginBabel = (function () {
+    function PluginBabel(jotted, options) {
+      babelHelpers.classCallCheck(this, PluginBabel);
+
+      var priority = 20;
+
+      this.options = extend(options, {
+        presets: ['es2015']
+      });
+
+      // check if babel is loaded
+      if (typeof window.Babel === 'undefined') {
+        return;
+      }
+
+      jotted.$container.classList.add('jotted-plugin-babel');
+
+      // change js link label
+      jotted.$container.querySelector('a[data-jotted-type="js"]').innerHTML = 'ES6';
+
+      jotted.on('change', this.change.bind(this), priority);
+    }
+
+    babelHelpers.createClass(PluginBabel, [{
+      key: 'change',
+      value: function change(params, callback) {
+        // only parse js content
+        if (params.type === 'js') {
+          try {
+            params.content = window.Babel.transform(params.content, this.options).code;
+          } catch (err) {
+            return callback(err, params);
+          }
+
+          callback(null, params);
+        } else {
+          // make sure we callback either way,
+          // to not break the pubsoup
+          callback(null, params);
+        }
+      }
+    }]);
+    return PluginBabel;
+  })();
+
   var PluginStylus = (function () {
     function PluginStylus(jotted, options) {
       babelHelpers.classCallCheck(this, PluginStylus);
@@ -709,6 +754,7 @@
     jotted.plugin('less', PluginLess);
     jotted.plugin('coffeescript', PluginCoffeeScript);
     jotted.plugin('stylus', PluginStylus);
+    jotted.plugin('babel', PluginBabel);
   }
 
   var Jotted = (function () {
@@ -883,10 +929,8 @@
       }
     }, {
       key: 'changeCallback',
-      value: function changeCallback(err, params) {
-        if (err) {
-          this.error(err, params);
-        }
+      value: function changeCallback(errors, params) {
+        this.error(errors, params);
 
         if (params.type === 'html') {
           this.$resultFrame.contentWindow.document.body.innerHTML = params.content;
@@ -903,9 +947,13 @@
           try {
             this.$resultFrame.contentWindow.eval(params.content);
           } catch (err) {
-            this.error([err.message], {
-              type: 'js'
-            });
+            // only show eval errors if we don't have other errors from plugins.
+            // useful for preprocessor error reporting (eg. babel, coffeescript).
+            if (!errors.length) {
+              this.error([err.message], {
+                type: 'js'
+              });
+            }
           }
 
           return;

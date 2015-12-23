@@ -806,9 +806,7 @@
         showBlank: false,
         pane: 'result',
         debounce: 250,
-        plugins: {
-          ace: {}
-        }
+        plugins: []
       });
 
       this.pubsoup = new PubSoup();

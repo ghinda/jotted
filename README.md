@@ -241,7 +241,6 @@ For a code editor plugin, see the [codemirror](src/plugins/codemirror.js) plugin
 * Install [grunt-cli](https://www.npmjs.com/package/grunt-cli).
 * Run `npm install` in the project folder.
 * Run `grunt server` for a live-reload server with everything you need.
-* Use two spaces for indentation.
 * Follow the [JavaScript Standard Style](https://github.com/feross/standard).
 * Send pull requests.
 * Thanks! :beers:

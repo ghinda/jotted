@@ -25,14 +25,12 @@ export default class PluginAce {
       return
     }
 
-    jotted.$container.classList.add('jotted-plugin-ace')
-
     var $editors = jotted.$container.querySelectorAll('.jotted-editor')
 
     for (i = 0; i < $editors.length; i++) {
       let $textarea = $editors[i].querySelector('textarea')
-      let type = $textarea.dataset.jottedType
-      let file = $textarea.dataset.jottedFile
+      let type = util.data($textarea, 'jotted-type')
+      let file = util.data($textarea, 'jotted-file')
 
       let $aceContainer = document.createElement('div')
       $editors[i].appendChild($aceContainer)

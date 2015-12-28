@@ -14,8 +14,6 @@ export default class PluginCoffeeScript {
       return
     }
 
-    jotted.$container.classList.add('jotted-plugin-less')
-
     // change JS link label to Less
     jotted.$container.querySelector('a[data-jotted-type="js"]').innerHTML = 'CoffeeScript'
 

@@ -150,7 +150,7 @@ module.exports = function (grunt) {
             }, {
               browserName: 'android',
               platform: 'Linux',
-              version: '5.0'
+              version: '5.1'
             }, {
               browserName: 'internet explorer',
               platform: 'Windows 7',

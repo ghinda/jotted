@@ -14,8 +14,6 @@ export default class PluginStylus {
       return
     }
 
-    jotted.$container.classList.add('jotted-plugin-stylus')
-
     // change CSS link label to Stylus
     jotted.$container.querySelector('a[data-jotted-type="css"]').innerHTML = 'Stylus'
 

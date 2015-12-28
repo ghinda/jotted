@@ -16,8 +16,6 @@ export default class PluginMarkdown {
 
     window.marked.setOptions(options)
 
-    jotted.$container.classList.add('jotted-plugin-markdown')
-
     // change html link label
     jotted.$container.querySelector('a[data-jotted-type="html"]').innerHTML = 'Markdown'
 

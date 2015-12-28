@@ -21,7 +21,7 @@ function fetch (file, callback) {
 
   xhr.onload = function () {
     if (xhr.status === 200) {
-      callback(null, xhr.response)
+      callback(null, xhr.responseText)
     } else {
       callback(xhr)
     }
@@ -80,10 +80,48 @@ function log () {
   console.log(arguments)
 }
 
+function hasClass (node, className) {
+  if (node.className.indexOf(className) !== -1) {
+    return true
+  }
+
+  return false
+}
+
+function addClass (node, className) {
+  node.className += ' ' + className
+
+  return node.className
+}
+
+function removeClass (node, className) {
+  var spaceBefore = ' ' + className
+  var spaceAfter = className + ' '
+
+  if (node.className.indexOf(spaceBefore) !== -1) {
+    node.className = node.className.replace(spaceBefore, '')
+  } else if (node.className.indexOf(spaceAfter) !== -1) {
+    node.className = node.className.replace(spaceAfter, '')
+  } else {
+    node.className = node.className.replace(className, '')
+  }
+
+  return node.className
+}
+
+function data (node, attr) {
+  return node.getAttribute('data-' + attr)
+}
+
 export {
   extend,
   fetch,
   seq,
   debounce,
-  log
+  log,
+
+  data,
+  hasClass,
+  addClass,
+  removeClass
 }

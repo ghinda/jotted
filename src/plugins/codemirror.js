@@ -19,14 +19,12 @@ export default class PluginCodeMirror {
       return
     }
 
-    jotted.$container.classList.add('jotted-plugin-codemirror')
-
     var $editors = jotted.$container.querySelectorAll('.jotted-editor')
 
     for (i = 0; i < $editors.length; i++) {
       let $textarea = $editors[i].querySelector('textarea')
-      let type = $textarea.dataset.jottedType
-      let file = $textarea.dataset.jottedFile
+      let type = util.data($textarea, 'jotted-type')
+      let file = util.data($textarea, 'jotted-file')
 
       this.editor[type] = window.CodeMirror.fromTextArea($textarea, options)
       let editor = this.editor[type]

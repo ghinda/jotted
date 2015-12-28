@@ -26,15 +26,11 @@ class Jotted {
 
     this.$container = $editor
     this.$container.innerHTML = template.container()
-    this.$container.classList.add(template.containerClass())
-
-    if (this.options.showEmpty) {
-      this.$container.classList.add(template.showBlankClass())
-    }
+    util.addClass(this.$container, template.containerClass())
 
     // default pane
     this.paneActive = this.options.pane
-    this.$container.classList.add(template.paneActiveClass(this.paneActive))
+    util.addClass(this.$container, template.paneActiveClass(this.paneActive))
 
     this.$result = $editor.querySelector('.jotted-pane-result')
     this.$pane = {}
@@ -49,8 +45,13 @@ class Jotted {
 
     this.$resultFrame = this.$result.querySelector('iframe')
 
+    var $frameDoc = this.$resultFrame.contentWindow.document
+    $frameDoc.open()
+    $frameDoc.write(template.frameContent())
+    $frameDoc.close()
+
     this.$styleInject = document.createElement('style')
-    this.$resultFrame.contentWindow.document.head.appendChild(this.$styleInject)
+    $frameDoc.head.appendChild(this.$styleInject)
 
     // change events
     this.$container.addEventListener('change', util.debounce(this.change.bind(this), this.options.debounce))
@@ -68,7 +69,7 @@ class Jotted {
 
     // show all tabs, even if empty
     if (this.options.showBlank) {
-      this.$container.classList.add('jotted-nav-show-blank')
+      util.addClass(this.$container, template.showBlankClass())
     }
   }
 
@@ -101,7 +102,7 @@ class Jotted {
     }
 
     // add the has-type class to the container
-    this.$container.classList.add(template.hasFileClass(type))
+    util.addClass(this.$container, template.hasFileClass(type))
 
     // file as string
     if (typeof file.content !== 'undefined') {
@@ -134,13 +135,13 @@ class Jotted {
   }
 
   change (e) {
-    if (!e.target.dataset.jottedType) {
+    if (!util.data(e.target, 'jotted-type')) {
       return
     }
 
     this.trigger('change', {
-      type: e.target.dataset.jottedType,
-      file: e.target.dataset.jottedFile,
+      type: util.data(e.target, 'jotted-type'),
+      file: util.data(e.target, 'jotted-file'),
       content: e.target.value
     })
   }
@@ -177,13 +178,13 @@ class Jotted {
   }
 
   pane (e) {
-    if (!e.target.dataset.jottedType) {
+    if (!util.data(e.target, 'jotted-type')) {
       return
     }
 
-    this.$container.classList.remove(template.paneActiveClass(this.paneActive))
-    this.paneActive = e.target.dataset.jottedType
-    this.$container.classList.add(template.paneActiveClass(this.paneActive))
+    util.removeClass(this.$container, template.paneActiveClass(this.paneActive))
+    this.paneActive = util.data(e.target, 'jotted-type')
+    util.addClass(this.$container, template.paneActiveClass(this.paneActive))
 
     e.preventDefault()
   }
@@ -205,7 +206,7 @@ class Jotted {
       return this.clearError(params)
     }
 
-    this.$container.classList.add(`jotted-error-active-${params.type}`)
+    util.addClass(this.$container, template.errorClass(params.type))
 
     var markup = ''
     for (let err of errors) {
@@ -216,7 +217,7 @@ class Jotted {
   }
 
   clearError (params) {
-    this.$container.classList.remove(`jotted-error-active-${params.type}`)
+    util.removeClass(this.$container, template.errorClass(params.type))
     this.$error[params.type].innerHTML = ''
   }
 }

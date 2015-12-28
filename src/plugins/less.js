@@ -14,8 +14,6 @@ export default class PluginLess {
       return
     }
 
-    jotted.$container.classList.add('jotted-plugin-less')
-
     // change CSS link label to Less
     jotted.$container.querySelector('a[data-jotted-type="css"]').innerHTML = 'Less'
 

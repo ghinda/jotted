@@ -43,7 +43,7 @@ export function containerClass () {
 }
 
 export function showBlankClass () {
-  return `jotted-show-blank`
+  return `jotted-nav-show-blank`
 }
 
 export function hasFileClass (type) {
@@ -64,5 +64,25 @@ export function editorContent (type, fileUrl = '') {
 export function errorMessage (err) {
   return `
     <p>${err}</p>
+  `
+}
+
+export function errorClass (type) {
+  return `jotted-error-active-${type}`
+}
+
+export function pluginClass (name) {
+  return `jotted-plugin-${name}`
+}
+
+export function frameContent () {
+  return `
+    <!doctype html>
+    <html>
+    <head>
+    </head>
+    <body>
+    </body>
+    </html>
   `
 }

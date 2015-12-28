@@ -51,7 +51,7 @@
   }
 
   function showBlankClass() {
-    return 'jotted-show-blank';
+    return 'jotted-nav-show-blank';
   }
 
   function hasFileClass(type) {
@@ -70,6 +70,18 @@
 
   function errorMessage(err) {
     return '\n    <p>' + err + '</p>\n  ';
+  }
+
+  function errorClass(type) {
+    return 'jotted-error-active-' + type;
+  }
+
+  function pluginClass(name) {
+    return 'jotted-plugin-' + name;
+  }
+
+  function frameContent() {
+    return '\n    <!doctype html>\n    <html>\n    <head>\n    </head>\n    <body>\n    </body>\n    </html>\n  ';
   }
 
   /* util
@@ -98,7 +110,7 @@
 
     xhr.onload = function () {
       if (xhr.status === 200) {
-        callback(null, xhr.response);
+        callback(null, xhr.responseText);
       } else {
         callback(xhr);
       }
@@ -161,8 +173,30 @@
     console.log(arguments);
   }
 
-  /* plugin
-   */
+  function addClass(node, className) {
+    node.className += ' ' + className;
+
+    return node.className;
+  }
+
+  function removeClass(node, className) {
+    var spaceBefore = ' ' + className;
+    var spaceAfter = className + ' ';
+
+    if (node.className.indexOf(spaceBefore) !== -1) {
+      node.className = node.className.replace(spaceBefore, '');
+    } else if (node.className.indexOf(spaceAfter) !== -1) {
+      node.className = node.className.replace(spaceAfter, '');
+    } else {
+      node.className = node.className.replace(className, '');
+    }
+
+    return node.className;
+  }
+
+  function data(node, attr) {
+    return node.getAttribute('data-' + attr);
+  }
 
   var plugins = [];
 
@@ -217,15 +251,19 @@
 
         // check if plugin definition is string or object
         var Plugin = undefined;
+        var pluginName = undefined;
         var pluginOptions = {};
         if (typeof plugin === 'string') {
-          Plugin = find(plugin);
+          pluginName = plugin;
         } else if ((typeof plugin === 'undefined' ? 'undefined' : babelHelpers.typeof(plugin)) === 'object') {
-          Plugin = find(plugin.name);
+          pluginName = plugin.name;
           pluginOptions = plugin.options || {};
         }
 
+        Plugin = find(pluginName);
         this.plugins[plugin] = new Plugin(this, pluginOptions);
+
+        addClass(this.$container, pluginClass(pluginName));
       }
     } catch (err) {
       _didIteratorError2 = true;
@@ -377,8 +415,6 @@
 
       window.marked.setOptions(options);
 
-      jotted.$container.classList.add('jotted-plugin-markdown');
-
       // change html link label
       jotted.$container.querySelector('a[data-jotted-type="html"]').innerHTML = 'Markdown';
 
@@ -422,8 +458,6 @@
         return;
       }
 
-      jotted.$container.classList.add('jotted-plugin-babel');
-
       // change js link label
       jotted.$container.querySelector('a[data-jotted-type="js"]').innerHTML = 'ES6';
 
@@ -464,8 +498,6 @@
       if (typeof window.stylus === 'undefined') {
         return;
       }
-
-      jotted.$container.classList.add('jotted-plugin-stylus');
 
       // change CSS link label to Stylus
       jotted.$container.querySelector('a[data-jotted-type="css"]').innerHTML = 'Stylus';
@@ -520,8 +552,6 @@
         return;
       }
 
-      jotted.$container.classList.add('jotted-plugin-less');
-
       // change JS link label to Less
       jotted.$container.querySelector('a[data-jotted-type="js"]').innerHTML = 'CoffeeScript';
 
@@ -567,8 +597,6 @@
       if (typeof window.less === 'undefined') {
         return;
       }
-
-      jotted.$container.classList.add('jotted-plugin-less');
 
       // change CSS link label to Less
       jotted.$container.querySelector('a[data-jotted-type="css"]').innerHTML = 'Less';
@@ -636,14 +664,12 @@
         return;
       }
 
-      jotted.$container.classList.add('jotted-plugin-ace');
-
       var $editors = jotted.$container.querySelectorAll('.jotted-editor');
 
       var _loop = function _loop() {
         var $textarea = $editors[i].querySelector('textarea');
-        var type = $textarea.dataset.jottedType;
-        var file = $textarea.dataset.jottedFile;
+        var type = data($textarea, 'jotted-type');
+        var file = data($textarea, 'jotted-file');
 
         var $aceContainer = document.createElement('div');
         $editors[i].appendChild($aceContainer);
@@ -737,14 +763,12 @@
         return;
       }
 
-      jotted.$container.classList.add('jotted-plugin-codemirror');
-
       var $editors = jotted.$container.querySelectorAll('.jotted-editor');
 
       var _loop = function _loop() {
         var $textarea = $editors[i].querySelector('textarea');
-        var type = $textarea.dataset.jottedType;
-        var file = $textarea.dataset.jottedFile;
+        var type = data($textarea, 'jotted-type');
+        var file = data($textarea, 'jotted-file');
 
         _this.editor[type] = window.CodeMirror.fromTextArea($textarea, options);
         var editor = _this.editor[type];
@@ -820,15 +844,11 @@
 
       this.$container = $editor;
       this.$container.innerHTML = container();
-      this.$container.classList.add(containerClass());
-
-      if (this.options.showEmpty) {
-        this.$container.classList.add(showBlankClass());
-      }
+      addClass(this.$container, containerClass());
 
       // default pane
       this.paneActive = this.options.pane;
-      this.$container.classList.add(paneActiveClass(this.paneActive));
+      addClass(this.$container, paneActiveClass(this.paneActive));
 
       this.$result = $editor.querySelector('.jotted-pane-result');
       this.$pane = {};
@@ -845,8 +865,13 @@
 
       this.$resultFrame = this.$result.querySelector('iframe');
 
+      var $frameDoc = this.$resultFrame.contentWindow.document;
+      $frameDoc.open();
+      $frameDoc.write(frameContent());
+      $frameDoc.close();
+
       this.$styleInject = document.createElement('style');
-      this.$resultFrame.contentWindow.document.head.appendChild(this.$styleInject);
+      $frameDoc.head.appendChild(this.$styleInject);
 
       // change events
       this.$container.addEventListener('change', debounce(this.change.bind(this), this.options.debounce));
@@ -864,7 +889,7 @@
 
       // show all tabs, even if empty
       if (this.options.showBlank) {
-        this.$container.classList.add('jotted-nav-show-blank');
+        addClass(this.$container, showBlankClass());
       }
     }
 
@@ -923,7 +948,7 @@
         }
 
         // add the has-type class to the container
-        this.$container.classList.add(hasFileClass(type));
+        addClass(this.$container, hasFileClass(type));
 
         // file as string
         if (typeof file.content !== 'undefined') {
@@ -958,13 +983,13 @@
     }, {
       key: 'change',
       value: function change(e) {
-        if (!e.target.dataset.jottedType) {
+        if (!data(e.target, 'jotted-type')) {
           return;
         }
 
         this.trigger('change', {
-          type: e.target.dataset.jottedType,
-          file: e.target.dataset.jottedFile,
+          type: data(e.target, 'jotted-type'),
+          file: data(e.target, 'jotted-file'),
           content: e.target.value
         });
       }
@@ -1003,13 +1028,13 @@
     }, {
       key: 'pane',
       value: function pane(e) {
-        if (!e.target.dataset.jottedType) {
+        if (!data(e.target, 'jotted-type')) {
           return;
         }
 
-        this.$container.classList.remove(paneActiveClass(this.paneActive));
-        this.paneActive = e.target.dataset.jottedType;
-        this.$container.classList.add(paneActiveClass(this.paneActive));
+        removeClass(this.$container, paneActiveClass(this.paneActive));
+        this.paneActive = data(e.target, 'jotted-type');
+        addClass(this.$container, paneActiveClass(this.paneActive));
 
         e.preventDefault();
       }
@@ -1035,7 +1060,7 @@
           return this.clearError(params);
         }
 
-        this.$container.classList.add('jotted-error-active-' + params.type);
+        addClass(this.$container, errorClass(params.type));
 
         var markup = '';
         var _iteratorNormalCompletion2 = true;
@@ -1068,7 +1093,7 @@
     }, {
       key: 'clearError',
       value: function clearError(params) {
-        this.$container.classList.remove('jotted-error-active-' + params.type);
+        removeClass(this.$container, errorClass(params.type));
         this.$error[params.type].innerHTML = '';
       }
     }]);

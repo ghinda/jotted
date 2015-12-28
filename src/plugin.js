@@ -1,6 +1,9 @@
 /* plugin
  */
 
+import * as util from './util.js'
+import * as template from './template.js'
+
 var plugins = []
 
 function find (id) {
@@ -25,15 +28,19 @@ function init () {
   for (let plugin of this.options.plugins) {
     // check if plugin definition is string or object
     let Plugin
+    let pluginName
     let pluginOptions = {}
     if (typeof plugin === 'string') {
-      Plugin = find(plugin)
+      pluginName = plugin
     } else if (typeof plugin === 'object') {
-      Plugin = find(plugin.name)
+      pluginName = plugin.name
       pluginOptions = plugin.options || {}
     }
 
+    Plugin = find(pluginName)
     this.plugins[plugin] = new Plugin(this, pluginOptions)
+
+    util.addClass(this.$container, template.pluginClass(pluginName))
   }
 }
 

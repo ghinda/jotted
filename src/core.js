@@ -10,6 +10,10 @@ import PubSoup from './pubsoup.js'
 
 class Jotted {
   constructor ($editor, opts) {
+    if (!$editor) {
+      throw new Error('Can\'t find Jotted container.')
+    }
+
     this.options = util.extend(opts, {
       files: [],
       showBlank: false,

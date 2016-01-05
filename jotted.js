@@ -828,6 +828,10 @@
     function Jotted($editor, opts) {
       babelHelpers.classCallCheck(this, Jotted);
 
+      if (!$editor) {
+        throw new Error('Can\'t find Jotted container.');
+      }
+
       this.options = extend(opts, {
         files: [],
         showBlank: false,

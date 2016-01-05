@@ -3,67 +3,46 @@ layout: main.html
 title: ''
 ---
 
-<div id="j-html"></div>
-<div id="j-css"></div>
+  <div class="gl">
 
-<link rel="stylesheet" href="bower_components/codemirror/lib/codemirror.css">
-<script src="bower_components/codemirror/lib/codemirror.js"></script>
+    <div class="gl-cell">
 
-<script src="bower_components/ace-builds/src/ace.js"></script>
+      <h1>
+        Jotted
+      </h1>
 
-<script src="bower_components/less/dist/less.js"></script>
+      <p>
+        Environment for showcasing self-hosted HTML, CSS and JavaScript snippets, with editable source.
+      </p>
 
-<script src="bower_components/coffee-script/extras/coffee-script.js"></script>
+      <div class="header-install">
+        <pre><code><a href="https://www.npmjs.com/package/jotted/">npm</a> install jotted</code></pre>
+        <pre><code><a href="http://bower.io/">bower</a> install jotted</code></pre>
+      </div>
 
-<script src="lib/stylus.min.js"></script>
+      <a href="#">
+        Download
+      </a>
 
-<script src="lib/babel.min.js"></script>
+      <a href="#">
+        View on GitHub
+      </a>
 
-<script src="lib/marked.js"></script>
+    </div>
 
-<script src="jotted.js"></script>
+    <div class="gl-cell">
 
-<script>
-  Jotted.plugin('test', function (jotted, options) {
-    console.log('test', options)
-  });
+      <div id="j-header"></div>
 
-  var jot = new Jotted(document.getElementById('j-html'), {
-    files: [{
-      type: 'html',
-      url: 'index.html'
-    }],
-    plugins: [
-      'ace',
-      'less',
-      'coffeescript',
-      {
-        name: 'test',
-        options: {
-          testOption: 'test-option'
-        }
-      }
-    ]
-  });
 
-  var jot = new Jotted(document.getElementById('j-css'), {
-    pane: 'html',
-    files: [{
-      type: 'css',
-      url: 'jotted.styl'
-    }, {
-      type: 'html',
-      content: '# heading 1'
-    }],
-    showBlank: true,
-    plugins: [
-      {
-        name: 'codemirror',
-        options: {}
-      },
-      'stylus',
-      'babel',
-      'markdown'
-    ]
-  });
-</script>
+
+    </div>
+
+  </div>
+
+<div class="container">
+
+
+
+</div>
+

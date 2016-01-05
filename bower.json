@@ -28,5 +28,7 @@
     "jasmine-jsreporter": "~0.1.2",
     "coffee-script": "coffeescript#~1.10.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "gridlayout": "~1.0.2"
+  }
 }

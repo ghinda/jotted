@@ -1,0 +1,519 @@
+/* jotted
+ * website
+ */
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  display: block;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+
+  color: #000;
+  font-family: sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  color: #333;
+  font-weight: 300;
+  font-family: sans-serif;
+}
+
+h2 {
+  margin: 0 0 20px;
+
+  font-size: 40px;
+}
+
+h3 {
+  font-size: 32px;
+}
+
+h4 {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+p {
+  margin: 0 0 1em;
+
+  line-height: 1.4em;
+}
+
+img {
+  max-width: 100%;
+}
+
+code {
+  padding: 2px;
+  background: #efefef;
+}
+
+pre code {
+  padding: 0;
+  background: transparent;
+}
+
+a {
+  color: #008033;
+}
+
+a:focus,
+a:hover {
+  color: #00aa44;
+}
+
+a:visited {
+  color: #536c53;
+}
+
+blockquote {
+  margin: 0 0 1em;
+  padding-left: 2em;
+  border-left: 5px solid rgba(0,0,0,.1);
+
+  font-family: serif;
+  line-height: 1.6em;
+}
+
+.container {
+  max-width: 840px;
+  padding: 0 8px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+section {
+  margin-bottom: 80px;
+}
+
+.button {
+  position: relative;
+  display: inline-block;
+  padding: .6em 2em;
+  margin-bottom: .4em;
+  border: 1px solid #008033;
+
+  color: #008033;
+  font-weight: bold;
+  text-decoration: none;
+  text-align: center;
+
+  transition:  all .1s;
+}
+
+.button:active {
+  top: 1px;
+}
+
+.button:hover,
+.button:focus {
+  border-color: #00aa44;
+
+  color: #00aa44;
+}
+
+.button:focus {
+  outline: 1px dotted #00aa44;
+}
+
+.button-full {
+  display: block;
+  width: 100%;
+}
+
+.button-primary,
+.button-primary:visited {
+  background: #008033;
+  border-color: #008033;
+
+  color: #fff;
+}
+
+.button-primary:hover,
+.button-primary:focus {
+  background: #00aa44;
+  border-color: #00aa44;
+
+  color: #fff;
+}
+
+ul {
+  margin: 0 0 1em;
+}
+
+.list-inline {
+  padding: 0;
+  list-style-type: none;
+}
+
+.list-inline li {
+  display: inline-block;
+}
+
+/* header
+ */
+
+.header-home {
+  padding-top: 52px;
+  margin: 0 0 40px;
+  background: #f2f2f2;
+
+  text-align: center;
+}
+
+.logo-gridlayout {
+  max-width: 400px;
+  margin: 0 auto 20px;
+
+  font-size: 28px;
+  text-decoration:none;
+}
+
+.header-tagline {
+  max-width: 660px;
+  margin: 0 auto 40px;
+
+  font-size: 24px;
+  line-height: 1.8em;
+}
+
+.header-get {
+  padding: 40px 0 52px;
+  background: #ececec;
+}
+
+.header-get pre {
+  margin: 0 0 1em;
+}
+
+.header-get pre:last-of-type {
+  margin-bottom: 40px;
+}
+
+/* why
+*/
+
+@media only screen and (min-width: 40em) {
+  .section-why {
+    padding-right: 40px;
+  }
+}
+
+
+.section-why em {
+  font-size: 14px;
+}
+
+/* browsers
+*/
+
+.logo-browser {
+  width: 40px;
+  height: 40px;
+  margin-bottom: 8px;
+}
+
+.browsers-supported {
+  font-size: 11px;
+  text-align: center;
+  font-weight: bold;
+}
+
+@media only screen and (min-width: 40em) {
+  .browsers-supported {
+    padding-right: 8px;
+    width: 188px;
+  }
+}
+
+@media only screen and (min-width: 64em) {
+  .browsers-supported {
+    width: 232px;
+  }
+}
+
+.browsers-supported:last-of-type {
+  padding-right: 0;
+}
+
+.browsers-supported li {
+  padding-right: 4px;
+}
+
+.browsers-supported img {
+  display: block;
+  margin: 0 auto 8px;
+}
+
+.browsers-limited {
+  width: auto;
+  border-width: 0 0 1px 1px;
+  border-style: solid;
+  border-color: #efefef;
+
+  color: #444;
+}
+
+.browsers-limited img {
+  opacity: .4;
+}
+
+.notice-browsers-limited {
+  margin: 0;
+  padding-bottom: 8px;
+
+  font-weight: normal;
+}
+
+.notice-ie-support {
+  font-size: 14px;
+}
+
+.notice-ie-support p {
+  margin-bottom: .5em;
+}
+
+/* demos
+*/
+
+.block-demo > a {
+  display: block;
+  margin-bottom: 12px;
+
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.block-demo img {
+  display: block;
+  margin: 0 0 4px -6px;
+  width: 200px;
+  height: 120px;
+  opacity: .6;
+}
+
+.block-demo a:hover {
+  text-decoration: underline;
+}
+
+.block-demo a:hover img {
+  opacity: 1;
+}
+
+
+/* code
+*/
+
+:not(pre) > code[class*="language-"],
+pre[class*="language-"] {
+  background: #f2f2f2;
+  margin-bottom: 2em;
+}
+
+/* footer
+*/
+
+footer {
+  padding: 8px;
+}
+
+/* footer
+*/
+
+.section-footer {
+  margin-bottom: 40px;
+}
+
+.section-footer .container {
+  padding-top: 20px;
+  border-top: 1px solid #efefef;
+
+  font-size: 14px;
+}
+
+.section-footer p {
+  margin-bottom: .4em;
+}
+
+/* IE8 support
+*/
+.section-footer .gl-cell {
+  text-align: right;
+}
+
+.section-footer .gl-cell:first-child {
+  text-align: left;
+}
+
+/* demo grids
+ */
+
+.gl-highlight .gl-cell {
+  background: #e3f4d7;
+  outline: 1px solid #fff;
+
+  color: #333;
+}
+
+.gl-inner {
+  padding: 1em;
+}
+
+/* demo header
+*/
+
+.header-demo {
+  min-height: 60px;
+  background: #f2f2f2;
+}
+
+.header-demo .gl-cell {
+  padding: 8px;
+}
+
+.header-demo h1 {
+  margin: 0;
+
+  font-size: 20px;
+}
+
+.button-back {
+  padding-bottom: 8px;
+
+  font-size: 12px;
+}
+
+.header-demo .dropdown {
+  width: 152px;
+}
+
+.header-demo .dropdown-button {
+  margin: 0;
+}
+
+/* dropdown
+*/
+
+.dropdown-container {
+  text-align: right;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-button {
+  display: block;
+}
+
+.dropdown-content {
+  list-style-type: none;
+  position: absolute;
+  top: 40px;
+  left: 0;
+  z-index: 9;
+  display: none;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  border: 1px solid #efefef;
+  background: #fff;
+
+  text-align: left;
+}
+
+.dropdown-active .dropdown-content {
+  display: block;
+}
+
+.dropdown-content a {
+  display: block;
+  padding: 8px;
+
+  text-decoration: none;
+}
+
+.dropdown-content a:hover {
+  background: #efefef;
+}
+
+/* demo content
+*/
+
+/* content toggler
+ */
+
+.content-hide {
+  display: none;
+}
+
+.content-show {
+  display: block !important;
+}
+
+/* mail app demo
+*/
+
+.gl-cell.mail-header {
+  height: 80px;
+  background: #5fbcd3;
+
+  text-align: center;
+}
+
+.mail-header h2 {
+  margin: 0;
+}
+
+.gl-cell.mail-status {
+  height: 40px;
+  background: #b7c4c8;
+
+  font-size: 12px;
+}
+
+.mail-list {
+  display: block;
+  margin: 0 -1em;
+  padding: 0;
+  list-style-type: none;
+}
+
+.mail-list li {
+  display: block;
+}
+
+.mail-list a {
+  display: block;
+  padding: 1em;
+  border-bottom: 1px solid #fff;
+
+  text-decoration: none;
+}
+
+.mail-list a:hover {
+  background: #fff;
+}
+
+.mail-list input {
+  display: block;
+  width: 100%;
+  padding: 1em;
+}
+
+.mail-list h4 {
+  margin: 0;
+}
+
+.mail-list p {
+  margin: 0;
+}

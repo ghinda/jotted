@@ -3,46 +3,233 @@ layout: main.html
 title: ''
 ---
 
-  <div class="gl">
-
-    <div class="gl-cell">
-
-      <h1>
+<header class="header-home">
+  <div class="gl container">
+    <div class="gl-cell header-details">
+      <h1 class="logo-jotted">
         Jotted
       </h1>
 
-      <p>
+      <p class="header-tagline">
         Environment for showcasing self-hosted HTML, CSS and JavaScript snippets, with editable source.
       </p>
 
-      <div class="header-install">
+      <div class="header-get">
         <pre><code><a href="https://www.npmjs.com/package/jotted/">npm</a> install jotted</code></pre>
         <pre><code><a href="http://bower.io/">bower</a> install jotted</code></pre>
       </div>
 
-      <a href="#">
+      <a href="https://github.com/ghinda/jotted/archive/master.zip" class="button button-primary">
         Download
       </a>
 
-      <a href="#">
+      <a href="https://github.com/ghinda/jotted" class="button">
         View on GitHub
       </a>
 
     </div>
-
     <div class="gl-cell">
 
       <div id="j-header"></div>
 
-
-
     </div>
-
   </div>
+</header>
 
 <div class="container">
 
+  <section>
+    <div class="gl">
+      <div class="gl-cell section-features">
+{{#markdown}}
+  ## Features
+
+  * **Lightweight:** No dependencies, uses `textarea`s for editing by default.
+  * **Plugins:** Flexible plugin architecture for custom editors, preprocessors or anything else.
+  * **Code editors:** Includes plugins for code editors like [Ace](https://ace.c9.io/) and [CodeMirror](https://codemirror.net/).
+  * **Preprocessors:** Includes plugins for preprocessors (ES6, CoffeeScript, Less, Stylus, Markdown).
+{{/markdown}}
+      </div>
+
+      <div class="gl-cell">
+        <h2>
+          Browser support
+        </h2>
+
+        <div class="browsers-supported">
+
+          <ul class="gl gl-sm">
+            <li class="gl-cell">
+              <img src="{{base}}images/logo-ie.png" class="logo-browser">
+              IE 9+
+            </li>
+            <li class="gl-cell">
+              <img src="{{base}}images/logo-safari-ios.png" class="logo-browser">
+              iOS 5+
+            </li>
+            <li class="gl-cell">
+              <img src="{{base}}images/logo-android.png" class="logo-browser">
+              Android 4+
+            </li>
+            <li class="gl-cell">
+              <img src="{{base}}images/logo-browser-modern.png" class="logo-browser">
+              Modern browsers
+            </li>
+          </ul>
+
+        </div>
+      </div>
+
+  </section>
+
+  <section>
+{{#markdown}}
+
+## Demos
+
+* [Ace Editor]() - Using the Ace editor and plugin
+* [CodeMirror Editor]() - Using the CodeMirror editor and plugin
+* [Markdown]() - Using the Markdown plugin
+* [Less]() - Using the Less plugin
+* [Stylus]() - Using the Stylus plugin
+* [CoffeeScript]() - Using the CoffeeScript plugin
+* [ES2015]() - Using the Bebel plugin for ES6/2015 JavaScript support
+
+{{/markdown}}
+
+  </section>
+
+  <section>
+
+{{#markdown}}
+
+## How to use
+
+### Quick use
+
+``` html
+<link rel="stylesheet" href="jotted.css">
+<script src="jotted.js"></script>
+
+<div id="editor"></div>
+<script>
+  new Jotted(document.querySelector('#editor'), {
+    files: [{
+      type: 'html',
+      url: 'index.html'
+    }]
+  })
+</script>
+```
+
+  ### Options
+
+  Initialize Jotted with `new Jotted(elementNode, optionsHash)`.
+
+  The first argument is a DOM container where the editor will be created. The second argument is a hash of options.
+
+  Available options are:
 
 
+#### files
+Type: `Array`
+Default: `[]`
+
+Array of `Object`s specifying files that will be loaded. Objects inside the array must follow this pattern:
+
+```
+{
+  type: "html", // can be "html", "css", or "js"
+  url: "/index.html", // load the file from a url (restricted by the same-domain policy), OR
+  content: "<h1>HTML Content</h1>" // insert file content as string
+}
+```
+
+Use either `url` or `content`, not both.
+
+#### showBlank
+Type: `Boolean`
+Default: `false`
+
+Specifies if panes/tabs without content/files should be visible.
+
+#### pane
+Type: `String`
+Default: `result`
+
+Specifies which pane/tab should be the default one opened. Can be `result`, `html`, `css` or `js`.
+
+#### debounce
+Type: `Number`
+Default: 250
+
+Sets the debounce interval used by the `change` event (eg. render changes in the Result pane after a change in an editor).
+
+#### plugins
+Type: `Array`
+Default: []
+
+Array of `String`s or `Object`s setting the plugins used by this editor instance.
+
+If `String`, specify plugin name.
+
+If `Object`, follow this pattern:
+
+```
+{
+  name: 'less', // plugin name
+  options: {} // options hash to be passed to plugin
+}
+```
+
+
+### Example
+
+``` javascript
+new Jotted(document.querySelector('#demo'), {
+  files: [{
+    type: 'css',
+    url: 'index.styl'
+  }, {
+    type: 'html',
+    content: '<h1>Demo</h1>'
+  }],
+  showBlank: true,
+  plugins: [
+    'stylus',
+    {
+      name: 'codemirror',
+      options: {
+        lineNumbers: false
+      }
+    }
+  ]
+```
+{{/markdown}}
+  </section>
+
+  <footer class="footer">
+    <div class="gl">
+
+      <div class="gl-cell">
+
+        <p>
+          Source code available on GitHub: <a href="https://github.com/ghinda/jotted">ghinda/jotted</a>.
+        </p>
+
+        <p>
+          GridLayout is a project by
+          <a href="https://ghinda.net">Ionuț Colceriu</a>.
+        </p>
+
+      </div>
+
+      <div class="gl-cell">
+        <p>
+          Licensed under the MIT license.
+        </p>
+      </div>
+
+    </div>
+  </footer>
 </div>
-

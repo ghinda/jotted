@@ -29,6 +29,7 @@
     "coffee-script": "coffeescript#~1.10.0"
   },
   "dependencies": {
-    "gridlayout": "~1.0.2"
+    "gridlayout": "~1.0.2",
+    "prism": "~1.3.0"
   }
 }

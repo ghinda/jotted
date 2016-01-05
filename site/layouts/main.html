@@ -15,14 +15,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <link rel="stylesheet" href="bower_components/gridlayout/gridlayout.css">
-  <link rel="stylesheet" href="css/site.css">
-
+  <link rel="stylesheet" href="bower_components/prism/themes/prism.css">
   <link rel="stylesheet" href="jotted.css">
+
+  <link rel="stylesheet" href="css/site.css">
 </head>
 <body>
 
   {{> body }}
 
+  <!--[if !(lte IE 8)]><!-->
+  <script src="{{base}}bower_components/prism/prism.js"></script>
+  <!--<![endif]-->
   <script src="bower_components/gridlayout/gridlayout-ie.js"></script>
   <script src="jotted.js"></script>
 

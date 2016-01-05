@@ -59,6 +59,8 @@ code {
 pre code {
   padding: 0;
   background: transparent;
+
+  font-size: 1.2em;
 }
 
 a {
@@ -84,8 +86,7 @@ blockquote {
 }
 
 .container {
-  max-width: 840px;
-  padding: 0 8px;
+  max-width: 64em;
   margin-left: auto;
   margin-right: auto;
 }
@@ -162,54 +163,45 @@ ul {
  */
 
 .header-home {
-  padding-top: 52px;
-  margin: 0 0 40px;
+  padding: 2em;
+  margin: 0 0 2em;
   background: #f2f2f2;
-
-  text-align: center;
 }
 
-.logo-gridlayout {
-  max-width: 400px;
-  margin: 0 auto 20px;
+.header-details {
+  padding-right: 2em;
+}
 
-  font-size: 28px;
+.logo-jotted {
+  max-width: 400px;
+  margin: 0 0 .4em;
+
+  font-size: 2.8em;
   text-decoration:none;
 }
 
 .header-tagline {
-  max-width: 660px;
-  margin: 0 auto 40px;
+  margin: 0 0 1em;
 
-  font-size: 24px;
+  font-size: 1.2em;
   line-height: 1.8em;
 }
 
 .header-get {
-  padding: 40px 0 52px;
-  background: #ececec;
+  padding: 1em 0;
 }
 
 .header-get pre {
   margin: 0 0 1em;
 }
 
-.header-get pre:last-of-type {
-  margin-bottom: 40px;
-}
-
-/* why
+/* features
 */
 
 @media only screen and (min-width: 40em) {
-  .section-why {
+  .section-features {
     padding-right: 40px;
   }
-}
-
-
-.section-why em {
-  font-size: 14px;
 }
 
 /* browsers
@@ -227,23 +219,6 @@ ul {
   font-weight: bold;
 }
 
-@media only screen and (min-width: 40em) {
-  .browsers-supported {
-    padding-right: 8px;
-    width: 188px;
-  }
-}
-
-@media only screen and (min-width: 64em) {
-  .browsers-supported {
-    width: 232px;
-  }
-}
-
-.browsers-supported:last-of-type {
-  padding-right: 0;
-}
-
 .browsers-supported li {
   padding-right: 4px;
 }
@@ -253,33 +228,6 @@ ul {
   margin: 0 auto 8px;
 }
 
-.browsers-limited {
-  width: auto;
-  border-width: 0 0 1px 1px;
-  border-style: solid;
-  border-color: #efefef;
-
-  color: #444;
-}
-
-.browsers-limited img {
-  opacity: .4;
-}
-
-.notice-browsers-limited {
-  margin: 0;
-  padding-bottom: 8px;
-
-  font-weight: normal;
-}
-
-.notice-ie-support {
-  font-size: 14px;
-}
-
-.notice-ie-support p {
-  margin-bottom: .5em;
-}
 
 /* demos
 */
@@ -328,28 +276,26 @@ footer {
 /* footer
 */
 
-.section-footer {
+.footer {
   margin-bottom: 40px;
 }
 
-.section-footer .container {
+.footer .container {
   padding-top: 20px;
   border-top: 1px solid #efefef;
 
   font-size: 14px;
 }
 
-.section-footer p {
+.footer p {
   margin-bottom: .4em;
 }
 
-/* IE8 support
-*/
-.section-footer .gl-cell {
+.footer .gl-cell {
   text-align: right;
 }
 
-.section-footer .gl-cell:first-child {
+.footer .gl-cell:first-child {
   text-align: left;
 }
 

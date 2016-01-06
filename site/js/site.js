@@ -5,12 +5,14 @@
 (function () {
   'use strict'
 
-  // header demo
-  new Jotted(document.getElementById('j-header'), {
-    files: [{
-      type: 'html',
-      url: 'index.html'
-    }]
-  })
-
+  var $demoHeader = document.getElementById('j-header')
+  if ($demoHeader) {
+    // header demo
+    new Jotted($demoHeader, {
+      files: [{
+        type: 'html',
+        url: 'index.html'
+      }]
+    })
+  }
 })()

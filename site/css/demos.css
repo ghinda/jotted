@@ -1,0 +1,117 @@
+/* jotted
+ * demos
+ */
+
+
+/* demo header
+*/
+
+.header-demo {
+  min-height: 60px;
+  background: #f2f2f2;
+}
+
+.header-demo .gl-cell {
+  padding: 8px;
+}
+
+.header-demo h1 {
+  margin: 0;
+
+  font-size: 20px;
+}
+
+.button-back {
+  padding-bottom: 8px;
+
+  font-size: 12px;
+}
+
+.header-demo .dropdown {
+  width: 152px;
+}
+
+.header-demo .dropdown-button {
+  margin: 0;
+}
+
+/* dropdown
+*/
+
+.dropdown-container {
+  text-align: right;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-button {
+  display: block;
+}
+
+.dropdown-content {
+  list-style-type: none;
+  position: absolute;
+  top: 40px;
+  left: 0;
+  z-index: 9;
+  display: none;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  border: 1px solid #efefef;
+  background: #fff;
+
+  text-align: left;
+}
+
+.dropdown-active .dropdown-content {
+  display: block;
+}
+
+.dropdown-content a {
+  display: block;
+  padding: 8px;
+
+  text-decoration: none;
+}
+
+.dropdown-content a:hover {
+  background: #efefef;
+}
+
+/* demo content
+ */
+
+.demo-content {
+  display: none;
+}
+
+/* demo skin
+ */
+
+.jotted-demo {
+  overflow: hidden;
+  height: 100%;
+}
+
+.jotted-demo .jotted-nav {
+  display: none;
+}
+
+.jotted-demo .jotted-pane {
+  float: right;
+  position: relative;
+  visibility: visible;
+  width: 50%;
+  height: 100%;
+  border: 1px solid red;
+}
+
+.jotted-demo .jotted-pane-css,
+.jotted-demo .jotted-pane-js {
+  display: none;
+}
+

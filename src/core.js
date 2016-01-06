@@ -17,6 +17,7 @@ class Jotted {
     this.options = util.extend(opts, {
       files: [],
       showBlank: false,
+      runScripts: true,
       pane: 'result',
       debounce: 250,
       plugins: []
@@ -155,6 +156,7 @@ class Jotted {
 
     if (params.type === 'html') {
       this.$resultFrame.contentWindow.document.body.innerHTML = params.content
+      this.runScripts(params.content)
       return
     }
 
@@ -179,6 +181,48 @@ class Jotted {
 
       return
     }
+  }
+
+  /* insert script tags from html content
+   */
+  insertScript ($script, callback = function (){}) {
+    let s = document.createElement('script')
+    if ($script.src) {
+      s.src = $script.src
+    } else {
+      s.textContent = $script.innerText
+    }
+
+    this.$resultFrame.contentWindow.document.head.appendChild(s)
+
+    if ($script.src) {
+      s.onload = callback
+    } else {
+      callback()
+    }
+
+  }
+
+  runScripts (content) {
+    /* run scripts inside html script tags
+     */
+    if (!this.options.runScripts) {
+      return
+    }
+
+    var $scripts = this.$resultFrame.contentWindow.document.querySelectorAll('script')
+    var l = $scripts.length
+    var runList = []
+
+    for (let i = 0; i < l; i++) {
+      runList.push((params, callback) => {
+        this.insertScript($scripts[i], callback)
+      })
+    }
+
+    // insert the script tags sequentially
+    // so we preserve execution order
+    util.seq(runList)
   }
 
   pane (e) {

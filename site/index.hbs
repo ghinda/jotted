@@ -40,7 +40,7 @@ title: ''
 
   <section>
     <div class="gl">
-      <div class="gl-cell section-features">
+      <div class="gl-cell section-features gl-md-8">
 {{#markdown}}
   ## Features
 
@@ -60,19 +60,19 @@ title: ''
 
           <ul class="gl gl-sm">
             <li class="gl-cell">
-              <img src="{{base}}images/logo-ie.png" class="logo-browser">
+              <img src="images/logo-ie.png" class="logo-browser">
               IE 9+
             </li>
             <li class="gl-cell">
-              <img src="{{base}}images/logo-safari-ios.png" class="logo-browser">
+              <img src="images/logo-safari-ios.png" class="logo-browser">
               iOS 5+
             </li>
             <li class="gl-cell">
-              <img src="{{base}}images/logo-android.png" class="logo-browser">
+              <img src="images/logo-android.png" class="logo-browser">
               Android 4+
             </li>
             <li class="gl-cell">
-              <img src="{{base}}images/logo-browser-modern.png" class="logo-browser">
+              <img src="images/logo-browser-modern.png" class="logo-browser">
               Modern browsers
             </li>
           </ul>
@@ -87,7 +87,7 @@ title: ''
 
 ## Demos
 
-* [Ace Editor]() - Using the Ace editor and plugin
+* [Ace Editor](demos/ace.html) - Using the Ace editor and plugin
 * [CodeMirror Editor]() - Using the CodeMirror editor and plugin
 * [Markdown]() - Using the Markdown plugin
 * [Less]() - Using the Less plugin
@@ -205,6 +205,14 @@ new Jotted(document.querySelector('#demo'), {
     }
   ]
 ```
+{{/markdown}}
+  </section>
+
+  <section>
+{{#markdown}}
+## Plugin API
+
+For creating custom plugins see the docs on the [Plugin API](https://github.com/ghinda/jotted#plugin-api).
 {{/markdown}}
   </section>
 

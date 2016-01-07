@@ -198,6 +198,51 @@
     return node.getAttribute('data-' + attr);
   }
 
+  /* re-insert script tags
+   */
+  function insertScript($script) {
+    var callback = arguments.length <= 1 || arguments[1] === undefined ? function () {} : arguments[1];
+
+    var s = document.createElement('script');
+    if ($script.src) {
+      s.src = $script.src;
+    } else {
+      s.textContent = $script.innerText;
+    }
+
+    this.$resultFrame.contentWindow.document.head.appendChild(s);
+
+    if ($script.src) {
+      s.onload = callback;
+    } else {
+      callback();
+    }
+  }
+
+  function runScripts(content) {
+    var _this = this;
+
+    /* get scripts tags from content added with innerhtml
+     */
+    var $scripts = this.$resultFrame.contentWindow.document.querySelectorAll('script');
+    var l = $scripts.length;
+    var runList = [];
+
+    var _loop = function _loop(i) {
+      runList.push(function (params, callback) {
+        insertScript.call(_this, $scripts[i], callback);
+      });
+    };
+
+    for (var i = 0; i < l; i++) {
+      _loop(i);
+    }
+
+    // insert the script tags sequentially
+    // so we preserve execution order
+    seq(runList);
+  }
+
   var plugins = [];
 
   function find(id) {
@@ -1005,7 +1050,11 @@
 
         if (params.type === 'html') {
           this.$resultFrame.contentWindow.document.body.innerHTML = params.content;
-          this.runScripts(params.content);
+
+          if (this.options.runScripts) {
+            runScripts.call(this, params.content);
+          }
+
           return;
         }
 
@@ -1030,59 +1079,6 @@
 
           return;
         }
-      }
-
-      /* insert script tags from html content
-       */
-
-    }, {
-      key: 'insertScript',
-      value: function insertScript($script) {
-        var callback = arguments.length <= 1 || arguments[1] === undefined ? function () {} : arguments[1];
-
-        var s = document.createElement('script');
-        if ($script.src) {
-          s.src = $script.src;
-        } else {
-          s.textContent = $script.innerText;
-        }
-
-        this.$resultFrame.contentWindow.document.head.appendChild(s);
-
-        if ($script.src) {
-          s.onload = callback;
-        } else {
-          callback();
-        }
-      }
-    }, {
-      key: 'runScripts',
-      value: function runScripts(content) {
-        var _this2 = this;
-
-        /* run scripts inside html script tags
-         */
-        if (!this.options.runScripts) {
-          return;
-        }
-
-        var $scripts = this.$resultFrame.contentWindow.document.querySelectorAll('script');
-        var l = $scripts.length;
-        var runList = [];
-
-        var _loop = function _loop(i) {
-          runList.push(function (params, callback) {
-            _this2.insertScript($scripts[i], callback);
-          });
-        };
-
-        for (var i = 0; i < l; i++) {
-          _loop(i);
-        }
-
-        // insert the script tags sequentially
-        // so we preserve execution order
-        seq(runList);
       }
     }, {
       key: 'pane',

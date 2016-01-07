@@ -6,6 +6,7 @@ import '../node_modules/babel-polyfill/browser.js'
 import * as util from './util.js'
 import * as template from './template.js'
 import * as plugin from './plugin.js'
+import script from './script.js'
 import PubSoup from './pubsoup.js'
 
 class Jotted {
@@ -156,7 +157,11 @@ class Jotted {
 
     if (params.type === 'html') {
       this.$resultFrame.contentWindow.document.body.innerHTML = params.content
-      this.runScripts(params.content)
+
+      if (this.options.runScripts) {
+        script.call(this, params.content)
+      }
+
       return
     }
 
@@ -181,48 +186,6 @@ class Jotted {
 
       return
     }
-  }
-
-  /* insert script tags from html content
-   */
-  insertScript ($script, callback = function (){}) {
-    let s = document.createElement('script')
-    if ($script.src) {
-      s.src = $script.src
-    } else {
-      s.textContent = $script.innerText
-    }
-
-    this.$resultFrame.contentWindow.document.head.appendChild(s)
-
-    if ($script.src) {
-      s.onload = callback
-    } else {
-      callback()
-    }
-
-  }
-
-  runScripts (content) {
-    /* run scripts inside html script tags
-     */
-    if (!this.options.runScripts) {
-      return
-    }
-
-    var $scripts = this.$resultFrame.contentWindow.document.querySelectorAll('script')
-    var l = $scripts.length
-    var runList = []
-
-    for (let i = 0; i < l; i++) {
-      runList.push((params, callback) => {
-        this.insertScript($scripts[i], callback)
-      })
-    }
-
-    // insert the script tags sequentially
-    // so we preserve execution order
-    util.seq(runList)
   }
 
   pane (e) {

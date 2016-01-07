@@ -1,8 +1,6 @@
 /* jotted
  */
 
-import '../node_modules/babel-polyfill/browser.js'
-
 import * as util from './util.js'
 import * as template from './template.js'
 import * as plugin from './plugin.js'
@@ -82,7 +80,8 @@ class Jotted {
   findFile (type) {
     var file = {}
 
-    for (let file of this.options.files) {
+    for (let fileIndex in this.options.files) {
+      let file = this.options.files[fileIndex]
       if (file.type === type) {
         return file
       }
@@ -220,7 +219,8 @@ class Jotted {
     util.addClass(this.$container, template.errorClass(params.type))
 
     var markup = ''
-    for (let err of errors) {
+    for (let errIndex in errors) {
+      let err = errors[errIndex]
       markup += template.errorMessage(err)
     }
 

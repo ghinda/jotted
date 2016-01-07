@@ -4,14 +4,33 @@ title: 'Ace Editor'
 demo: true
 ---
 
-<div class="jotted-demo jotted-demo-ace"></div>
+<div class="jotted-demo"></div>
 
-<textarea class="demo-content demo-content-ace">
+<textarea class="demo-content">
+
+<h2>
+  Jotted demo using Jotted
+</h2>
+
 <div id="jotted-demo-ace"></div>
 
+<script src="../bower_components/ace-builds/src/ace.js"></script>
+
+<link href="../jotted.css" rel="stylesheet">
 <script src="../jotted.js"></script>
 <script>
-  new Jotted(document.querySelector('#jotted-demo-ace'))
+  new Jotted(document.querySelector('#jotted-demo-ace'), {
+    files: [
+      {
+        type: 'html',
+        content: '<html>'
+      }
+    ],
+    pane: 'html',
+    plugins: [
+      'ace'
+    ]
+  })
 </script>
 
 </textarea>

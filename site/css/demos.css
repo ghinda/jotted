@@ -97,7 +97,27 @@
   height: 100%;
 }
 
+.jotted-demo .CodeMirror {
+  height: 100%;
+}
+
 .jotted-demo .jotted-nav {
+  background: #ddd;
+  border: 0;
+}
+
+.jotted-demo .jotted-nav-item-result,
+.jotted-demo .jotted-nav-item-html {
+  background: #fff;
+  border: 0;
+}
+
+.jotted-demo .jotted-nav-item-result {
+  float: right;
+}
+
+.jotted-demo .jotted-nav-item-html {
+  float: left;
 }
 
 .jotted-demo .jotted-pane {
@@ -106,7 +126,10 @@
   visibility: visible;
   width: 50%;
   height: 100%;
-  border: 1px solid red;
+}
+
+.jotted-demo .jotted-pane-html {
+  border-right: 1px solid #efefef;
 }
 
 .jotted-demo .jotted-pane-css,

@@ -64,15 +64,21 @@
   var init = function() {
     addEventListener.call(document.body, 'click', toggleDropdown);
 
-    // ace demo
-    new Jotted(document.querySelector('.jotted-demo-ace'), {
-      files: [
-        {
-          type: 'html',
-          content: document.querySelector('.demo-content-ace').value
-        }
-      ]
-    })
+    var $jdemo = document.querySelector('.jotted-demo')
+    if ($jdemo) {
+      // ace demo
+      new Jotted($jdemo, {
+        files: [
+          {
+            type: 'html',
+            content: document.querySelector('.demo-content').value
+          }
+        ],
+        plugins: [
+          'codemirror'
+        ]
+      })
+    }
 
   };
 

@@ -65,7 +65,8 @@ export default class PubSoup {
     return function () {
       pub.callbacks[topic] = pub.callbacks[topic] || []
 
-      for (let c of pub.callbacks[topic]) {
+      for (let callbackIndex in pub.callbacks[topic]) {
+        let c = pub.callbacks[topic][callbackIndex]
         c.apply(this, arguments)
       }
     }

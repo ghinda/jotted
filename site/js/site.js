@@ -11,7 +11,7 @@
     new Jotted($demoHeader, {
       files: [{
         type: 'html',
-        url: 'index.html'
+        url: 'blank.html'
       }]
     })
   }

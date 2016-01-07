@@ -13,10 +13,13 @@ function insertScript ($script, callback = function () {}) {
     s.textContent = $script.innerText
   }
 
+  // we can append it to the head,
+  // the dom is already loaded so it won't block.
   this.$resultFrame.contentWindow.document.head.appendChild(s)
 
   if ($script.src) {
     s.onload = callback
+    s.onerror = callback
   } else {
     callback()
   }

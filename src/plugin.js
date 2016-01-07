@@ -7,7 +7,8 @@ import * as template from './template.js'
 var plugins = []
 
 function find (id) {
-  for (let plugin of plugins) {
+  for (let pluginIndex in plugins) {
+    let plugin = plugins[pluginIndex]
     if (plugin._id === id) {
       return plugin
     }
@@ -25,7 +26,8 @@ function register (id, plugin) {
 
 // create a new instance of each plugin, on the jotted instance
 function init () {
-  for (let plugin of this.options.plugins) {
+  for (let pluginIndex in this.options.plugins) {
+    let plugin = this.options.plugins[pluginIndex]
     // check if plugin definition is string or object
     let Plugin
     let pluginName

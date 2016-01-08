@@ -30,23 +30,43 @@ layout: main.html
 
           <ul id="dropdown-demos" class="dropdown-content">
             <li>
-              <a href="simple.html">
-                Simple Layout
+              <a href="demos/ace.html">
+                Ace Editor
               </a>
             </li>
             <li>
-              <a href="sticky.html">
-                Sticky Footer
+              <a href="demos/codemirror.html">
+                CodeMirror Editor
               </a>
             </li>
             <li>
-              <a href="holy.html">
-                Holy Grail Layout
+              <a href="demos/markdown.html">
+                Markdown
               </a>
             </li>
             <li>
-              <a href="mail.html">
-                Email App
+              <a href="demos/less.html">
+                Less
+              </a>
+            </li>
+            <li>
+              <a href="demos/stylus.html">
+                Stylus
+              </a>
+            </li>
+            <li>
+              <a href="demos/coffeescript.html">
+                CoffeeScript
+              </a>
+            </li>
+            <li>
+              <a href="demos/es2015.html">
+                ES2015
+              </a>
+            </li>
+            <li>
+              <a href="demos/files.html">
+                Loading files
               </a>
             </li>
           </ul>
@@ -60,7 +80,17 @@ layout: main.html
   </div>
 
   <div class="gl-cell gl-fill">
-    {{> body }}
+
+    <div class="jotted-demo"></div>
+
+    <div class="demo-content">
+{{#markdown}}
+```
+{{> body }}
+```
+{{/markdown}}
+    </div>
+
   </div>
 </div>
 

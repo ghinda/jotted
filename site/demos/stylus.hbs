@@ -1,0 +1,25 @@
+---
+layout: demo.html
+title: Stylus
+demo: true
+---
+<div id="jotted-demo-stylus"></div>
+
+<script src="../lib/stylus.min.js"></script>
+
+<link href="../jotted.css" rel="stylesheet">
+<script src="../jotted.js"></script>
+<script>
+  new Jotted(document.querySelector('#jotted-demo-stylus'), {
+    files: [
+      {
+        type: 'css',
+        content: 'stylusVar = hotpink;\nbody {\n background: stylusVar; \n}'
+      }
+    ],
+    pane: 'css',
+    plugins: [
+      'stylus'
+    ]
+  })
+</script>

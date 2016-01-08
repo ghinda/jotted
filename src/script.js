@@ -7,26 +7,29 @@ import * as util from './util.js'
  */
 function insertScript ($script, callback = function () {}) {
   let s = document.createElement('script')
+  s.type = 'text/javascript'
   if ($script.src) {
+    s.onload = callback
+    s.onerror = callback
     s.src = $script.src
   } else {
     s.textContent = $script.innerText
   }
 
-  // re-insert the string tags so they execute
-  this.$resultFrame.contentWindow.document.head.appendChild(s)
+  // re-insert the script tag so it executes.
+  // use the timeout trick to make sure the script is also executed,
+  // not just loaded.
+  setTimeout(() => {
+    this.$resultFrame.contentWindow.document.head.appendChild(s)
+  })
 
-  if ($script.src) {
-    s.onload = callback
-    s.onerror = callback
-  } else {
+  if (!$script.src) {
     callback()
   }
 }
 
 export default function runScripts (content) {
-  /* get scripts tags from content added with innerhtml
-   */
+  // get scripts tags from content added with innerhtml
   var $scripts = this.$resultFrame.contentWindow.document.body.querySelectorAll('script')
   var l = $scripts.length
   var runList = []

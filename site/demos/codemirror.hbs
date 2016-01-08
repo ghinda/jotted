@@ -1,0 +1,26 @@
+---
+layout: demo.html
+title: CodeMirror
+demo: true
+---
+<div id="jotted-demo-codemirror"></div>
+
+<link rel="stylesheet" href="../bower_components/codemirror/lib/codemirror.css">
+<script src="../bower_components/codemirror/lib/codemirror.js"></script>
+
+<link href="../jotted.css" rel="stylesheet">
+<script src="../jotted.js"></script>
+<script>
+  new Jotted(document.querySelector('#jotted-demo-codemirror'), {
+    files: [
+      {
+        type: 'html',
+        content: '<html>\n<body>\n<h1>Using CodeMirror</h1>\n</body>\n</html>'
+      }
+    ],
+    pane: 'html',
+    plugins: [
+      'codemirror'
+    ]
+  })
+</script>

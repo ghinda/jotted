@@ -66,6 +66,12 @@ Default: `false`
 
 Specifies if panes/tabs without content/files should be visible.
 
+#### runScripts
+Type: `Boolean`
+Default: `true`
+
+Specifies if script tags inside HTML content should be ran.
+
 #### pane
 Type: `String`
 Default: `result`

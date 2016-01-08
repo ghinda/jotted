@@ -17,7 +17,7 @@ export default class PluginBabel {
     }
 
     // change js link label
-    jotted.$container.querySelector('a[data-jotted-type="js"]').innerHTML = 'ES6'
+    jotted.$container.querySelector('a[data-jotted-type="js"]').innerHTML = 'ES2015'
 
     jotted.on('change', this.change.bind(this), priority)
   }

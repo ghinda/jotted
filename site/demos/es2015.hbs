@@ -1,0 +1,30 @@
+---
+layout: demo.html
+title: ES2015
+demo: true
+---
+
+<p>
+  Get <code>babel.js</code> from <a href="https://github.com/Daniel15/babel-standalone" target="_blank">babel-standalone</a>.
+</p>
+
+<div id="jotted-demo-es2015"></div>
+
+<script src="../lib/babel.js"></script>
+
+<link href="../jotted.css" rel="stylesheet">
+<script src="../jotted.js"></script>
+<script>
+  new Jotted(document.querySelector('#jotted-demo-es2015'), {
+    files: [
+      {
+        type: 'js',
+        content: '[ 1, 2 ].forEach((item) => { console.log(item) })'
+      }
+    ],
+    pane: 'js',
+    plugins: [
+      'babel'
+    ]
+  })
+</script>

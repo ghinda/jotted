@@ -71,7 +71,7 @@
         files: [
           {
             type: 'html',
-            content: document.querySelector('.demo-content').value
+            content: he.decode(document.querySelector('.demo-content code').innerHTML)
           }
         ],
         plugins: [

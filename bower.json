@@ -26,7 +26,8 @@
     "less": "~2.5.3",
     "jasmine-core": "jasmine#~2.4.1",
     "jasmine-jsreporter": "~0.1.2",
-    "coffee-script": "coffeescript#~1.10.0"
+    "coffee-script": "coffeescript#~1.10.0",
+    "he": "~0.5.0"
   },
   "dependencies": {
     "gridlayout": "~1.0.2",

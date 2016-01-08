@@ -81,7 +81,9 @@
   }
 
   function frameContent() {
-    return '\n    <!doctype html>\n    <html>\n    <head>\n    </head>\n    <body>\n    </body>\n    </html>\n  ';
+    var body = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
+
+    return '\n    <!doctype html>\n    <html>\n    <head>\n    </head>\n    <body>\n    ' + body + '\n    </body>\n    </html>\n  ';
   }
 
   /* util
@@ -210,8 +212,7 @@
       s.textContent = $script.innerText;
     }
 
-    // we can append it to the head,
-    // the dom is already loaded so it won't block.
+    // re-insert the string tags so they execute
     this.$resultFrame.contentWindow.document.head.appendChild(s);
 
     if ($script.src) {
@@ -227,7 +228,7 @@
 
     /* get scripts tags from content added with innerhtml
      */
-    var $scripts = this.$resultFrame.contentWindow.document.querySelectorAll('script');
+    var $scripts = this.$resultFrame.contentWindow.document.body.querySelectorAll('script');
     var l = $scripts.length;
     var runList = [];
 
@@ -268,8 +269,9 @@
 
   // create a new instance of each plugin, on the jotted instance
   function init() {
-    for (var pluginIndex in this.options.plugins) {
-      var plugin = this.options.plugins[pluginIndex];
+    var _this = this;
+
+    this.options.plugins.forEach(function (plugin) {
       // check if plugin definition is string or object
       var Plugin = undefined;
       var pluginName = undefined;
@@ -282,10 +284,10 @@
       }
 
       Plugin = find(pluginName);
-      this.plugins[plugin] = new Plugin(this, pluginOptions);
+      _this.plugins[plugin] = new Plugin(_this, pluginOptions);
 
-      addClass(this.$container, pluginClass(pluginName));
-    }
+      addClass(_this.$container, pluginClass(pluginName));
+    });
   }
 
   var PubSoup = (function () {
@@ -364,12 +366,14 @@
       value: function runCallbacks(topic) {
         var pub = this;
         return function () {
+          var _this = this,
+              _arguments = arguments;
+
           pub.callbacks[topic] = pub.callbacks[topic] || [];
 
-          for (var callbackIndex in pub.callbacks[topic]) {
-            var c = pub.callbacks[topic][callbackIndex];
-            c.apply(this, arguments);
-          }
+          pub.callbacks[topic].forEach(function (c) {
+            c.apply(_this, _arguments);
+          });
         };
       }
 
@@ -840,6 +844,13 @@
       addClass(this.$container, paneActiveClass(this.paneActive));
 
       this.$result = $editor.querySelector('.jotted-pane-result');
+      this.$resultFrame = this.$result.querySelector('iframe');
+
+      var $frameDoc = this.$resultFrame.contentWindow.document;
+      $frameDoc.open();
+      $frameDoc.write(frameContent());
+      $frameDoc.close();
+
       this.$pane = {};
       this.$error = {};
 
@@ -851,13 +862,6 @@
 
         this.$error[type] = this.$pane[type].querySelector('.jotted-error');
       }
-
-      this.$resultFrame = this.$result.querySelector('iframe');
-
-      var $frameDoc = this.$resultFrame.contentWindow.document;
-      $frameDoc.open();
-      $frameDoc.write(frameContent());
-      $frameDoc.close();
 
       this.$styleInject = document.createElement('style');
       $frameDoc.head.appendChild(this.$styleInject);
@@ -968,6 +972,18 @@
         this.error(errors, params);
 
         if (params.type === 'html') {
+          // if we have script execution enabled,
+          // re-create the iframe,
+          // to stop execution of any previously started js,
+          // and garbage collect it.
+          if (this.options.runScripts) {
+            this.$result.removeChild(this.$resultFrame);
+            this.$resultFrame = document.createElement('iframe');
+            this.$result.appendChild(this.$resultFrame);
+
+            params.content = frameContent(params.content);
+          }
+
           this.$resultFrame.contentWindow.document.body.innerHTML = params.content;
 
           if (this.options.runScripts) {
@@ -1037,10 +1053,9 @@
         addClass(this.$container, errorClass(params.type));
 
         var markup = '';
-        for (var errIndex in errors) {
-          var err = errors[errIndex];
+        errors.forEach(function (err) {
           markup += errorMessage(err);
-        }
+        });
 
         this.$error[params.type].innerHTML = markup;
       }

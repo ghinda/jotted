@@ -26,8 +26,7 @@ function register (id, plugin) {
 
 // create a new instance of each plugin, on the jotted instance
 function init () {
-  for (let pluginIndex in this.options.plugins) {
-    let plugin = this.options.plugins[pluginIndex]
+  this.options.plugins.forEach((plugin) => {
     // check if plugin definition is string or object
     let Plugin
     let pluginName
@@ -43,7 +42,7 @@ function init () {
     this.plugins[plugin] = new Plugin(this, pluginOptions)
 
     util.addClass(this.$container, template.pluginClass(pluginName))
-  }
+  })
 }
 
 export {

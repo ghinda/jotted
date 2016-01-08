@@ -13,8 +13,7 @@ function insertScript ($script, callback = function () {}) {
     s.textContent = $script.innerText
   }
 
-  // we can append it to the head,
-  // the dom is already loaded so it won't block.
+  // re-insert the string tags so they execute
   this.$resultFrame.contentWindow.document.head.appendChild(s)
 
   if ($script.src) {
@@ -28,7 +27,7 @@ function insertScript ($script, callback = function () {}) {
 export default function runScripts (content) {
   /* get scripts tags from content added with innerhtml
    */
-  var $scripts = this.$resultFrame.contentWindow.document.querySelectorAll('script')
+  var $scripts = this.$resultFrame.contentWindow.document.body.querySelectorAll('script')
   var l = $scripts.length
   var runList = []
 

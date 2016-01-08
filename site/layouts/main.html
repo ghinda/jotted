@@ -23,26 +23,18 @@
   <link rel="stylesheet" href="jotted.css">
 
   <link rel="stylesheet" href="css/site.css">
-  {{#if demo}}
-    <link rel="stylesheet" href="css/demos.css">
-  {{/if}}
 </head>
 <body>
+
+  <script src="jotted.js"></script>
 
   {{> body }}
 
   <!--[if !(lte IE 8)]><!-->
-  <script src="{{base}}bower_components/prism/prism.js"></script>
+  <script src="bower_components/prism/prism.js"></script>
   <!--<![endif]-->
   <script src="bower_components/gridlayout/gridlayout-ie.js"></script>
-  <script src="jotted.js"></script>
 
   <script src="js/site.js"></script>
-
-  {{#if demo}}
-    <link rel="stylesheet" href="bower_components/codemirror/lib/codemirror.css">
-    <script src="bower_components/codemirror/lib/codemirror.js"></script>
-    <script src="js/demos.js"></script>
-  {{/if}}
 </body>
 </html>

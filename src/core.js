@@ -37,6 +37,13 @@ class Jotted {
     util.addClass(this.$container, template.paneActiveClass(this.paneActive))
 
     this.$result = $editor.querySelector('.jotted-pane-result')
+    this.$resultFrame = this.$result.querySelector('iframe')
+
+    var $frameDoc = this.$resultFrame.contentWindow.document
+    $frameDoc.open()
+    $frameDoc.write(template.frameContent())
+    $frameDoc.close()
+
     this.$pane = {}
     this.$error = {}
 
@@ -46,13 +53,6 @@ class Jotted {
 
       this.$error[type] = this.$pane[type].querySelector('.jotted-error')
     }
-
-    this.$resultFrame = this.$result.querySelector('iframe')
-
-    var $frameDoc = this.$resultFrame.contentWindow.document
-    $frameDoc.open()
-    $frameDoc.write(template.frameContent())
-    $frameDoc.close()
 
     this.$styleInject = document.createElement('style')
     $frameDoc.head.appendChild(this.$styleInject)
@@ -155,6 +155,18 @@ class Jotted {
     this.error(errors, params)
 
     if (params.type === 'html') {
+      // if we have script execution enabled,
+      // re-create the iframe,
+      // to stop execution of any previously started js,
+      // and garbage collect it.
+      if (this.options.runScripts) {
+        this.$result.removeChild(this.$resultFrame)
+        this.$resultFrame = document.createElement('iframe')
+        this.$result.appendChild(this.$resultFrame)
+
+        params.content = template.frameContent(params.content)
+      }
+
       this.$resultFrame.contentWindow.document.body.innerHTML = params.content
 
       if (this.options.runScripts) {
@@ -219,10 +231,9 @@ class Jotted {
     util.addClass(this.$container, template.errorClass(params.type))
 
     var markup = ''
-    for (let errIndex in errors) {
-      let err = errors[errIndex]
+    errors.forEach(function (err) {
       markup += template.errorMessage(err)
-    }
+    })
 
     this.$error[params.type].innerHTML = markup
   }

@@ -75,13 +75,14 @@ export function pluginClass (name) {
   return `jotted-plugin-${name}`
 }
 
-export function frameContent () {
+export function frameContent (body = '') {
   return `
     <!doctype html>
     <html>
     <head>
     </head>
     <body>
+    ${body}
     </body>
     </html>
   `

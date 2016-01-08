@@ -1,0 +1,30 @@
+{
+  "name": "he",
+  "version": "0.5.0",
+  "main": "he.js",
+  "ignore": [
+    "bin",
+    "coverage",
+    "data",
+    "man",
+    "scripts",
+    "src",
+    "tests",
+    ".*",
+    "component.json",
+    "Gruntfile.js",
+    "node_modules",
+    "package.json"
+  ],
+  "homepage": "https://github.com/mathiasbynens/he",
+  "_release": "0.5.0",
+  "_resolution": {
+    "type": "version",
+    "tag": "v0.5.0",
+    "commit": "6606d5dacd888c2cfd9a93dfd6b8b5be4a518c16"
+  },
+  "_source": "git://github.com/mathiasbynens/he.git",
+  "_target": "~0.5.0",
+  "_originalSource": "he",
+  "_direct": true
+}

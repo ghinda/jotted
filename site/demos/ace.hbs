@@ -6,8 +6,9 @@ demo: true
 
 <div class="jotted-demo"></div>
 
-<textarea class="demo-content">
-
+<pre class="demo-content">
+{{#markdown}}
+```
 <h2>
   Jotted demo using Jotted
 </h2>
@@ -23,7 +24,7 @@ demo: true
     files: [
       {
         type: 'html',
-        content: '<html>'
+        content: '<html>\n<body>\n<h1>Using Ace Editor</h1>\n</body>\n</html>'
       }
     ],
     pane: 'html',
@@ -32,5 +33,6 @@ demo: true
     ]
   })
 </script>
-
-</textarea>
+```
+{{/markdown}}
+</pre>

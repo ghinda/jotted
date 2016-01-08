@@ -1,0 +1,102 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>
+    
+      Jotted &#8212; Showcase self-hosted HTML, CSS and JavaScript demos, with editable source
+    
+  </title>
+  <meta name="description" content="Environment for showcasing HTML, CSS and JavaScript, with editable source. Like JSFiddle or JS Bin for self-hosted demos.">
+  <meta name="keywords" content="jot,jotted,html,css,javascript,editor,client-side,self-hosted,demo,jsfiddle,jsbin,codepen,cssdeck,fiddle">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+  <link rel="stylesheet" href="bower_components/gridlayout/gridlayout.css">
+  <link rel="stylesheet" href="bower_components/prism/themes/prism.css">
+  <link rel="stylesheet" href="jotted.css">
+
+  <link rel="stylesheet" href="css/site.css">
+</head>
+<body>
+
+  <script src="jotted.js"></script>
+
+  
+
+<div id="j-ace"></div>
+<div id="j-cm"></div>
+
+<link rel="stylesheet" href="bower_components/codemirror/lib/codemirror.css">
+<script src="bower_components/codemirror/lib/codemirror.js"></script>
+
+<script src="bower_components/ace-builds/src/ace.js"></script>
+
+<script src="bower_components/less/dist/less.js"></script>
+
+<script src="bower_components/coffee-script/extras/coffee-script.js"></script>
+
+<script src="lib/stylus.min.js"></script>
+
+<script src="lib/babel.min.js"></script>
+
+<script src="lib/marked.js"></script>
+
+<script src="jotted.js"></script>
+
+<script>
+  Jotted.plugin('test', function (jotted, options) {
+    console.log('test', options)
+  });
+
+  var jot = new Jotted(document.getElementById('j-ace'), {
+    files: [{
+      type: 'html',
+      url: 'demos/ace.html'
+    }],
+    plugins: [
+      'ace',
+      'less',
+      'coffeescript',
+      {
+        name: 'test',
+        options: {
+          testOption: 'test-option'
+        }
+      }
+    ]
+  });
+
+  var jot = new Jotted(document.getElementById('j-cm'), {
+    pane: 'html',
+    files: [{
+      type: 'css',
+      url: 'jotted.styl'
+    }, {
+      type: 'html',
+      content: '# heading 1'
+    }],
+    showBlank: true,
+    plugins: [
+      {
+        name: 'codemirror',
+        options: {}
+      },
+      'stylus',
+      'babel',
+      'markdown'
+    ]
+  });
+</script>
+
+
+  <!--[if !(lte IE 8)]><!-->
+  <script src="bower_components/prism/prism.js"></script>
+  <!--<![endif]-->
+  <script src="bower_components/gridlayout/gridlayout-ie.js"></script>
+
+  <script src="js/site.js"></script>
+</body>
+</html>

@@ -1,0 +1,159 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>
+    
+      Markdown &#8212; Jotted
+    
+  </title>
+  <meta name="description" content="Environment for showcasing HTML, CSS and JavaScript, with editable source. Like JSFiddle or JS Bin for self-hosted demos.">
+  <meta name="keywords" content="jot,jotted,html,css,javascript,editor,client-side,self-hosted,demo,jsfiddle,jsbin,codepen,cssdeck,fiddle">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+    <base href="../">
+  
+
+  <link rel="stylesheet" href="bower_components/gridlayout/gridlayout.css">
+  <link rel="stylesheet" href="bower_components/prism/themes/prism.css">
+  <link rel="stylesheet" href="jotted.css">
+
+  <link rel="stylesheet" href="css/site.css">
+</head>
+<body>
+
+  <script src="jotted.js"></script>
+
+  
+
+<div class="gl gl-vertical">
+
+  <div class="gl-cell header-demo">
+
+    <div class="gl">
+
+      <div class="gl-cell">
+
+        <a href="../" class="button-back">
+          &larr; Back to documentation
+        </a>
+
+        <h1>
+          Jotted
+        </h1>
+
+      </div>
+
+      <div class="gl-cell dropdown-container">
+
+        <div class="dropdown">
+
+          <a href="#dropdown-demos" class="button dropdown-button">
+            Demos
+          </a>
+
+          <ul id="dropdown-demos" class="dropdown-content">
+            <li>
+              <a href="demos/ace.html">
+                Ace Editor
+              </a>
+            </li>
+            <li>
+              <a href="demos/codemirror.html">
+                CodeMirror Editor
+              </a>
+            </li>
+            <li>
+              <a href="demos/markdown.html">
+                Markdown
+              </a>
+            </li>
+            <li>
+              <a href="demos/less.html">
+                Less
+              </a>
+            </li>
+            <li>
+              <a href="demos/stylus.html">
+                Stylus
+              </a>
+            </li>
+            <li>
+              <a href="demos/coffeescript.html">
+                CoffeeScript
+              </a>
+            </li>
+            <li>
+              <a href="demos/es2015.html">
+                ES2015
+              </a>
+            </li>
+            <li>
+              <a href="demos/files.html">
+                Loading files
+              </a>
+            </li>
+          </ul>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="gl-cell gl-fill">
+
+    <div class="jotted-demo"></div>
+
+    <div class="demo-content">
+<pre><code>
+&lt;div id=&quot;jotted-demo-markdown&quot;&gt;&lt;/div&gt;
+
+&lt;link rel=&quot;stylesheet&quot; href=&quot;../bower_components/codemirror/lib/codemirror.css&quot;&gt;
+&lt;script src=&quot;../bower_components/codemirror/lib/codemirror.js&quot;&gt;&lt;/script&gt;
+
+&lt;script src=&quot;../lib/marked.js&quot;&gt;&lt;/script&gt;
+
+&lt;link href=&quot;../jotted.css&quot; rel=&quot;stylesheet&quot;&gt;
+&lt;script src=&quot;../jotted.js&quot;&gt;&lt;/script&gt;
+&lt;script&gt;
+  new Jotted(document.querySelector(&#39;#jotted-demo-markdown&#39;), {
+    files: [
+      {
+        type: &#39;html&#39;,
+        content: &#39;# Using Markdown\n\n &gt; And CodeMirror&#39;
+      }
+    ],
+    pane: &#39;html&#39;,
+    plugins: [
+      &#39;codemirror&#39;,
+      &#39;markdown&#39;
+    ]
+  })
+&lt;/script&gt;</code></pre>
+
+    </div>
+
+  </div>
+</div>
+
+<link rel="stylesheet" href="bower_components/codemirror/lib/codemirror.css">
+<link rel="stylesheet" href="css/demos.css">
+
+<script src="bower_components/codemirror/lib/codemirror.js"></script>
+<script src="bower_components/he/he.js"></script>
+<script src="js/demos.js"></script>
+
+
+  <!--[if !(lte IE 8)]><!-->
+  <script src="bower_components/prism/prism.js"></script>
+  <!--<![endif]-->
+  <script src="bower_components/gridlayout/gridlayout-ie.js"></script>
+
+  <script src="js/site.js"></script>
+</body>
+</html>

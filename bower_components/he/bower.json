@@ -1,0 +1,19 @@
+{
+	"name": "he",
+	"version": "0.5.0",
+	"main": "he.js",
+	"ignore": [
+		"bin",
+		"coverage",
+		"data",
+		"man",
+		"scripts",
+		"src",
+		"tests",
+		".*",
+		"component.json",
+		"Gruntfile.js",
+		"node_modules",
+		"package.json"
+	]
+}

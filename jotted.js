@@ -215,8 +215,6 @@
   /* re-insert script tags
    */
   function insertScript($script) {
-    var _this = this;
-
     var callback = arguments.length <= 1 || arguments[1] === undefined ? function () {} : arguments[1];
 
     var s = document.createElement('script');
@@ -226,23 +224,30 @@
       s.onerror = callback;
       s.src = $script.src;
     } else {
-      s.textContent = $script.innerText;
+      // wrap inline scripts in a timeout,
+      // to make sure they don't execute if the iframe is destroyed,
+      // and get the garbage collected.
+      // when using a plugin that triggers another quick change event
+      // - ace/codemirror, inline scripts would still execute,
+      // but without some of the other external script dependencies.
+      // eg. when using jotted with codemirror to demo jotted,
+      // in one of the two inline script runs, `Jotted` would be undefined,
+      // because jotted.js was unloaded from memory when the iframe was removed,
+      // but the `new Jotted(..` inline script would still run.
+      s.textContent = 'setTimeout(function(){' + $script.innerText + '})';
     }
 
     // re-insert the script tag so it executes.
-    // use the timeout trick to make sure the script is also executed,
-    // not just loaded.
-    setTimeout(function () {
-      _this.$resultFrame.contentWindow.document.head.appendChild(s);
+    this.$resultFrame.contentWindow.document.head.appendChild(s);
 
-      if (!$script.src) {
-        callback();
-      }
-    });
+    // run the callback immediately for inline scripts
+    if (!$script.src) {
+      callback();
+    }
   }
 
   function runScripts(content) {
-    var _this2 = this;
+    var _this = this;
 
     // get scripts tags from content added with innerhtml
     var $scripts = this.$resultFrame.contentWindow.document.body.querySelectorAll('script');
@@ -251,7 +256,7 @@
 
     var _loop = function _loop(i) {
       runList.push(function (params, callback) {
-        insertScript.call(_this2, $scripts[i], callback);
+        insertScript.call(_this, $scripts[i], callback);
       });
     };
 

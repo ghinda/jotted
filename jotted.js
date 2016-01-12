@@ -226,11 +226,11 @@
     // not just loaded.
     setTimeout(function () {
       _this.$resultFrame.contentWindow.document.head.appendChild(s);
-    });
 
-    if (!$script.src) {
-      callback();
-    }
+      if (!$script.src) {
+        callback();
+      }
+    });
   }
 
   function runScripts(content) {

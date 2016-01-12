@@ -21,11 +21,11 @@ function insertScript ($script, callback = function () {}) {
   // not just loaded.
   setTimeout(() => {
     this.$resultFrame.contentWindow.document.head.appendChild(s)
-  })
 
-  if (!$script.src) {
-    callback()
-  }
+    if (!$script.src) {
+      callback()
+    }
+  })
 }
 
 export default function runScripts (content) {

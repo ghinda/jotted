@@ -65,15 +65,19 @@
   function editorContent(type) {
     var fileUrl = arguments.length <= 1 || arguments[1] === undefined ? '' : arguments[1];
 
-    return '\n    <textarea data-jotted-type="' + type + '" data-jotted-file="' + fileUrl + '"></textarea>\n    <div class="jotted-error"></div>\n  ';
+    return '\n    <textarea data-jotted-type="' + type + '" data-jotted-file="' + fileUrl + '"></textarea>\n    <div class="jotted-status"></div>\n  ';
   }
 
-  function errorMessage(err) {
+  function statusMessage(err) {
     return '\n    <p>' + err + '</p>\n  ';
   }
 
-  function errorClass(type) {
-    return 'jotted-error-active-' + type;
+  function statusClass(type) {
+    return 'jotted-status-' + type;
+  }
+
+  function statusActiveClass(type) {
+    return 'jotted-status-active-' + type;
   }
 
   function pluginClass(name) {
@@ -86,8 +90,12 @@
     return '\n    <!doctype html>\n    <html>\n    <head>\n    </head>\n    <body>\n    ' + body + '\n    </body>\n    </html>\n  ';
   }
 
-  function loadError(url) {
-    return 'There was an error loading <strong>' + url + '.</strong>';
+  function statusLoading(url) {
+    return 'Loading <strong>' + url + '</strong>..';
+  }
+
+  function statusFetchError(url) {
+    return 'There was an error loading <strong>' + url + '</strong>.';
   }
 
   /* util
@@ -861,15 +869,13 @@
       $frameDoc.close();
 
       this.$pane = {};
-      this.$error = {};
+      this.$status = {};
 
       var _arr = ['html', 'css', 'js'];
       for (var _i = 0; _i < _arr.length; _i++) {
         var type = _arr[_i];
         this.$pane[type] = $editor.querySelector('.jotted-pane-' + type);
         this.markup(type, this.$pane[type]);
-
-        this.$error[type] = this.$pane[type].querySelector('.jotted-error');
       }
 
       this.$styleInject = document.createElement('style');
@@ -924,6 +930,9 @@
 
         $parent.appendChild($editor);
 
+        // get the status node
+        this.$status[type] = this.$pane[type].querySelector('.jotted-status');
+
         // if we don't have a file for the current type
         if (typeof file.url === 'undefined' && typeof file.content === 'undefined') {
           return;
@@ -936,11 +945,17 @@
         if (typeof file.content !== 'undefined') {
           this.setValue($textarea, file.content);
         } else if (typeof file.url !== 'undefined') {
+          // show loading message
+          this.status('loading', [statusLoading(file.url)], {
+            type: type,
+            file: file
+          });
+
           // file as url
           fetch(file.url, function (err, res) {
             if (err) {
               // show load errors
-              _this.error([loadError(err)], {
+              _this.status('error', [statusFetchError(err)], {
                 type: type,
                 file: file
               });
@@ -948,6 +963,8 @@
               return;
             }
 
+            // the change callback will clear all status messages,
+            // so we don't have to manually clear the loading message.
             _this.setValue($textarea, res);
           });
         }
@@ -978,7 +995,7 @@
     }, {
       key: 'changeCallback',
       value: function changeCallback(errors, params) {
-        this.error(errors, params);
+        this.status('error', errors, params);
 
         if (params.type === 'html') {
           // if we have script execution enabled,
@@ -1015,7 +1032,7 @@
             // only show eval errors if we don't have other errors from plugins.
             // useful for preprocessor error reporting (eg. babel, coffeescript).
             if (!errors.length) {
-              this.error([err.message], {
+              this.status('error', [err.message], {
                 type: 'js'
               });
             }
@@ -1053,26 +1070,34 @@
         this.pubsoup.done.apply(this.pubsoup, arguments);
       }
     }, {
-      key: 'error',
-      value: function error(errors, params) {
-        if (!errors.length) {
-          return this.clearError(params);
+      key: 'status',
+      value: function status() {
+        var statusType = arguments.length <= 0 || arguments[0] === undefined ? 'error' : arguments[0];
+        var messages = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
+        var params = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+
+        if (!messages.length) {
+          return this.clearStatus(statusType, params);
         }
 
-        addClass(this.$container, errorClass(params.type));
+        // add error/loading class to status
+        addClass(this.$status[params.type], statusClass(statusType));
+
+        addClass(this.$container, statusActiveClass(params.type));
 
         var markup = '';
-        errors.forEach(function (err) {
-          markup += errorMessage(err);
+        messages.forEach(function (err) {
+          markup += statusMessage(err);
         });
 
-        this.$error[params.type].innerHTML = markup;
+        this.$status[params.type].innerHTML = markup;
       }
     }, {
-      key: 'clearError',
-      value: function clearError(params) {
-        removeClass(this.$container, errorClass(params.type));
-        this.$error[params.type].innerHTML = '';
+      key: 'clearStatus',
+      value: function clearStatus(statusType, params) {
+        removeClass(this.$status[params.type], statusClass(statusType));
+        removeClass(this.$container, statusActiveClass(params.type));
+        this.$status[params.type].innerHTML = '';
       }
     }]);
     return Jotted;

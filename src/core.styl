@@ -128,35 +128,34 @@
   background: #fff;
 }
 
-/* errors
+/* status
  */
 
-.jotted-error-active-html .jotted-pane-html,
-.jotted-error-active-css .jotted-pane-css,
-.jotted-error-active-js .jotted-pane-js {
+.jotted-status-active-html .jotted-pane-html,
+.jotted-status-active-css .jotted-pane-css,
+.jotted-status-active-js .jotted-pane-js {
   padding-bottom: 1.5em;
 }
 
-.jotted-error {
+.jotted-status {
   position: absolute;
   bottom: 0;
   left: 0;
   z-index: 999;
   width: 100%;
   padding: 0 .6em;
-  background: #FFCCBC;
 
   line-height: 1.5em;
 }
 
-.jotted-error p {
+.jotted-status p {
   margin: 0;
 
   color: #333;
   font-size: .8em;
 }
 
-.jotted-error p:before {
+.jotted-status p:before {
   content: '';
   position: relative;
   display: inline-block;
@@ -165,7 +164,6 @@
   margin-right: .8em;
   margin-bottom: .24em;
   border-radius: 100%;
-  background: #C0392B;
 
   color: #fff;
   font-size: .8em;
@@ -174,6 +172,22 @@
   line-height: 1.2em;
   text-align: center;
   vertical-align: middle;
+}
+
+.jotted-status-loading {
+  background: #fff6d5;
+}
+
+.jotted-status-loading p:before {
+  background: #ffdd55;
+}
+
+.jotted-status-error {
+  background: #FFCCBC;
+}
+
+.jotted-status-error p:before {
+  background: #C0392B;
 }
 
 /* plugins

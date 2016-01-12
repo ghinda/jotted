@@ -57,18 +57,22 @@ export function editorClass (type) {
 export function editorContent (type, fileUrl = '') {
   return `
     <textarea data-jotted-type="${type}" data-jotted-file="${fileUrl}"></textarea>
-    <div class="jotted-error"></div>
+    <div class="jotted-status"></div>
   `
 }
 
-export function errorMessage (err) {
+export function statusMessage (err) {
   return `
     <p>${err}</p>
   `
 }
 
-export function errorClass (type) {
-  return `jotted-error-active-${type}`
+export function statusClass (type) {
+  return `jotted-status-${type}`
+}
+
+export function statusActiveClass (type) {
+  return `jotted-status-active-${type}`
 }
 
 export function pluginClass (name) {
@@ -88,6 +92,10 @@ export function frameContent (body = '') {
   `
 }
 
-export function loadError (url) {
-  return `There was an error loading <strong>${url}.</strong>`
+export function statusLoading (url) {
+  return `Loading <strong>${url}</strong>..`
+}
+
+export function statusFetchError (url) {
+  return `There was an error loading <strong>${url}</strong>.`
 }

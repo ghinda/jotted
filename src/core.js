@@ -45,13 +45,11 @@ class Jotted {
     $frameDoc.close()
 
     this.$pane = {}
-    this.$error = {}
+    this.$status = {}
 
     for (let type of [ 'html', 'css', 'js' ]) {
       this.$pane[type] = $editor.querySelector(`.jotted-pane-${type}`)
       this.markup(type, this.$pane[type])
-
-      this.$error[type] = this.$pane[type].querySelector('.jotted-error')
     }
 
     this.$styleInject = document.createElement('style')
@@ -101,6 +99,9 @@ class Jotted {
 
     $parent.appendChild($editor)
 
+    // get the status node
+    this.$status[type] = this.$pane[type].querySelector('.jotted-status')
+
     // if we don't have a file for the current type
     if (typeof file.url === 'undefined' && typeof file.content === 'undefined') {
       return
@@ -113,11 +114,17 @@ class Jotted {
     if (typeof file.content !== 'undefined') {
       this.setValue($textarea, file.content)
     } else if (typeof file.url !== 'undefined') {
+      // show loading message
+      this.status('loading', [ template.statusLoading(file.url) ], {
+        type: type,
+        file: file
+      })
+
       // file as url
       util.fetch(file.url, (err, res) => {
         if (err) {
           // show load errors
-          this.error([ template.loadError(err) ], {
+          this.status('error', [ template.statusFetchError(err) ], {
             type: type,
             file: file
           })
@@ -125,6 +132,8 @@ class Jotted {
           return
         }
 
+        // the change callback will clear all status messages,
+        // so we don't have to manually clear the loading message.
         this.setValue($textarea, res)
       })
     }
@@ -152,7 +161,7 @@ class Jotted {
   }
 
   changeCallback (errors, params) {
-    this.error(errors, params)
+    this.status('error', errors, params)
 
     if (params.type === 'html') {
       // if we have script execution enabled,
@@ -189,7 +198,7 @@ class Jotted {
         // only show eval errors if we don't have other errors from plugins.
         // useful for preprocessor error reporting (eg. babel, coffeescript).
         if (!errors.length) {
-          this.error([ err.message ], {
+          this.status('error', [ err.message ], {
             type: 'js'
           })
         }
@@ -223,24 +232,28 @@ class Jotted {
     this.pubsoup.done.apply(this.pubsoup, arguments)
   }
 
-  error (errors, params) {
-    if (!errors.length) {
-      return this.clearError(params)
+  status (statusType = 'error', messages = [], params = {}) {
+    if (!messages.length) {
+      return this.clearStatus(statusType, params)
     }
 
-    util.addClass(this.$container, template.errorClass(params.type))
+    // add error/loading class to status
+    util.addClass(this.$status[params.type], template.statusClass(statusType))
+
+    util.addClass(this.$container, template.statusActiveClass(params.type))
 
     var markup = ''
-    errors.forEach(function (err) {
-      markup += template.errorMessage(err)
+    messages.forEach(function (err) {
+      markup += template.statusMessage(err)
     })
 
-    this.$error[params.type].innerHTML = markup
+    this.$status[params.type].innerHTML = markup
   }
 
-  clearError (params) {
-    util.removeClass(this.$container, template.errorClass(params.type))
-    this.$error[params.type].innerHTML = ''
+  clearStatus (statusType, params) {
+    util.removeClass(this.$status[params.type], template.statusClass(statusType))
+    util.removeClass(this.$container, template.statusActiveClass(params.type))
+    this.$status[params.type].innerHTML = ''
   }
 }
 

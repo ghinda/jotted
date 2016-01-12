@@ -13,19 +13,26 @@ function insertScript ($script, callback = function () {}) {
     s.onerror = callback
     s.src = $script.src
   } else {
-    s.textContent = $script.innerText
+    // wrap inline scripts in a timeout,
+    // to make sure they don't execute if the iframe is destroyed,
+    // and get the garbage collected.
+    // when using a plugin that triggers another quick change event
+    // - ace/codemirror, inline scripts would still execute,
+    // but without some of the other external script dependencies.
+    // eg. when using jotted with codemirror to demo jotted,
+    // in one of the two inline script runs, `Jotted` would be undefined,
+    // because jotted.js was unloaded from memory when the iframe was removed,
+    // but the `new Jotted(..` inline script would still run.
+    s.textContent = `setTimeout(function(){${$script.innerText}})`
   }
 
   // re-insert the script tag so it executes.
-  // use the timeout trick to make sure the script is also executed,
-  // not just loaded.
-  setTimeout(() => {
-    this.$resultFrame.contentWindow.document.head.appendChild(s)
+  this.$resultFrame.contentWindow.document.head.appendChild(s)
 
-    if (!$script.src) {
-      callback()
-    }
-  })
+  // run the callback immediately for inline scripts
+  if (!$script.src) {
+    callback()
+  }
 }
 
 export default function runScripts (content) {

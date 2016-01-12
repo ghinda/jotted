@@ -14,16 +14,16 @@ function extend (obj = {}, defaults = {}) {
   return extended
 }
 
-function fetch (file, callback) {
+function fetch (url, callback) {
   var xhr = new window.XMLHttpRequest()
-  xhr.open('GET', file)
+  xhr.open('GET', url)
   xhr.responseType = 'text'
 
   xhr.onload = function () {
     if (xhr.status === 200) {
       callback(null, xhr.responseText)
     } else {
-      callback(xhr)
+      callback(url, xhr)
     }
   }
 

@@ -87,3 +87,7 @@ export function frameContent (body = '') {
     </html>
   `
 }
+
+export function loadError (url) {
+  return `There was an error loading <strong>${url}.</strong>`
+}

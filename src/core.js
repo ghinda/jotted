@@ -117,7 +117,7 @@ class Jotted {
       util.fetch(file.url, (err, res) => {
         if (err) {
           // show load errors
-          this.error([ err.responseText ], {
+          this.error([ template.loadError(err) ], {
             type: type,
             file: file
           })

@@ -205,7 +205,7 @@ module.exports = function (grunt) {
             cwd: 'site/',
             src: [
               '**/*',
-              '!**/*.{html,hbs,md}'
+              '!**/*.{hbs,md}'
             ],
             dest: 'build/'
           },

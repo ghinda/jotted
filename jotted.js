@@ -39,7 +39,7 @@
    */
 
   function container() {
-    return '\n    <ul class="jotted-nav">\n      <li class="jotted-nav-item jotted-nav-item-result">\n        <a href="#" data-jotted-type="result">\n          Result\n        </a>\n      </li>\n      <li class="jotted-nav-item jotted-nav-item-html">\n        <a href="#" data-jotted-type="html">\n          HTML\n        </a>\n      </li>\n      <li class="jotted-nav-item jotted-nav-item-css">\n        <a href="#" data-jotted-type="css">\n          CSS\n        </a>\n      </li>\n      <li class="jotted-nav-item jotted-nav-item-js">\n        <a href="#" data-jotted-type="js">\n          JavaScript\n        </a>\n      </li>\n    </ul>\n    <div class="jotted-pane jotted-pane-result">\n      <iframe></iframe>\n    </div>\n    <div class="jotted-pane jotted-pane-html"></div>\n    <div class="jotted-pane jotted-pane-css"></div>\n    <div class="jotted-pane jotted-pane-js"></div>\n  ';
+    return '\n    <ul class="jotted-nav">\n      <li class="jotted-nav-item jotted-nav-item-result">\n        <a href="#" data-jotted-type="result">\n          Result\n        </a>\n      </li>\n      <li class="jotted-nav-item jotted-nav-item-html">\n        <a href="#" data-jotted-type="html">\n          HTML\n        </a>\n      </li>\n      <li class="jotted-nav-item jotted-nav-item-css">\n        <a href="#" data-jotted-type="css">\n          CSS\n        </a>\n      </li>\n      <li class="jotted-nav-item jotted-nav-item-js">\n        <a href="#" data-jotted-type="js">\n          JavaScript\n        </a>\n      </li>\n    </ul>\n    <div class="jotted-pane jotted-pane-result"></div>\n    <div class="jotted-pane jotted-pane-html"></div>\n    <div class="jotted-pane jotted-pane-css"></div>\n    <div class="jotted-pane jotted-pane-js"></div>\n  ';
   }
 
   function paneActiveClass(type) {
@@ -856,6 +856,10 @@
       // debounced trigger method
       this.trigger = debounce(this.pubsoup.publish.bind(this.pubsoup), this.options.debounce);
 
+      // done change on all subscribers,
+      // render the results.
+      this.done('change', this.changeCallback.bind(this));
+
       this.plugins = {};
 
       this.$container = $editor;
@@ -867,12 +871,7 @@
       addClass(this.$container, paneActiveClass(this.paneActive));
 
       this.$result = $editor.querySelector('.jotted-pane-result');
-      this.$resultFrame = this.$result.querySelector('iframe');
-
-      var $frameDoc = this.$resultFrame.contentWindow.document;
-      $frameDoc.open();
-      $frameDoc.write(frameContent());
-      $frameDoc.close();
+      this.createResultFrame();
 
       this.$pane = {};
       this.$status = {};
@@ -884,9 +883,6 @@
         this.markup(type, this.$pane[type]);
       }
 
-      this.$styleInject = document.createElement('style');
-      $frameDoc.head.appendChild(this.$styleInject);
-
       // change events
       this.$container.addEventListener('change', debounce(this.change.bind(this), this.options.debounce));
       this.$container.addEventListener('keyup', debounce(this.change.bind(this), this.options.debounce));
@@ -896,10 +892,6 @@
 
       // init plugins
       init.call(this);
-
-      // done change on all subscribers,
-      // render the results.
-      this.done('change', this.changeCallback.bind(this));
 
       // show all tabs, even if empty
       if (this.options.showBlank) {
@@ -962,15 +954,17 @@
             if (err) {
               // show load errors
               _this.status('error', [statusFetchError(err)], {
-                type: type,
-                file: file
+                type: type
               });
 
               return;
             }
 
-            // the change callback will clear all status messages,
-            // so we don't have to manually clear the loading message.
+            // clear the loading status
+            _this.clearStatus('loading', {
+              type: type
+            });
+
             _this.setValue($textarea, res);
           });
         }
@@ -992,11 +986,43 @@
           return;
         }
 
-        this.trigger('change', {
+        // don't use .trigger,
+        // so we don't debounce different change calls (html, css, js)
+        // causing only one of them to be inserted.
+        // the textarea change event is debounced when attached.
+        this.pubsoup.publish('change', {
           type: data(e.target, 'jotted-type'),
           file: data(e.target, 'jotted-file'),
           content: e.target.value
         });
+      }
+    }, {
+      key: 'createResultFrame',
+      value: function createResultFrame() {
+        var css = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
+
+        // maintain previous styles
+        var $newStyle = document.createElement('style');
+
+        if (this.$styleInject) {
+          $newStyle.textContent = this.$styleInject.textContent;
+        }
+
+        this.$styleInject = $newStyle;
+
+        if (this.$resultFrame) {
+          this.$result.removeChild(this.$resultFrame);
+        }
+
+        this.$resultFrame = document.createElement('iframe');
+        this.$result.appendChild(this.$resultFrame);
+
+        var $frameDoc = this.$resultFrame.contentWindow.document;
+        $frameDoc.open();
+        $frameDoc.write(frameContent());
+        $frameDoc.close();
+
+        $frameDoc.head.appendChild(this.$styleInject);
       }
     }, {
       key: 'changeCallback',
@@ -1009,14 +1035,7 @@
           // to stop execution of any previously started js,
           // and garbage collect it.
           if (this.options.runScripts) {
-            this.$result.removeChild(this.$resultFrame);
-            this.$resultFrame = document.createElement('iframe');
-            this.$result.appendChild(this.$resultFrame);
-
-            var $frameDoc = this.$resultFrame.contentWindow.document;
-            $frameDoc.open();
-            $frameDoc.write(frameContent());
-            $frameDoc.close();
+            this.createResultFrame();
           }
 
           this.$resultFrame.contentWindow.document.body.innerHTML = params.content;

@@ -26,6 +26,10 @@ class Jotted {
     // debounced trigger method
     this.trigger = util.debounce(this.pubsoup.publish.bind(this.pubsoup), this.options.debounce)
 
+    // done change on all subscribers,
+    // render the results.
+    this.done('change', this.changeCallback.bind(this))
+
     this.plugins = {}
 
     this.$container = $editor
@@ -37,12 +41,7 @@ class Jotted {
     util.addClass(this.$container, template.paneActiveClass(this.paneActive))
 
     this.$result = $editor.querySelector('.jotted-pane-result')
-    this.$resultFrame = this.$result.querySelector('iframe')
-
-    var $frameDoc = this.$resultFrame.contentWindow.document
-    $frameDoc.open()
-    $frameDoc.write(template.frameContent())
-    $frameDoc.close()
+    this.createResultFrame()
 
     this.$pane = {}
     this.$status = {}
@@ -51,9 +50,6 @@ class Jotted {
       this.$pane[type] = $editor.querySelector(`.jotted-pane-${type}`)
       this.markup(type, this.$pane[type])
     }
-
-    this.$styleInject = document.createElement('style')
-    $frameDoc.head.appendChild(this.$styleInject)
 
     // change events
     this.$container.addEventListener('change', util.debounce(this.change.bind(this), this.options.debounce))
@@ -64,10 +60,6 @@ class Jotted {
 
     // init plugins
     plugin.init.call(this)
-
-    // done change on all subscribers,
-    // render the results.
-    this.done('change', this.changeCallback.bind(this))
 
     // show all tabs, even if empty
     if (this.options.showBlank) {
@@ -125,15 +117,17 @@ class Jotted {
         if (err) {
           // show load errors
           this.status('error', [ template.statusFetchError(err) ], {
-            type: type,
-            file: file
+            type: type
           })
 
           return
         }
 
-        // the change callback will clear all status messages,
-        // so we don't have to manually clear the loading message.
+        // clear the loading status
+        this.clearStatus('loading', {
+          type: type
+        })
+
         this.setValue($textarea, res)
       })
     }
@@ -153,11 +147,40 @@ class Jotted {
       return
     }
 
-    this.trigger('change', {
+    // don't use .trigger,
+    // so we don't debounce different change calls (html, css, js)
+    // causing only one of them to be inserted.
+    // the textarea change event is debounced when attached.
+    this.pubsoup.publish('change', {
       type: util.data(e.target, 'jotted-type'),
       file: util.data(e.target, 'jotted-file'),
       content: e.target.value
     })
+  }
+
+  createResultFrame (css = '') {
+    // maintain previous styles
+    var $newStyle = document.createElement('style')
+
+    if (this.$styleInject) {
+      $newStyle.textContent = this.$styleInject.textContent
+    }
+
+    this.$styleInject = $newStyle
+
+    if (this.$resultFrame) {
+      this.$result.removeChild(this.$resultFrame)
+    }
+
+    this.$resultFrame = document.createElement('iframe')
+    this.$result.appendChild(this.$resultFrame)
+
+    var $frameDoc = this.$resultFrame.contentWindow.document
+    $frameDoc.open()
+    $frameDoc.write(template.frameContent())
+    $frameDoc.close()
+
+    $frameDoc.head.appendChild(this.$styleInject)
   }
 
   changeCallback (errors, params) {
@@ -169,14 +192,7 @@ class Jotted {
       // to stop execution of any previously started js,
       // and garbage collect it.
       if (this.options.runScripts) {
-        this.$result.removeChild(this.$resultFrame)
-        this.$resultFrame = document.createElement('iframe')
-        this.$result.appendChild(this.$resultFrame)
-
-        var $frameDoc = this.$resultFrame.contentWindow.document
-        $frameDoc.open()
-        $frameDoc.write(template.frameContent())
-        $frameDoc.close()
+        this.createResultFrame()
       }
 
       this.$resultFrame.contentWindow.document.body.innerHTML = params.content

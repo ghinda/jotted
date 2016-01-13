@@ -25,9 +25,7 @@ export function container () {
         </a>
       </li>
     </ul>
-    <div class="jotted-pane jotted-pane-result">
-      <iframe></iframe>
-    </div>
+    <div class="jotted-pane jotted-pane-result"></div>
     <div class="jotted-pane jotted-pane-html"></div>
     <div class="jotted-pane jotted-pane-css"></div>
     <div class="jotted-pane jotted-pane-js"></div>

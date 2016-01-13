@@ -102,6 +102,11 @@
 }
 
 .jotted-demo .jotted-nav {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2.4em;
   background: #ddd;
   border: 0;
 }
@@ -126,6 +131,7 @@
   visibility: visible;
   width: 50%;
   height: 100%;
+  padding-top: 2.4em;
 }
 
 .jotted-demo .jotted-pane-html {

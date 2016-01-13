@@ -14,6 +14,13 @@
 
   
     <base href="../">
+    <!--[if IE]><script type="text/javascript">
+    // Fix for IE ignoring relative base tags.
+    (function() {
+        var baseTag = document.getElementsByTagName('base')[0];
+        baseTag.href = baseTag.href;
+    })();
+    </script><![endif]-->
   
 
   <link href="https://fonts.googleapis.com/css?family=Oxygen:400,300,700" rel="stylesheet" type="text/css">
@@ -118,10 +125,10 @@
 
 &lt;div id=&quot;jotted-demo-less&quot;&gt;&lt;/div&gt;
 
-&lt;script src=&quot;bower_components/less/dist/less.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;../bower_components/less/dist/less.js&quot;&gt;&lt;/script&gt;
 
-&lt;link href=&quot;jotted.css&quot; rel=&quot;stylesheet&quot;&gt;
-&lt;script src=&quot;jotted.js&quot;&gt;&lt;/script&gt;
+&lt;link href=&quot;../jotted.css&quot; rel=&quot;stylesheet&quot;&gt;
+&lt;script src=&quot;../jotted.js&quot;&gt;&lt;/script&gt;
 &lt;script&gt;
   new Jotted(document.querySelector(&#39;#jotted-demo-less&#39;), {
     files: [
@@ -134,7 +141,7 @@
     plugins: [
       &#39;less&#39;
     ]
-  })
+  });
 &lt;/script&gt;</code></pre>
 
     </div>

@@ -1,0 +1,92 @@
+body {
+  padding: 0 20px;
+  min-width: 320px;
+  background: #fff;
+
+  font-family: sans-serif;
+}
+
+.toggle {
+  position: relative;
+  display: block;
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.toggle input {
+  position: absolute;
+  top: 50%;
+  margin: 0;
+  transform: translateY(-50%);
+}
+
+.toggle label {
+  position: relative;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+/* ripple
+ */
+.toggle label:after {
+  content: '';
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 48px;
+  height: 48px;
+  margin-left: -18px;
+  margin-top: -16px;
+  background: #3f51b5;
+  border-radius: 100%;
+  opacity: .6;
+
+  transform: scale(0);
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(0);
+  }
+  20% {
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1);
+  }
+}
+
+@keyframes rippleDuplicate {
+  0% {
+    transform: scale(0);
+  }
+  40% {
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1);
+  }
+}
+
+.toggle input + label:after {
+  animation: ripple .4s ease-out;
+}
+
+/* to re-trigger the animation with just CSS, we need to duplicate the keyframes
+ */
+.toggle input:checked + label:after {
+  animation-name: rippleDuplicate;
+}
+
+/* fixes initial animation run, without user input, on page load.
+ */
+.toggle label:after {
+  visibility: hidden;
+}
+
+.toggle input:focus + label:after {
+  visibility: visible;
+}

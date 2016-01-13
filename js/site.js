@@ -11,8 +11,15 @@
     new Jotted($demoHeader, {
       files: [{
         type: 'html',
-        url: 'blank.html'
-      }]
+        url: 'demo-home/ripple.html'
+      }, {
+        type: 'css',
+        url: 'demo-home/ripple.css'
+      }, {
+        type: 'js',
+        url: 'demo-home/ripple.js'
+      }],
+      plugins: [ 'codemirror' ]
     })
   }
 })()

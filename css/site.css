@@ -80,6 +80,10 @@ a:visited {
   color: #782144;
 }
 
+a img {
+  border: 0;
+}
+
 blockquote {
   margin: 0 0 1em;
   padding-left: 2em;
@@ -200,10 +204,19 @@ section ul li {
   }
 }
 
+#j-header .jotted-pane {
+  height: 18em;
+}
+
 .header-demo {
   position: relative;
   z-index: 2;
-  padding: 2em;
+}
+
+@media only screen and (min-width: 40em) {
+  .header-demo {
+    padding-left: 2em;
+  }
 }
 
 .header-details {

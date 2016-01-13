@@ -220,25 +220,26 @@
     var s = document.createElement('script');
     s.type = 'text/javascript';
     if ($script.src) {
-      s.onload = callback;
+      s.onload = function () {
+        // use the timeout trick to make sure the script is garbage collected,
+        // when the iframe is destroyed.
+        // sometimes when loading large files (eg. babel.js)
+        // and a change is triggered,
+        // the seq runner skips loading jotted.js, and runs the inline script
+        // causing a `Jotted is undefined` error.
+        setTimeout(callback);
+      };
       s.onerror = callback;
       s.src = $script.src;
     } else {
-      // wrap inline scripts in a timeout,
-      // to make sure they don't execute if the iframe is destroyed,
-      // and get the garbage collected.
-      // when using a plugin that triggers another quick change event
-      // - ace/codemirror, inline scripts would still execute,
-      // but without some of the other external script dependencies.
-      // eg. when using jotted with codemirror to demo jotted,
-      // in one of the two inline script runs, `Jotted` would be undefined,
-      // because jotted.js was unloaded from memory when the iframe was removed,
-      // but the `new Jotted(..` inline script would still run.
-      s.textContent = 'setTimeout(function(){' + $script.innerText + '})';
+      s.textContent = $script.innerText;
     }
 
     // re-insert the script tag so it executes.
     this.$resultFrame.contentWindow.document.head.appendChild(s);
+
+    // clean-up
+    $script.parentNode.removeChild($script);
 
     // run the callback immediately for inline scripts
     if (!$script.src) {
@@ -246,7 +247,7 @@
     }
   }
 
-  function runScripts(content) {
+  function runScripts() {
     var _this = this;
 
     // get scripts tags from content added with innerhtml
@@ -1012,13 +1013,16 @@
             this.$resultFrame = document.createElement('iframe');
             this.$result.appendChild(this.$resultFrame);
 
-            params.content = frameContent(params.content);
+            var $frameDoc = this.$resultFrame.contentWindow.document;
+            $frameDoc.open();
+            $frameDoc.write(frameContent());
+            $frameDoc.close();
           }
 
           this.$resultFrame.contentWindow.document.body.innerHTML = params.content;
 
           if (this.options.runScripts) {
-            runScripts.call(this, params.content);
+            runScripts.call(this);
           }
 
           return;

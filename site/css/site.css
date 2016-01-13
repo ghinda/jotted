@@ -80,6 +80,10 @@ a:visited {
   color: #782144;
 }
 
+a img {
+  border: 0;
+}
+
 blockquote {
   margin: 0 0 1em;
   padding-left: 2em;

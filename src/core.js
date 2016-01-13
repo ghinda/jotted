@@ -173,13 +173,16 @@ class Jotted {
         this.$resultFrame = document.createElement('iframe')
         this.$result.appendChild(this.$resultFrame)
 
-        params.content = template.frameContent(params.content)
+        var $frameDoc = this.$resultFrame.contentWindow.document
+        $frameDoc.open()
+        $frameDoc.write(template.frameContent())
+        $frameDoc.close()
       }
 
       this.$resultFrame.contentWindow.document.body.innerHTML = params.content
 
       if (this.options.runScripts) {
-        script.call(this, params.content)
+        script.call(this)
       }
 
       return

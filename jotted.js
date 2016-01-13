@@ -860,8 +860,6 @@
       // render the results.
       this.done('change', this.changeCallback.bind(this));
 
-      this.plugins = {};
-
       this.$container = $editor;
       this.$container.innerHTML = container();
       addClass(this.$container, containerClass());
@@ -891,7 +889,15 @@
       this.$container.addEventListener('click', this.pane.bind(this));
 
       // init plugins
+      this.plugins = {};
       init.call(this);
+
+      // load files
+      var _arr2 = ['html', 'css', 'js'];
+      for (var _i2 = 0; _i2 < _arr2.length; _i2++) {
+        var type = _arr2[_i2];
+        this.load(type);
+      }
 
       // show all tabs, even if empty
       if (this.options.showBlank) {
@@ -916,15 +922,12 @@
     }, {
       key: 'markup',
       value: function markup(type, $parent) {
-        var _this = this;
-
         // create the markup for an editor
         var file = this.findFile(type);
 
         var $editor = document.createElement('div');
         $editor.innerHTML = editorContent(type, file.url);
         $editor.className = editorClass(type);
-        var $textarea = $editor.querySelector('textarea');
 
         $parent.appendChild($editor);
 
@@ -938,6 +941,15 @@
 
         // add the has-type class to the container
         addClass(this.$container, hasFileClass(type));
+      }
+    }, {
+      key: 'load',
+      value: function load(type) {
+        var _this = this;
+
+        // create the markup for an editor
+        var file = this.findFile(type);
+        var $textarea = this.$pane[type].querySelector('textarea');
 
         // file as string
         if (typeof file.content !== 'undefined') {

@@ -30,8 +30,6 @@ class Jotted {
     // render the results.
     this.done('change', this.changeCallback.bind(this))
 
-    this.plugins = {}
-
     this.$container = $editor
     this.$container.innerHTML = template.container()
     util.addClass(this.$container, template.containerClass())
@@ -59,7 +57,13 @@ class Jotted {
     this.$container.addEventListener('click', this.pane.bind(this))
 
     // init plugins
+    this.plugins = {}
     plugin.init.call(this)
+
+    // load files
+    for (let type of [ 'html', 'css', 'js' ]) {
+      this.load(type)
+    }
 
     // show all tabs, even if empty
     if (this.options.showBlank) {
@@ -87,7 +91,6 @@ class Jotted {
     var $editor = document.createElement('div')
     $editor.innerHTML = template.editorContent(type, file.url)
     $editor.className = template.editorClass(type)
-    var $textarea = $editor.querySelector('textarea')
 
     $parent.appendChild($editor)
 
@@ -101,6 +104,12 @@ class Jotted {
 
     // add the has-type class to the container
     util.addClass(this.$container, template.hasFileClass(type))
+  }
+
+  load (type) {
+    // create the markup for an editor
+    var file = this.findFile(type)
+    var $textarea = this.$pane[type].querySelector('textarea')
 
     // file as string
     if (typeof file.content !== 'undefined') {

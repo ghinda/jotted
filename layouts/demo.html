@@ -1,0 +1,102 @@
+---
+layout: main.html
+---
+
+<div class="gl gl-vertical">
+
+  <div class="gl-cell header-demo">
+
+    <div class="gl">
+
+      <div class="gl-cell">
+
+        <a href="index.html" class="button-back">
+          &larr; Back to documentation
+        </a>
+
+        <h1>
+          Jotted
+        </h1>
+
+      </div>
+
+      <div class="gl-cell dropdown-container">
+
+        <div class="dropdown">
+
+          <a href="#dropdown-demos" class="button dropdown-button">
+            Demos
+          </a>
+
+          <ul id="dropdown-demos" class="dropdown-content">
+            <li>
+              <a href="demos/ace.html">
+                Ace Editor
+              </a>
+            </li>
+            <li>
+              <a href="demos/codemirror.html">
+                CodeMirror Editor
+              </a>
+            </li>
+            <li>
+              <a href="demos/markdown.html">
+                Markdown
+              </a>
+            </li>
+            <li>
+              <a href="demos/less.html">
+                Less
+              </a>
+            </li>
+            <li>
+              <a href="demos/stylus.html">
+                Stylus
+              </a>
+            </li>
+            <li>
+              <a href="demos/coffeescript.html">
+                CoffeeScript
+              </a>
+            </li>
+            <li>
+              <a href="demos/es2015.html">
+                ES2015
+              </a>
+            </li>
+            <li>
+              <a href="demos/files.html">
+                External files
+              </a>
+            </li>
+          </ul>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="gl-cell gl-fill">
+
+    <div class="jotted-demo"></div>
+
+    <div class="demo-content">
+{{#markdown}}
+```
+{{> body }}
+```
+{{/markdown}}
+    </div>
+
+  </div>
+</div>
+
+<link rel="stylesheet" href="bower_components/codemirror/lib/codemirror.css">
+<link rel="stylesheet" href="css/demos.css">
+
+<script src="bower_components/codemirror/lib/codemirror.js"></script>
+<script src="bower_components/he/he.js"></script>
+<script src="js/demos.js"></script>

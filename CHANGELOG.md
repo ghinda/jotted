@@ -1,4 +1,8 @@
 
+## [1.0.2] - 2016-01-14
+
+* Improvements to the npm package.json, to not install all files in the repo.
+
 ## [1.0.1] - 2016-01-14
 
 * Clean-up unnecessary dependencies.

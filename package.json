@@ -1,16 +1,23 @@
 {
   "name": "jotted",
-  "version": "1.0.1",
+  "version": "1.0.2",
+  "author": "Ionut Colceriu <contact@ghinda.net>",
   "description": "Environment for showcasing HTML, CSS and JavaScript, with editable source.",
-  "main": "jotted.js",
-  "scripts": {
-    "watch": "grunt server",
-    "test": "node -e \"require('grunt').tasks(['test']);\""
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ghinda/jotted/issues"
   },
+  "homepage": "https://github.com/ghinda/jotted#readme",
+  "main": "jotted.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ghinda/jotted.git"
   },
+  "files": [
+    "jotted*",
+    "LICENSE",
+    "README.md"
+  ],
   "keywords": [
     "demo",
     "fiddle",
@@ -18,12 +25,10 @@
     "code",
     "editor"
   ],
-  "author": "Ionut Colceriu",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/ghinda/jotted/issues"
+  "scripts": {
+    "watch": "grunt server",
+    "test": "node -e \"require('grunt').tasks(['test']);\""
   },
-  "homepage": "https://github.com/ghinda/jotted#readme",
   "dependencies": {},
   "devDependencies": {
     "marked": "^0.3.5",

@@ -1,6 +1,6 @@
 {
   "name": "jotted",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Environment for showcasing HTML, CSS and JavaScript, with editable source.",
   "main": "jotted.js",
   "scripts": {
@@ -24,10 +24,9 @@
     "url": "https://github.com/ghinda/jotted/issues"
   },
   "homepage": "https://github.com/ghinda/jotted#readme",
-  "dependencies": {
-    "marked": "^0.3.5"
-  },
+  "dependencies": {},
   "devDependencies": {
+    "marked": "^0.3.5",
     "assemble": "^0.4.42",
     "babel-preset-es2015": "^6.1.18",
     "babel-preset-es2015-rollup": "^1.0.0",

@@ -1,4 +1,8 @@
 
+## [1.0.1] - 2016-01-14
+
+* Clean-up unnecessary dependencies.
+
 ## [1.0.0] - 2016-01-14
 
 * Release first version.

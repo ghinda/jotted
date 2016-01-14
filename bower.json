@@ -1,6 +1,6 @@
 {
   "name": "jotted",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "authors": [
     "Ionut Colceriu <contact@ghinda.net>"
   ],
@@ -27,10 +27,9 @@
     "jasmine-core": "jasmine#~2.4.1",
     "jasmine-jsreporter": "~0.1.2",
     "coffee-script": "coffeescript#~1.10.0",
-    "he": "~0.5.0"
-  },
-  "dependencies": {
+    "he": "~0.5.0",
     "gridlayout": "~1.0.2",
     "prism": "~1.3.0"
-  }
+  },
+  "dependencies": {}
 }

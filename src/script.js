@@ -25,7 +25,7 @@ function insertScript ($script, callback = function () {}) {
   }
 
   // re-insert the script tag so it executes.
-  this.$resultFrame.contentWindow.document.head.appendChild(s)
+  this._get('$resultFrame').contentWindow.document.head.appendChild(s)
 
   // clean-up
   $script.parentNode.removeChild($script)
@@ -38,7 +38,7 @@ function insertScript ($script, callback = function () {}) {
 
 export default function runScripts () {
   // get scripts tags from content added with innerhtml
-  var $scripts = this.$resultFrame.contentWindow.document.body.querySelectorAll('script')
+  var $scripts = this._get('$resultFrame').contentWindow.document.body.querySelectorAll('script')
   var l = $scripts.length
   var runList = []
 

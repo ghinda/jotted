@@ -28,8 +28,7 @@ module.exports = function (grunt) {
       },
       js: {
         files: [
-          'src/{,*/}*.js',
-          'test/{,*/}*.js'
+          'src/{,*/}*.js'
         ],
         tasks: [
           'rollup'

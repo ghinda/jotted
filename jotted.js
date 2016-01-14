@@ -236,7 +236,7 @@
     }
 
     // re-insert the script tag so it executes.
-    this.$resultFrame.contentWindow.document.head.appendChild(s);
+    this._get('$resultFrame').contentWindow.document.head.appendChild(s);
 
     // clean-up
     $script.parentNode.removeChild($script);
@@ -251,7 +251,7 @@
     var _this = this;
 
     // get scripts tags from content added with innerhtml
-    var $scripts = this.$resultFrame.contentWindow.document.body.querySelectorAll('script');
+    var $scripts = this._get('$resultFrame').contentWindow.document.body.querySelectorAll('script');
     var l = $scripts.length;
     var runList = [];
 
@@ -294,7 +294,7 @@
   function init() {
     var _this = this;
 
-    this.options.plugins.forEach(function (plugin) {
+    this._get('options').plugins.forEach(function (plugin) {
       // check if plugin definition is string or object
       var Plugin = undefined;
       var pluginName = undefined;
@@ -307,9 +307,9 @@
       }
 
       Plugin = find(pluginName);
-      _this.plugins[plugin] = new Plugin(_this, pluginOptions);
+      _this._get('plugins')[plugin] = new Plugin(_this, pluginOptions);
 
-      addClass(_this.$container, pluginClass(pluginName));
+      addClass(_this._get('$container'), pluginClass(pluginName));
     });
   }
 
@@ -836,60 +836,92 @@
   }
 
   var Jotted = (function () {
-    function Jotted($editor, opts) {
+    function Jotted($jottedContainer, opts) {
       babelHelpers.classCallCheck(this, Jotted);
 
-      if (!$editor) {
+      if (!$jottedContainer) {
         throw new Error('Can\'t find Jotted container.');
       }
 
-      this.options = extend(opts, {
+      // private data
+      var _private = {};
+      this._get = function (key) {
+        return _private[key];
+      };
+      this._set = function (key, value) {
+        _private[key] = value;
+        return _private[key];
+      };
+
+      // options
+      var options = this._set('options', extend(opts, {
         files: [],
         showBlank: false,
         runScripts: true,
         pane: 'result',
         debounce: 250,
         plugins: []
-      });
+      }));
 
-      this.pubsoup = new PubSoup();
+      // show all tabs, even if empty
+      if (options.showBlank) {
+        addClass($container, showBlankClass());
+      }
+
+      // PubSoup
+      var pubsoup = this._set('pubsoup', new PubSoup());
       // debounced trigger method
-      this.trigger = debounce(this.pubsoup.publish.bind(this.pubsoup), this.options.debounce);
+      this._set('trigger', debounce(pubsoup.publish.bind(pubsoup), options.debounce));
+      this._set('on', function () {
+        pubsoup.subscribe.apply(pubsoup, arguments);
+      });
+      this._set('off', function () {
+        pubsoup.unsubscribe.apply(pubsoup, arguments);
+      });
+      var done = this._set('done', function () {
+        pubsoup.done.apply(pubsoup, arguments);
+      });
 
       // done change on all subscribers,
       // render the results.
-      this.done('change', this.changeCallback.bind(this));
+      done('change', this.changeCallback.bind(this));
 
-      this.$container = $editor;
-      this.$container.innerHTML = container();
-      addClass(this.$container, containerClass());
+      // DOM
+      var $container = this._set('$container', $jottedContainer);
+      $container.innerHTML = container();
+      addClass($container, containerClass());
 
       // default pane
-      this.paneActive = this.options.pane;
-      addClass(this.$container, paneActiveClass(this.paneActive));
+      var paneActive = this._set('paneActive', options.pane);
+      addClass($container, paneActiveClass(paneActive));
 
-      this.$result = $editor.querySelector('.jotted-pane-result');
-      this.createResultFrame();
-
-      this.$pane = {};
-      this.$status = {};
+      this._set('$status', {});
 
       var _arr = ['html', 'css', 'js'];
       for (var _i = 0; _i < _arr.length; _i++) {
         var type = _arr[_i];
-        this.$pane[type] = $editor.querySelector('.jotted-pane-' + type);
-        this.markup(type, this.$pane[type]);
+        this.markup(type);
       }
 
+      this.createResultFrame();
+
       // change events
-      this.$container.addEventListener('change', debounce(this.change.bind(this), this.options.debounce));
-      this.$container.addEventListener('keyup', debounce(this.change.bind(this), this.options.debounce));
+      $container.addEventListener('change', debounce(this.change.bind(this), options.debounce));
+      $container.addEventListener('keyup', debounce(this.change.bind(this), options.debounce));
 
       // pane change
-      this.$container.addEventListener('click', this.pane.bind(this));
+      $container.addEventListener('click', this.pane.bind(this));
+
+      // expose public properties
+      this.$container = this._get('$container');
+      this.on = this._get('on');
+      this.off = this._get('off');
+      this.done = this._get('done');
+      this.trigger = this._get('trigger');
+      this.paneActive = this._get('paneActive');
 
       // init plugins
-      this.plugins = {};
+      this._set('plugins', {});
       init.call(this);
 
       // load files
@@ -898,20 +930,16 @@
         var type = _arr2[_i2];
         this.load(type);
       }
-
-      // show all tabs, even if empty
-      if (this.options.showBlank) {
-        addClass(this.$container, showBlankClass());
-      }
     }
 
     babelHelpers.createClass(Jotted, [{
       key: 'findFile',
       value: function findFile(type) {
         var file = {};
+        var options = this._get('options');
 
-        for (var fileIndex in this.options.files) {
-          var _file = this.options.files[fileIndex];
+        for (var fileIndex in options.files) {
+          var _file = options.files[fileIndex];
           if (_file.type === type) {
             return _file;
           }
@@ -921,7 +949,9 @@
       }
     }, {
       key: 'markup',
-      value: function markup(type, $parent) {
+      value: function markup(type) {
+        var $container = this._get('$container');
+        var $parent = $container.querySelector('.jotted-pane-' + type);
         // create the markup for an editor
         var file = this.findFile(type);
 
@@ -932,15 +962,13 @@
         $parent.appendChild($editor);
 
         // get the status node
-        this.$status[type] = this.$pane[type].querySelector('.jotted-status');
+        this._get('$status')[type] = $parent.querySelector('.jotted-status');
 
-        // if we don't have a file for the current type
-        if (typeof file.url === 'undefined' && typeof file.content === 'undefined') {
-          return;
+        // if we have a file for the current type
+        if (typeof file.url !== 'undefined' || typeof file.content !== 'undefined') {
+          // add the has-type class to the container
+          addClass($container, hasFileClass(type));
         }
-
-        // add the has-type class to the container
-        addClass(this.$container, hasFileClass(type));
       }
     }, {
       key: 'load',
@@ -949,7 +977,7 @@
 
         // create the markup for an editor
         var file = this.findFile(type);
-        var $textarea = this.$pane[type].querySelector('textarea');
+        var $textarea = this._get('$container').querySelector('.jotted-pane-' + type + ' textarea');
 
         // file as string
         if (typeof file.content !== 'undefined') {
@@ -1002,7 +1030,7 @@
         // so we don't debounce different change calls (html, css, js)
         // causing only one of them to be inserted.
         // the textarea change event is debounced when attached.
-        this.pubsoup.publish('change', {
+        this._get('pubsoup').publish('change', {
           type: data(e.target, 'jotted-type'),
           file: data(e.target, 'jotted-file'),
           content: e.target.value
@@ -1016,43 +1044,49 @@
         // maintain previous styles
         var $newStyle = document.createElement('style');
 
-        if (this.$styleInject) {
-          $newStyle.textContent = this.$styleInject.textContent;
+        var $styleInject = this._get('$styleInject');
+        if ($styleInject) {
+          $newStyle.textContent = $styleInject.textContent;
         }
 
-        this.$styleInject = $newStyle;
+        $styleInject = this._set('$styleInject', $newStyle);
+        var $paneResult = this._get('$container').querySelector('.jotted-pane-result');
 
-        if (this.$resultFrame) {
-          this.$result.removeChild(this.$resultFrame);
+        var $resultFrame = this._get('$resultFrame');
+        if ($resultFrame) {
+          $paneResult.removeChild($resultFrame);
         }
 
-        this.$resultFrame = document.createElement('iframe');
-        this.$result.appendChild(this.$resultFrame);
+        $resultFrame = this._set('$resultFrame', document.createElement('iframe'));
+        $paneResult.appendChild($resultFrame);
 
-        var $frameDoc = this.$resultFrame.contentWindow.document;
+        var $frameDoc = $resultFrame.contentWindow.document;
         $frameDoc.open();
         $frameDoc.write(frameContent());
         $frameDoc.close();
 
-        $frameDoc.head.appendChild(this.$styleInject);
+        $frameDoc.head.appendChild($styleInject);
       }
     }, {
       key: 'changeCallback',
       value: function changeCallback(errors, params) {
         this.status('error', errors, params);
+        var options = this._get('options');
 
         if (params.type === 'html') {
           // if we have script execution enabled,
           // re-create the iframe,
           // to stop execution of any previously started js,
           // and garbage collect it.
-          if (this.options.runScripts) {
+          if (options.runScripts) {
             this.createResultFrame();
           }
 
-          this.$resultFrame.contentWindow.document.body.innerHTML = params.content;
+          // can't cache the $resultFrame reference, because
+          // it's re-created when using runScripts.
+          this._get('$resultFrame').contentWindow.document.body.innerHTML = params.content;
 
-          if (this.options.runScripts) {
+          if (options.runScripts) {
             runScripts.call(this);
           }
 
@@ -1060,14 +1094,14 @@
         }
 
         if (params.type === 'css') {
-          this.$styleInject.textContent = params.content;
+          this._get('$styleInject').textContent = params.content;
           return;
         }
 
         if (params.type === 'js') {
           // catch and show js errors
           try {
-            this.$resultFrame.contentWindow.eval(params.content);
+            this._get('$resultFrame').contentWindow.eval(params.content);
           } catch (err) {
             // only show eval errors if we don't have other errors from plugins.
             // useful for preprocessor error reporting (eg. babel, coffeescript).
@@ -1088,26 +1122,14 @@
           return;
         }
 
-        removeClass(this.$container, paneActiveClass(this.paneActive));
-        this.paneActive = data(e.target, 'jotted-type');
-        addClass(this.$container, paneActiveClass(this.paneActive));
+        var $container = this._get('$container');
+        var paneActive = this._get('paneActive');
+        removeClass($container, paneActiveClass(paneActive));
+
+        paneActive = this._set('paneActive', data(e.target, 'jotted-type'));
+        addClass($container, paneActiveClass(paneActive));
 
         e.preventDefault();
-      }
-    }, {
-      key: 'on',
-      value: function on() {
-        this.pubsoup.subscribe.apply(this.pubsoup, arguments);
-      }
-    }, {
-      key: 'off',
-      value: function off() {
-        this.pubsoup.unsubscribe.apply(this.pubsoup, arguments);
-      }
-    }, {
-      key: 'done',
-      value: function done() {
-        this.pubsoup.done.apply(this.pubsoup, arguments);
       }
     }, {
       key: 'status',
@@ -1120,24 +1142,28 @@
           return this.clearStatus(statusType, params);
         }
 
-        // add error/loading class to status
-        addClass(this.$status[params.type], statusClass(statusType));
+        var $status = this._get('$status');
 
-        addClass(this.$container, statusActiveClass(params.type));
+        // add error/loading class to status
+        addClass($status[params.type], statusClass(statusType));
+
+        addClass(this._get('$container'), statusActiveClass(params.type));
 
         var markup = '';
         messages.forEach(function (err) {
           markup += statusMessage(err);
         });
 
-        this.$status[params.type].innerHTML = markup;
+        $status[params.type].innerHTML = markup;
       }
     }, {
       key: 'clearStatus',
       value: function clearStatus(statusType, params) {
-        removeClass(this.$status[params.type], statusClass(statusType));
-        removeClass(this.$container, statusActiveClass(params.type));
-        this.$status[params.type].innerHTML = '';
+        var $status = this._get('$status');
+
+        removeClass($status[params.type], statusClass(statusType));
+        removeClass(this._get('$container'), statusActiveClass(params.type));
+        $status[params.type].innerHTML = '';
       }
     }]);
     return Jotted;

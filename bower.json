@@ -1,10 +1,10 @@
 {
   "name": "jotted",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "authors": [
     "Ionut Colceriu <contact@ghinda.net>"
   ],
-  "description": "",
+  "description": "Environment for showcasing HTML, CSS and JavaScript, with editable source.",
   "license": "MIT",
   "repository": {
     "type": "git",

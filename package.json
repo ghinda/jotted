@@ -1,7 +1,7 @@
 {
   "name": "jotted",
-  "version": "0.0.1",
-  "description": "Lite HTML, CSS, JavaScript editor for self-hosted demos.",
+  "version": "1.0.0",
+  "description": "Environment for showcasing HTML, CSS and JavaScript, with editable source.",
   "main": "jotted.js",
   "scripts": {
     "watch": "grunt server",

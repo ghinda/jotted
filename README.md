@@ -20,7 +20,7 @@ Environment for showcasing HTML, CSS and JavaScript, with editable source. It's 
 
 ### Quick use
 
-```
+```html
 <link rel="stylesheet" href="jotted.css">
 <script src="jotted.js"></script>
 
@@ -50,7 +50,7 @@ Default: `[]`
 
 Array of `Object`s specifying files that will be loaded. Objects inside the array must follow this pattern:
 
-```
+```javascript
 {
   type: "html", // can be "html", "css", or "js"
   url: "/index.html", // load the file from a url (restricted by the same-domain policy), OR
@@ -94,7 +94,7 @@ If `String`, specify plugin name.
 
 If `Object`, follow this pattern:
 
-```
+```javascript
 {
   name: 'less', // plugin name
   options: {} // options hash to be passed to plugin
@@ -104,7 +104,7 @@ If `Object`, follow this pattern:
 
 ### Example
 
-```
+```javascript
 new Jotted(document.querySelector('#demo'), {
   files: [{
     type: 'css',
@@ -151,7 +151,7 @@ new Jotted(document.querySelector('#demo'), {
 
 You can quickly create Jotted plugins with:
 
-```
+```javascript
 Jotted.plugin('demoPlugin', function (jotted, options) {
   // do stuff
 });
@@ -180,7 +180,7 @@ Unlike most PubSub systems, subscriber functions are run sequentially, not in pa
 
 The functions gets two arguments. The first one is a hash with the format:
 
-```
+```javascript
 {
   file: 'index.html', // changed file's url, if specified
   content: '<h1>Demo</h1>' // file's content
@@ -191,7 +191,7 @@ The second one is a callback that should be called with two arguments: an error 
 
 You can modify the `params` object before sending it with the callback.
 
-```
+```javascript
 jotted.on('change', function (params, callback) {
   params.content += 'Content added by plugin.'
   callback(null, params)
@@ -207,7 +207,7 @@ jotted.on('change', function (params, callback) {
 
 Use the `off` method to remove a subscriber function from an event.
 
-```
+```javascript
 var subscriber = function (params, callback) {}
 jotted.on('change', subscriber)
 jotted.off('change', subscriber)
@@ -219,7 +219,7 @@ Use the `trigger` method to trigger the function queue on an event.
 
 The first argument is the event name, while the second is the `params` hash sent to the attached subscriber functions.
 
-```
+```javascript
 jotted.trigger('change', {
   type: 'html', // can be 'html', 'css' or 'js'
   file: 'index.html', // file url

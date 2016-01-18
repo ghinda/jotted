@@ -8,6 +8,12 @@ Environment for showcasing HTML, CSS and JavaScript, with editable source. It's 
 
 * [npm](https://www.npmjs.com/package/jotted): `npm install --save jotted`
 * [Bower](http://bower.io/): `bower install --save jotted`
+* [jsDelivr](https://www.jsdelivr.com/projects/jotted):
+
+``` html
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/jotted/latest/jotted.min.css">
+<script src="https://cdn.jsdelivr.net/jotted/latest/jotted.min.js"></script>
+```
 
 ## Features
 

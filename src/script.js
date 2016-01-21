@@ -36,16 +36,31 @@ function insertScript ($script, callback = function () {}) {
   }
 }
 
+// https://developer.mozilla.org/en/docs/Web/HTML/Element/script
+var runScriptTypes = [
+  'text/javascript',
+  'text/ecmascript',
+  'application/javascript',
+  'application/ecmascript'
+]
+
 export default function runScripts () {
   // get scripts tags from content added with innerhtml
   var $scripts = this._get('$resultFrame').contentWindow.document.body.querySelectorAll('script')
   var l = $scripts.length
   var runList = []
+  var typeAttr
 
   for (let i = 0; i < l; i++) {
-    runList.push((params, callback) => {
-      insertScript.call(this, $scripts[i], callback)
-    })
+    typeAttr = $scripts[i].getAttribute('type')
+
+    // only run script tags without type attribute
+    // or with a standard attribute value
+    if (!typeAttr || runScriptTypes.indexOf(typeAttr) !== -1) {
+      runList.push((params, callback) => {
+        insertScript.call(this, $scripts[i], callback)
+      })
+    }
   }
 
   // insert the script tags sequentially

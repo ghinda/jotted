@@ -247,6 +247,9 @@
     }
   }
 
+  // https://developer.mozilla.org/en/docs/Web/HTML/Element/script
+  var runScriptTypes = ['text/javascript', 'text/ecmascript', 'application/javascript', 'application/ecmascript'];
+
   function runScripts() {
     var _this = this;
 
@@ -254,11 +257,18 @@
     var $scripts = this._get('$resultFrame').contentWindow.document.body.querySelectorAll('script');
     var l = $scripts.length;
     var runList = [];
+    var typeAttr;
 
     var _loop = function _loop(i) {
-      runList.push(function (params, callback) {
-        insertScript.call(_this, $scripts[i], callback);
-      });
+      typeAttr = $scripts[i].getAttribute('type');
+
+      // only run script tags without type attribute
+      // or with a standard attribute value
+      if (!typeAttr || runScriptTypes.indexOf(typeAttr) !== -1) {
+        runList.push(function (params, callback) {
+          insertScript.call(_this, $scripts[i], callback);
+        });
+      }
     };
 
     for (var i = 0; i < l; i++) {

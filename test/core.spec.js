@@ -9,7 +9,9 @@ describe('Core', function () {
   var jotted = {}
 
   beforeAll(function () {
-    dom.$editor = document.getElementById('editor-core')
+    dom.$editor = document.createElement('div')
+
+    document.querySelector('.fixture').appendChild(dom.$editor)
   })
 
   it('should initialize jotted on #editor-core', function () {

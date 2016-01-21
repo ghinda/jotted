@@ -21,7 +21,7 @@ function insertScript ($script, callback = function () {}) {
     s.onerror = callback
     s.src = $script.src
   } else {
-    s.textContent = $script.innerText
+    s.textContent = $script.textContent
   }
 
   // re-insert the script tag so it executes.

@@ -9,7 +9,9 @@ describe('Script', function () {
   var jotted = {}
 
   beforeAll(function () {
-    dom.$scriptType = document.getElementById('editor-script-type')
+    dom.$scriptType = document.createElement('div')
+
+    document.querySelector('.fixture').appendChild(dom.$scriptType)
   })
 
   it('should run script tags with no type attribute', function () {

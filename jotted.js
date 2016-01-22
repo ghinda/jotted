@@ -106,8 +106,14 @@
     var defaults = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
     var extended = {};
+    // clone object
+    Object.keys(obj).forEach(function (key) {
+      extended[key] = obj[key];
+    });
+
+    // copy default keys where undefined
     Object.keys(defaults).forEach(function (key) {
-      if (typeof obj[key] !== 'undefined') {
+      if (typeof extended[key] !== 'undefined') {
         extended[key] = obj[key];
       } else {
         extended[key] = defaults[key];
@@ -488,12 +494,18 @@
 
       var priority = 20;
 
-      this.options = extend(options, {
-        presets: ['es2015']
-      });
+      this.options = extend(options, {});
 
       // check if babel is loaded
-      if (typeof window.Babel === 'undefined') {
+      if (typeof window.Babel !== 'undefined') {
+        // using babel-standalone
+        this.babel = window.Babel;
+      } else if (typeof window.babel !== 'undefined') {
+        // using browser.js from babel-core 5.x
+        this.babel = {
+          transform: window.babel
+        };
+      } else {
         return;
       }
 
@@ -509,7 +521,7 @@
         // only parse js content
         if (params.type === 'js') {
           try {
-            params.content = window.Babel.transform(params.content, this.options).code;
+            params.content = this.babel.transform(params.content, this.options).code;
           } catch (err) {
             return callback(err, params);
           }

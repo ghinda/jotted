@@ -7,12 +7,18 @@ export default class PluginBabel {
   constructor (jotted, options) {
     var priority = 20
 
-    this.options = util.extend(options, {
-      presets: [ 'es2015' ]
-    })
+    this.options = util.extend(options, {})
 
     // check if babel is loaded
-    if (typeof window.Babel === 'undefined') {
+    if (typeof window.Babel !== 'undefined') {
+      // using babel-standalone
+      this.babel = window.Babel
+    } else if (typeof window.babel !== 'undefined') {
+      // using browser.js from babel-core 5.x
+      this.babel = {
+        transform: window.babel
+      }
+    } else {
       return
     }
 
@@ -26,7 +32,7 @@ export default class PluginBabel {
     // only parse js content
     if (params.type === 'js') {
       try {
-        params.content = window.Babel.transform(params.content, this.options).code
+        params.content = this.babel.transform(params.content, this.options).code
       } catch (err) {
         return callback(err, params)
       }

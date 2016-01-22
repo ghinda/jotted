@@ -92,14 +92,14 @@ describe('Script', function () {
     dom.$script.querySelector('iframe').contentWindow.addEventListener('DOMContentLoaded', function () {
       // give it a sec for react to render
       setTimeout(function () {
-        expect(dom.$script.querySelector('iframe').contentWindow.document.querySelector('#content span').textContent).toContain('Hello, world!')
+        expect(dom.$script.querySelector('iframe').contentWindow.document.querySelector('#content').textContent).toContain('Hello, world!')
 
         done()
       })
     })
   })
 
-  it('should run js in js pane only after all inline scripts are loaded', function (done) {
+  it('should run js only after all inline scripts are loaded', function (done) {
     jotted.script = new Jotted(dom.$script, {
       files: [{
         type: 'html',
@@ -109,20 +109,17 @@ describe('Script', function () {
         content: 'ReactDOM.render(<span>Hello, world!</span>,document.getElementById("content"))'
       }],
       plugins: [{
-        name: 'babel',
-        options: {
-          presets: ['react']
-        }
+        name: 'babel'
       }]
     })
 
     dom.$script.querySelector('iframe').contentWindow.addEventListener('DOMContentLoaded', function () {
       // give it a sec for react to render
       setTimeout(function () {
-        expect(dom.$script.querySelector('iframe').contentWindow.document.querySelector('#content span').textContent).toContain('Hello, world!')
+        expect(dom.$script.querySelector('iframe').contentWindow.document.querySelector('#content').textContent).toContain('Hello, world!')
 
         done()
-      })
+      }, 500)
     })
   })
 })

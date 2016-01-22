@@ -3,8 +3,14 @@
 
 function extend (obj = {}, defaults = {}) {
   var extended = {}
+  // clone object
+  Object.keys(obj).forEach(function (key) {
+    extended[key] = obj[key]
+  })
+
+  // copy default keys where undefined
   Object.keys(defaults).forEach(function (key) {
-    if (typeof obj[key] !== 'undefined') {
+    if (typeof extended[key] !== 'undefined') {
       extended[key] = obj[key]
     } else {
       extended[key] = defaults[key]

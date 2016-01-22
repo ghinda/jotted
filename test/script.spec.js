@@ -80,27 +80,34 @@ describe('Script', function () {
   })
 
   it('should re-trigger DOMContentLoaded after all scripts finished loading', function (done) {
+    dom.$script2 = document.createElement('div')
+    document.querySelector('.fixture').appendChild(dom.$script2)
+
     // that's the default browser behavior,
     // and some loaded scripts could rely on it.
-    jotted.script = new Jotted(dom.$script, {
+    jotted.script2 = new Jotted(dom.$script2, {
       files: [{
         type: 'html',
         content: '<script src="https://fb.me/react-0.14.6.js"></script><script src="https://fb.me/react-dom-0.14.6.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.23/browser.js"></script><div id="content"></div><script language="javascript" type="text/babel">ReactDOM.render(<span>Hello, world!</span>, document.getElementById("content"));</script>'
       }]
     })
 
-    dom.$script.querySelector('iframe').contentWindow.addEventListener('DOMContentLoaded', function () {
+    var $frame = dom.$script2.querySelector('iframe').contentWindow
+    $frame.addEventListener('DOMContentLoaded', function () {
       // give it a sec for react to render
       setTimeout(function () {
-        expect(dom.$script.querySelector('iframe').contentWindow.document.querySelector('#content').textContent).toContain('Hello, world!')
+        expect($frame.document.querySelector('#content').textContent).toContain('Hello, world!')
 
         done()
-      })
+      }, 1000)
     })
   })
 
   it('should run js only after all inline scripts are loaded', function (done) {
-    jotted.script = new Jotted(dom.$script, {
+    dom.$script3 = document.createElement('div')
+    document.querySelector('.fixture').appendChild(dom.$script3)
+
+    jotted.script3 = new Jotted(dom.$script3, {
       files: [{
         type: 'html',
         content: '<script src="https://fb.me/react-0.14.6.js"></script><script src="https://fb.me/react-dom-0.14.6.js"></script><div id="content"></div>'
@@ -113,13 +120,14 @@ describe('Script', function () {
       }]
     })
 
-    dom.$script.querySelector('iframe').contentWindow.addEventListener('DOMContentLoaded', function () {
+    var $frame = dom.$script3.querySelector('iframe').contentWindow
+    $frame.addEventListener('DOMContentLoaded', function () {
       // give it a sec for react to render
       setTimeout(function () {
-        expect(dom.$script.querySelector('iframe').contentWindow.document.querySelector('#content').textContent).toContain('Hello, world!')
+        expect($frame.document.querySelector('#content').textContent).toContain('Hello, world!')
 
         done()
-      }, 500)
+      }, 1000)
     })
   })
 })

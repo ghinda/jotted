@@ -80,34 +80,33 @@ describe('Script', function () {
   })
 
   it('should re-trigger DOMContentLoaded after all scripts finished loading', function (done) {
-    dom.$script2 = document.createElement('div')
-    document.querySelector('.fixture').appendChild(dom.$script2)
-
     // that's the default browser behavior,
     // and some loaded scripts could rely on it.
-    jotted.script2 = new Jotted(dom.$script2, {
+    jotted.script = new Jotted(dom.$script, {
       files: [{
         type: 'html',
         content: '<script src="https://fb.me/react-0.14.6.js"></script><script src="https://fb.me/react-dom-0.14.6.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.23/browser.js"></script><div id="content"></div><script language="javascript" type="text/babel">ReactDOM.render(<span>Hello, world!</span>, document.getElementById("content"));</script>'
       }]
     })
 
-    var $frame = dom.$script2.querySelector('iframe').contentWindow
-    $frame.addEventListener('DOMContentLoaded', function () {
-      // give it a sec for react to render
-      setTimeout(function () {
-        expect($frame.document.querySelector('#content').textContent).toContain('Hello, world!')
+    // firefox triggers DOMContentLoaded immediately
+    // delay the event listener so we only catch the DOMContentLoaded
+    // triggered by jotted after the scripts are loaded.
+    setTimeout(function () {
+      var $frame = dom.$script.querySelector('iframe').contentWindow
+      $frame.addEventListener('DOMContentLoaded', function () {
+        // give it a sec for react to render
+        setTimeout(function () {
+          expect($frame.document.querySelector('#content').textContent).toContain('Hello, world!')
 
-        done()
-      }, 1000)
+          done()
+        })
+      })
     })
   })
 
   it('should run js only after all inline scripts are loaded', function (done) {
-    dom.$script3 = document.createElement('div')
-    document.querySelector('.fixture').appendChild(dom.$script3)
-
-    jotted.script3 = new Jotted(dom.$script3, {
+    jotted.script = new Jotted(dom.$script, {
       files: [{
         type: 'html',
         content: '<script src="https://fb.me/react-0.14.6.js"></script><script src="https://fb.me/react-dom-0.14.6.js"></script><div id="content"></div>'
@@ -120,14 +119,19 @@ describe('Script', function () {
       }]
     })
 
-    var $frame = dom.$script3.querySelector('iframe').contentWindow
-    $frame.addEventListener('DOMContentLoaded', function () {
-      // give it a sec for react to render
-      setTimeout(function () {
-        expect($frame.document.querySelector('#content').textContent).toContain('Hello, world!')
+    // firefox triggers DOMContentLoaded immediately
+    // delay the event listener so we only catch the DOMContentLoaded
+    // triggered by jotted after the scripts are loaded.
+    setTimeout(function () {
+      var $frame = dom.$script.querySelector('iframe').contentWindow
+      $frame.addEventListener('DOMContentLoaded', function () {
+        // give it a sec for react to render
+        setTimeout(function () {
+          expect($frame.document.querySelector('#content').textContent).toContain('Hello, world!')
 
-        done()
-      }, 1000)
+          done()
+        })
+      })
     })
   })
 })

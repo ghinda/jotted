@@ -65,13 +65,19 @@ class Jotted {
     var paneActive = this._set('paneActive', options.pane)
     util.addClass($container, template.paneActiveClass(paneActive))
 
+    // file content caching
+    this._set('content', {
+      html: '',
+      css: '',
+      js: ''
+    })
+
+    // status nodes
     this._set('$status', {})
 
     for (let type of [ 'html', 'css', 'js' ]) {
       this.markup(type)
     }
-
-    this.createResultFrame()
 
     // change events
     $container.addEventListener('change', util.debounce(this.change.bind(this), options.debounce))
@@ -81,7 +87,6 @@ class Jotted {
     $container.addEventListener('click', this.pane.bind(this))
 
     // expose public properties
-    this.$container = this._get('$container')
     this.on = this._get('on')
     this.off = this._get('off')
     this.done = this._get('done')
@@ -195,78 +200,70 @@ class Jotted {
     })
   }
 
-  createResultFrame (css = '') {
-    // maintain previous styles
-    var $newStyle = document.createElement('style')
+  runJS (errors, content) {
+    var $container = this._get('$container')
+    var $resultFrame = $container.querySelector('.jotted-pane-result iframe')
 
-    var $styleInject = this._get('$styleInject')
-    if ($styleInject) {
-      $newStyle.textContent = $styleInject.textContent
+    // catch and show js errors
+    try {
+      $resultFrame.contentWindow.eval(content)
+    } catch (err) {
+      // only show eval errors if we don't have other errors from plugins.
+      // useful for preprocessor error reporting (eg. babel, coffeescript).
+      if (!errors.length) {
+        this.status('error', [ err.message ], {
+          type: 'js'
+        })
+      }
     }
-
-    $styleInject = this._set('$styleInject', $newStyle)
-    var $paneResult = this._get('$container').querySelector('.jotted-pane-result')
-
-    var $resultFrame = this._get('$resultFrame')
-    if ($resultFrame) {
-      $paneResult.removeChild($resultFrame)
-    }
-
-    $resultFrame = this._set('$resultFrame', document.createElement('iframe'))
-    $paneResult.appendChild($resultFrame)
-
-    var $frameDoc = $resultFrame.contentWindow.document
-    $frameDoc.open()
-    $frameDoc.write(template.frameContent())
-    $frameDoc.close()
-
-    $frameDoc.head.appendChild($styleInject)
   }
 
   changeCallback (errors, params) {
     this.status('error', errors, params)
     var options = this._get('options')
 
-    if (params.type === 'html') {
-      // if we have script execution enabled,
-      // re-create the iframe,
-      // to stop execution of any previously started js,
-      // and garbage collect it.
-      if (options.runScripts) {
-        this.createResultFrame()
-      }
+    var $container = this._get('$container')
+    var $resultPane = $container.querySelector('.jotted-pane-result')
+    var $resultFrame = $resultPane.querySelector('iframe')
 
-      // can't cache the $resultFrame reference, because
-      // it's re-created when using runScripts.
-      this._get('$resultFrame').contentWindow.document.body.innerHTML = params.content
+    // if we have script execution enabled,
+    // re-create the iframe,
+    // to stop execution of any previously started js,
+    // and garbage collect it.
+    if (options.runScripts) {
+      $resultPane.removeChild($resultFrame)
 
-      if (options.runScripts) {
-        script.call(this)
-      }
-
-      return
+      $resultFrame = document.createElement('iframe')
+      $resultPane.appendChild($resultFrame)
     }
 
-    if (params.type === 'css') {
-      this._get('$styleInject').textContent = params.content
-      return
-    }
+    // refresh the iframe
+    var $frameDoc = $resultFrame.contentWindow.document
+    $frameDoc.open()
+    $frameDoc.write(template.frameContent())
+    $frameDoc.close()
 
-    if (params.type === 'js') {
-      // catch and show js errors
-      try {
-        this._get('$resultFrame').contentWindow.eval(params.content)
-      } catch (err) {
-        // only show eval errors if we don't have other errors from plugins.
-        // useful for preprocessor error reporting (eg. babel, coffeescript).
-        if (!errors.length) {
-          this.status('error', [ err.message ], {
-            type: 'js'
-          })
-        }
-      }
+    // cache manipulated content
+    var cachedContent = this._get('content')
+    cachedContent[params.type] = params.content
 
-      return
+    // set html
+    $frameDoc.body.innerHTML = cachedContent['html']
+
+    // set css
+    var $styleInject = document.createElement('style')
+    $styleInject.textContent = cachedContent['css']
+    $frameDoc.head.appendChild($styleInject)
+
+    // set js
+    // if runScripts, run js after inline script tags are loaded
+    if (options.runScripts) {
+      script.call(this, $resultFrame, () => {
+        this.runJS(errors, cachedContent['js'])
+      })
+    } else {
+      // otherwise run it immediately
+      this.runJS(errors, cachedContent['js'])
     }
   }
 

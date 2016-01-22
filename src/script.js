@@ -40,11 +40,9 @@ function insertScript (frameWindow, $script, callback = function () {}) {
 // because that's the browser behaviour, and some loaded scripts could rely on it
 // (eg. babel browser.js)
 function scriptsDone (frameWindow) {
-  return function () {
-    var DOMContentLoadedEvent = document.createEvent('Event')
-    DOMContentLoadedEvent.initEvent('DOMContentLoaded', true, true)
-    frameWindow.document.dispatchEvent(DOMContentLoadedEvent)
-  }
+  var DOMContentLoadedEvent = document.createEvent('Event')
+  DOMContentLoadedEvent.initEvent('DOMContentLoaded', true, true)
+  frameWindow.document.dispatchEvent(DOMContentLoadedEvent)
 }
 
 // https://developer.mozilla.org/en/docs/Web/HTML/Element/script
@@ -55,9 +53,9 @@ var runScriptTypes = [
   'application/ecmascript'
 ]
 
-export default function runScripts () {
+export default function runScripts ($resultFrame, callback = function () {}) {
   // get scripts tags from content added with innerhtml
-  var frameWindow = this._get('$resultFrame').contentWindow
+  var frameWindow = $resultFrame.contentWindow
   var $scripts = frameWindow.document.body.querySelectorAll('script')
   var l = $scripts.length
   var runList = []
@@ -77,5 +75,8 @@ export default function runScripts () {
 
   // insert the script tags sequentially
   // so we preserve execution order
-  util.seq(runList, {}, scriptsDone(frameWindow))
+  util.seq(runList, {}, function () {
+    scriptsDone(frameWindow)
+    callback()
+  })
 }

@@ -68,4 +68,28 @@ describe('Core', function () {
       expect(e.toString()).toContain('Can\'t find Jotted container')
     }
   })
+
+  it('should refresh the entire iframe on each change', function () {
+    jotted.core = new Jotted(dom.$editor, {
+      files: [{
+        type: 'html',
+        content: '<h1>Default Heading</h1>'
+      }, {
+        type: 'js',
+        content: ''
+      }]
+    })
+
+    var changeEvent = document.createEvent('Event')
+    changeEvent.initEvent('DOMContentLoaded', true, true)
+
+    var $textareaJS = dom.$editor.querySelector('.jotted-pane-js textarea')
+    $textareaJS.value = 'document.querySelector("h1").innerHTML = "Different Heading"'
+    $textareaJS.dispatchEvent(changeEvent)
+
+    $textareaJS.value = ''
+    $textareaJS.dispatchEvent(changeEvent)
+
+    expect(dom.$editor.querySelector('.jotted-pane-result iframe').contentWindow.document.querySelector('h1').innerHTML).toBe('Default Heading')
+  })
 })

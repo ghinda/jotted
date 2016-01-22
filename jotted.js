@@ -39,7 +39,7 @@
    */
 
   function container() {
-    return '\n    <ul class="jotted-nav">\n      <li class="jotted-nav-item jotted-nav-item-result">\n        <a href="#" data-jotted-type="result">\n          Result\n        </a>\n      </li>\n      <li class="jotted-nav-item jotted-nav-item-html">\n        <a href="#" data-jotted-type="html">\n          HTML\n        </a>\n      </li>\n      <li class="jotted-nav-item jotted-nav-item-css">\n        <a href="#" data-jotted-type="css">\n          CSS\n        </a>\n      </li>\n      <li class="jotted-nav-item jotted-nav-item-js">\n        <a href="#" data-jotted-type="js">\n          JavaScript\n        </a>\n      </li>\n    </ul>\n    <div class="jotted-pane jotted-pane-result"></div>\n    <div class="jotted-pane jotted-pane-html"></div>\n    <div class="jotted-pane jotted-pane-css"></div>\n    <div class="jotted-pane jotted-pane-js"></div>\n  ';
+    return '\n    <ul class="jotted-nav">\n      <li class="jotted-nav-item jotted-nav-item-result">\n        <a href="#" data-jotted-type="result">\n          Result\n        </a>\n      </li>\n      <li class="jotted-nav-item jotted-nav-item-html">\n        <a href="#" data-jotted-type="html">\n          HTML\n        </a>\n      </li>\n      <li class="jotted-nav-item jotted-nav-item-css">\n        <a href="#" data-jotted-type="css">\n          CSS\n        </a>\n      </li>\n      <li class="jotted-nav-item jotted-nav-item-js">\n        <a href="#" data-jotted-type="js">\n          JavaScript\n        </a>\n      </li>\n    </ul>\n    <div class="jotted-pane jotted-pane-result"><iframe></iframe></div>\n    <div class="jotted-pane jotted-pane-html"></div>\n    <div class="jotted-pane jotted-pane-css"></div>\n    <div class="jotted-pane jotted-pane-js"></div>\n  ';
   }
 
   function paneActiveClass(type) {
@@ -251,21 +251,21 @@
   // because that's the browser behaviour, and some loaded scripts could rely on it
   // (eg. babel browser.js)
   function scriptsDone(frameWindow) {
-    return function () {
-      var DOMContentLoadedEvent = document.createEvent('Event');
-      DOMContentLoadedEvent.initEvent('DOMContentLoaded', true, true);
-      frameWindow.document.dispatchEvent(DOMContentLoadedEvent);
-    };
+    var DOMContentLoadedEvent = document.createEvent('Event');
+    DOMContentLoadedEvent.initEvent('DOMContentLoaded', true, true);
+    frameWindow.document.dispatchEvent(DOMContentLoadedEvent);
   }
 
   // https://developer.mozilla.org/en/docs/Web/HTML/Element/script
   var runScriptTypes = ['text/javascript', 'text/ecmascript', 'application/javascript', 'application/ecmascript'];
 
-  function runScripts() {
+  function runScripts($resultFrame) {
     var _this = this;
 
+    var callback = arguments.length <= 1 || arguments[1] === undefined ? function () {} : arguments[1];
+
     // get scripts tags from content added with innerhtml
-    var frameWindow = this._get('$resultFrame').contentWindow;
+    var frameWindow = $resultFrame.contentWindow;
     var $scripts = frameWindow.document.body.querySelectorAll('script');
     var l = $scripts.length;
     var runList = [];
@@ -289,7 +289,10 @@
 
     // insert the script tags sequentially
     // so we preserve execution order
-    seq(runList, {}, scriptsDone(frameWindow));
+    seq(runList, {}, function () {
+      scriptsDone(frameWindow);
+      callback();
+    });
   }
 
   var plugins = [];
@@ -917,6 +920,14 @@
       var paneActive = this._set('paneActive', options.pane);
       addClass($container, paneActiveClass(paneActive));
 
+      // file content caching
+      this._set('content', {
+        html: '',
+        css: '',
+        js: ''
+      });
+
+      // status nodes
       this._set('$status', {});
 
       var _arr = ['html', 'css', 'js'];
@@ -924,8 +935,6 @@
         var type = _arr[_i];
         this.markup(type);
       }
-
-      this.createResultFrame();
 
       // change events
       $container.addEventListener('change', debounce(this.change.bind(this), options.debounce));
@@ -935,7 +944,6 @@
       $container.addEventListener('click', this.pane.bind(this));
 
       // expose public properties
-      this.$container = this._get('$container');
       this.on = this._get('on');
       this.off = this._get('off');
       this.done = this._get('done');
@@ -1059,82 +1067,74 @@
         });
       }
     }, {
-      key: 'createResultFrame',
-      value: function createResultFrame() {
-        var css = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
+      key: 'runJS',
+      value: function runJS(errors, content) {
+        var $container = this._get('$container');
+        var $resultFrame = $container.querySelector('.jotted-pane-result iframe');
 
-        // maintain previous styles
-        var $newStyle = document.createElement('style');
+        // catch and show js errors
+        try {
+          $resultFrame.contentWindow.eval(content);
+        } catch (err) {
+          // only show eval errors if we don't have other errors from plugins.
+          // useful for preprocessor error reporting (eg. babel, coffeescript).
+          if (!errors.length) {
+            this.status('error', [err.message], {
+              type: 'js'
+            });
+          }
+        }
+      }
+    }, {
+      key: 'changeCallback',
+      value: function changeCallback(errors, params) {
+        var _this2 = this;
 
-        var $styleInject = this._get('$styleInject');
-        if ($styleInject) {
-          $newStyle.textContent = $styleInject.textContent;
+        this.status('error', errors, params);
+        var options = this._get('options');
+
+        var $container = this._get('$container');
+        var $resultPane = $container.querySelector('.jotted-pane-result');
+        var $resultFrame = $resultPane.querySelector('iframe');
+
+        // if we have script execution enabled,
+        // re-create the iframe,
+        // to stop execution of any previously started js,
+        // and garbage collect it.
+        if (options.runScripts) {
+          $resultPane.removeChild($resultFrame);
+
+          $resultFrame = document.createElement('iframe');
+          $resultPane.appendChild($resultFrame);
         }
 
-        $styleInject = this._set('$styleInject', $newStyle);
-        var $paneResult = this._get('$container').querySelector('.jotted-pane-result');
-
-        var $resultFrame = this._get('$resultFrame');
-        if ($resultFrame) {
-          $paneResult.removeChild($resultFrame);
-        }
-
-        $resultFrame = this._set('$resultFrame', document.createElement('iframe'));
-        $paneResult.appendChild($resultFrame);
-
+        // refresh the iframe
         var $frameDoc = $resultFrame.contentWindow.document;
         $frameDoc.open();
         $frameDoc.write(frameContent());
         $frameDoc.close();
 
+        // cache manipulated content
+        var cachedContent = this._get('content');
+        cachedContent[params.type] = params.content;
+
+        // set html
+        $frameDoc.body.innerHTML = cachedContent['html'];
+
+        // set css
+        var $styleInject = document.createElement('style');
+        $styleInject.textContent = cachedContent['css'];
         $frameDoc.head.appendChild($styleInject);
-      }
-    }, {
-      key: 'changeCallback',
-      value: function changeCallback(errors, params) {
-        this.status('error', errors, params);
-        var options = this._get('options');
 
-        if (params.type === 'html') {
-          // if we have script execution enabled,
-          // re-create the iframe,
-          // to stop execution of any previously started js,
-          // and garbage collect it.
-          if (options.runScripts) {
-            this.createResultFrame();
-          }
-
-          // can't cache the $resultFrame reference, because
-          // it's re-created when using runScripts.
-          this._get('$resultFrame').contentWindow.document.body.innerHTML = params.content;
-
-          if (options.runScripts) {
-            runScripts.call(this);
-          }
-
-          return;
-        }
-
-        if (params.type === 'css') {
-          this._get('$styleInject').textContent = params.content;
-          return;
-        }
-
-        if (params.type === 'js') {
-          // catch and show js errors
-          try {
-            this._get('$resultFrame').contentWindow.eval(params.content);
-          } catch (err) {
-            // only show eval errors if we don't have other errors from plugins.
-            // useful for preprocessor error reporting (eg. babel, coffeescript).
-            if (!errors.length) {
-              this.status('error', [err.message], {
-                type: 'js'
-              });
-            }
-          }
-
-          return;
+        // set js
+        // if runScripts, run js after inline script tags are loaded
+        if (options.runScripts) {
+          runScripts.call(this, $resultFrame, function () {
+            _this2.runJS(errors, cachedContent['js']);
+          });
+        } else {
+          // otherwise run it immediately
+          this.runJS(errors, cachedContent['js']);
         }
       }
     }, {

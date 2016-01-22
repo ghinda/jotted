@@ -78,7 +78,7 @@ describe('Script', function () {
         expect(dom.$scriptType.querySelector('iframe').contentWindow.document.querySelector('#content').innerHTML).toContain('Hello, world!')
 
         done()
-      }, 500)
+      }, 1000)
     })
   })
 })

@@ -24,6 +24,7 @@
 
   <script>
     jasmine.getEnv().addReporter(new jasmineRequire.JSReporter2());
+    jasmine.getEnv().defaultTimeoutInterval = 5000;
   </script>
 
   <script src="core.spec.js"></script>

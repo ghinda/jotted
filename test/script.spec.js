@@ -75,10 +75,10 @@ describe('Script', function () {
     dom.$scriptType.querySelector('iframe').contentWindow.addEventListener('DOMContentLoaded', function () {
       // give it a sec for react to render
       setTimeout(function () {
-        expect(dom.$scriptType.querySelector('iframe').contentWindow.document.querySelector('#content').innerHTML).toContain('Hello, world!')
+        expect(dom.$scriptType.querySelector('iframe').contentWindow.document.querySelector('#content span').textContent).toContain('Hello, world!')
 
         done()
-      }, 1000)
+      })
     })
   })
 })

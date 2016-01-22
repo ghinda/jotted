@@ -87,6 +87,7 @@ class Jotted {
     $container.addEventListener('click', this.pane.bind(this))
 
     // expose public properties
+    this.$container = this._get('$container')
     this.on = this._get('on')
     this.off = this._get('off')
     this.done = this._get('done')

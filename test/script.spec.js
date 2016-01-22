@@ -98,4 +98,31 @@ describe('Script', function () {
       })
     })
   })
+
+  it('should run js in js pane only after all inline scripts are loaded', function (done) {
+    jotted.script = new Jotted(dom.$script, {
+      files: [{
+        type: 'html',
+        content: '<script src="https://fb.me/react-0.14.6.js"></script><script src="https://fb.me/react-dom-0.14.6.js"></script><div id="content"></div>'
+      }, {
+        type: 'js',
+        content: 'ReactDOM.render(<span>Hello, world!</span>,document.getElementById("content"))'
+      }],
+      plugins: [{
+        name: 'babel',
+        options: {
+          presets: ['react']
+        }
+      }]
+    })
+
+    dom.$script.querySelector('iframe').contentWindow.addEventListener('DOMContentLoaded', function () {
+      // give it a sec for react to render
+      setTimeout(function () {
+        expect(dom.$script.querySelector('iframe').contentWindow.document.querySelector('#content span').textContent).toContain('Hello, world!')
+
+        done()
+      })
+    })
+  })
 })

@@ -1,4 +1,11 @@
 
+## [1.0.4] - 2016-01-22
+
+* Add support for browser.js from babel-core 5.x, in the babel plugin. Use browser.js instead of babel-standalone, for IE9 support.
+* Remove the default `presets` option in the babel plugin, because it's not supported by babel-core/browser.js.
+* Change the way the iframe is rendered, by refreshing the entire iframe content on each change. The previous behavior was incorrect, and would maintain the DOM, even if the JS would change.
+* Run the JavaScript from the JS pane only after all inline script tags are loaded, if runScripts is true.
+
 ## [1.0.3] - 2016-01-22
 
 * Fix the script tag runner on Firefox.

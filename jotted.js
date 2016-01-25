@@ -1,13 +1,14 @@
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
-  global.Jotted = factory();
+  (global.Jotted = factory());
 }(this, function () { 'use strict';
 
   var babelHelpers = {};
-
-  babelHelpers.typeof = function (obj) {
-    return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj;
+  babelHelpers.typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+    return typeof obj;
+  } : function (obj) {
+    return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj;
   };
 
   babelHelpers.classCallCheck = function (instance, Constructor) {
@@ -16,7 +17,7 @@
     }
   };
 
-  babelHelpers.createClass = (function () {
+  babelHelpers.createClass = function () {
     function defineProperties(target, props) {
       for (var i = 0; i < props.length; i++) {
         var descriptor = props[i];
@@ -32,71 +33,9 @@
       if (staticProps) defineProperties(Constructor, staticProps);
       return Constructor;
     };
-  })();
+  }();
 
   babelHelpers;
-  /* template
-   */
-
-  function container() {
-    return '\n    <ul class="jotted-nav">\n      <li class="jotted-nav-item jotted-nav-item-result">\n        <a href="#" data-jotted-type="result">\n          Result\n        </a>\n      </li>\n      <li class="jotted-nav-item jotted-nav-item-html">\n        <a href="#" data-jotted-type="html">\n          HTML\n        </a>\n      </li>\n      <li class="jotted-nav-item jotted-nav-item-css">\n        <a href="#" data-jotted-type="css">\n          CSS\n        </a>\n      </li>\n      <li class="jotted-nav-item jotted-nav-item-js">\n        <a href="#" data-jotted-type="js">\n          JavaScript\n        </a>\n      </li>\n    </ul>\n    <div class="jotted-pane jotted-pane-result"><iframe></iframe></div>\n    <div class="jotted-pane jotted-pane-html"></div>\n    <div class="jotted-pane jotted-pane-css"></div>\n    <div class="jotted-pane jotted-pane-js"></div>\n  ';
-  }
-
-  function paneActiveClass(type) {
-    return 'jotted-pane-active-' + type;
-  }
-
-  function containerClass() {
-    return 'jotted';
-  }
-
-  function showBlankClass() {
-    return 'jotted-nav-show-blank';
-  }
-
-  function hasFileClass(type) {
-    return 'jotted-has-' + type;
-  }
-
-  function editorClass(type) {
-    return 'jotted-editor jotted-editor-' + type;
-  }
-
-  function editorContent(type) {
-    var fileUrl = arguments.length <= 1 || arguments[1] === undefined ? '' : arguments[1];
-
-    return '\n    <textarea data-jotted-type="' + type + '" data-jotted-file="' + fileUrl + '"></textarea>\n    <div class="jotted-status"></div>\n  ';
-  }
-
-  function statusMessage(err) {
-    return '\n    <p>' + err + '</p>\n  ';
-  }
-
-  function statusClass(type) {
-    return 'jotted-status-' + type;
-  }
-
-  function statusActiveClass(type) {
-    return 'jotted-status-active-' + type;
-  }
-
-  function pluginClass(name) {
-    return 'jotted-plugin-' + name;
-  }
-
-  function frameContent() {
-    var body = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
-
-    return '\n    <!doctype html>\n    <html>\n    <head>\n    </head>\n    <body>\n    ' + body + '\n    </body>\n    </html>\n  ';
-  }
-
-  function statusLoading(url) {
-    return 'Loading <strong>' + url + '</strong>..';
-  }
-
-  function statusFetchError(url) {
-    return 'There was an error loading <strong>' + url + '</strong>.';
-  }
 
   /* util
    */
@@ -218,6 +157,112 @@
     return node.getAttribute('data-' + attr);
   }
 
+  /* template
+   */
+
+  function container() {
+    return '\n    <ul class="jotted-nav">\n      <li class="jotted-nav-item jotted-nav-item-result">\n        <a href="#" data-jotted-type="result">\n          Result\n        </a>\n      </li>\n      <li class="jotted-nav-item jotted-nav-item-html">\n        <a href="#" data-jotted-type="html">\n          HTML\n        </a>\n      </li>\n      <li class="jotted-nav-item jotted-nav-item-css">\n        <a href="#" data-jotted-type="css">\n          CSS\n        </a>\n      </li>\n      <li class="jotted-nav-item jotted-nav-item-js">\n        <a href="#" data-jotted-type="js">\n          JavaScript\n        </a>\n      </li>\n    </ul>\n    <div class="jotted-pane jotted-pane-result"><iframe></iframe></div>\n    <div class="jotted-pane jotted-pane-html"></div>\n    <div class="jotted-pane jotted-pane-css"></div>\n    <div class="jotted-pane jotted-pane-js"></div>\n  ';
+  }
+
+  function paneActiveClass(type) {
+    return 'jotted-pane-active-' + type;
+  }
+
+  function containerClass() {
+    return 'jotted';
+  }
+
+  function showBlankClass() {
+    return 'jotted-nav-show-blank';
+  }
+
+  function hasFileClass(type) {
+    return 'jotted-has-' + type;
+  }
+
+  function editorClass(type) {
+    return 'jotted-editor jotted-editor-' + type;
+  }
+
+  function editorContent(type) {
+    var fileUrl = arguments.length <= 1 || arguments[1] === undefined ? '' : arguments[1];
+
+    return '\n    <textarea data-jotted-type="' + type + '" data-jotted-file="' + fileUrl + '"></textarea>\n    <div class="jotted-status"></div>\n  ';
+  }
+
+  function statusMessage(err) {
+    return '\n    <p>' + err + '</p>\n  ';
+  }
+
+  function statusClass(type) {
+    return 'jotted-status-' + type;
+  }
+
+  function statusActiveClass(type) {
+    return 'jotted-status-active-' + type;
+  }
+
+  function pluginClass(name) {
+    return 'jotted-plugin-' + name;
+  }
+
+  function frameContent() {
+    var body = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
+
+    return '\n    <!doctype html>\n    <html>\n    <head>\n    </head>\n    <body>\n    ' + body + '\n    </body>\n    </html>\n  ';
+  }
+
+  function statusLoading(url) {
+    return 'Loading <strong>' + url + '</strong>..';
+  }
+
+  function statusFetchError(url) {
+    return 'There was an error loading <strong>' + url + '</strong>.';
+  }
+
+  var plugins = [];
+
+  function find(id) {
+    for (var pluginIndex in plugins) {
+      var plugin = plugins[pluginIndex];
+      if (plugin._id === id) {
+        return plugin;
+      }
+    }
+
+    // can't find plugin
+    throw new Error('Plugin ' + id + ' is not registered.');
+  }
+
+  function register(id, plugin) {
+    // private properties
+    plugin._id = id;
+    plugins.push(plugin);
+  }
+
+  // create a new instance of each plugin, on the jotted instance
+  function init() {
+    var _this = this;
+
+    this._get('options').plugins.forEach(function (plugin) {
+      // check if plugin definition is string or object
+      var Plugin = undefined;
+      var pluginName = undefined;
+      var pluginOptions = {};
+      if (typeof plugin === 'string') {
+        pluginName = plugin;
+      } else if ((typeof plugin === 'undefined' ? 'undefined' : babelHelpers.typeof(plugin)) === 'object') {
+        pluginName = plugin.name;
+        pluginOptions = plugin.options || {};
+      }
+
+      Plugin = find(pluginName);
+      _this._get('plugins')[plugin] = new Plugin(_this, pluginOptions);
+
+      addClass(_this._get('$container'), pluginClass(pluginName));
+    });
+  }
+
   /* re-insert script tags
    */
   function insertScript(frameWindow, $script) {
@@ -301,50 +346,7 @@
     });
   }
 
-  var plugins = [];
-
-  function find(id) {
-    for (var pluginIndex in plugins) {
-      var plugin = plugins[pluginIndex];
-      if (plugin._id === id) {
-        return plugin;
-      }
-    }
-
-    // can't find plugin
-    throw new Error('Plugin ' + id + ' is not registered.');
-  }
-
-  function register(id, plugin) {
-    // private properties
-    plugin._id = id;
-    plugins.push(plugin);
-  }
-
-  // create a new instance of each plugin, on the jotted instance
-  function init() {
-    var _this = this;
-
-    this._get('options').plugins.forEach(function (plugin) {
-      // check if plugin definition is string or object
-      var Plugin = undefined;
-      var pluginName = undefined;
-      var pluginOptions = {};
-      if (typeof plugin === 'string') {
-        pluginName = plugin;
-      } else if ((typeof plugin === 'undefined' ? 'undefined' : babelHelpers.typeof(plugin)) === 'object') {
-        pluginName = plugin.name;
-        pluginOptions = plugin.options || {};
-      }
-
-      Plugin = find(pluginName);
-      _this._get('plugins')[plugin] = new Plugin(_this, pluginOptions);
-
-      addClass(_this._get('$container'), pluginClass(pluginName));
-    });
-  }
-
-  var PubSoup = (function () {
+  var PubSoup = function () {
     function PubSoup() {
       babelHelpers.classCallCheck(this, PubSoup);
 
@@ -443,253 +445,9 @@
       }
     }]);
     return PubSoup;
-  })();
+  }();
 
-  var PluginMarkdown = (function () {
-    function PluginMarkdown(jotted, options) {
-      babelHelpers.classCallCheck(this, PluginMarkdown);
-
-      var priority = 20;
-
-      this.options = extend(options, {});
-
-      // check if marked is loaded
-      if (typeof window.marked === 'undefined') {
-        return;
-      }
-
-      window.marked.setOptions(options);
-
-      // change html link label
-      jotted.$container.querySelector('a[data-jotted-type="html"]').innerHTML = 'Markdown';
-
-      jotted.on('change', this.change.bind(this), priority);
-    }
-
-    babelHelpers.createClass(PluginMarkdown, [{
-      key: 'change',
-      value: function change(params, callback) {
-        // only parse html content
-        if (params.type === 'html') {
-          try {
-            params.content = window.marked(params.content);
-          } catch (err) {
-            return callback(err, params);
-          }
-
-          callback(null, params);
-        } else {
-          // make sure we callback either way,
-          // to not break the pubsoup
-          callback(null, params);
-        }
-      }
-    }]);
-    return PluginMarkdown;
-  })();
-
-  var PluginBabel = (function () {
-    function PluginBabel(jotted, options) {
-      babelHelpers.classCallCheck(this, PluginBabel);
-
-      var priority = 20;
-
-      this.options = extend(options, {});
-
-      // check if babel is loaded
-      if (typeof window.Babel !== 'undefined') {
-        // using babel-standalone
-        this.babel = window.Babel;
-      } else if (typeof window.babel !== 'undefined') {
-        // using browser.js from babel-core 5.x
-        this.babel = {
-          transform: window.babel
-        };
-      } else {
-        return;
-      }
-
-      // change js link label
-      jotted.$container.querySelector('a[data-jotted-type="js"]').innerHTML = 'ES2015';
-
-      jotted.on('change', this.change.bind(this), priority);
-    }
-
-    babelHelpers.createClass(PluginBabel, [{
-      key: 'change',
-      value: function change(params, callback) {
-        // only parse js content
-        if (params.type === 'js') {
-          try {
-            params.content = this.babel.transform(params.content, this.options).code;
-          } catch (err) {
-            return callback(err, params);
-          }
-
-          callback(null, params);
-        } else {
-          // make sure we callback either way,
-          // to not break the pubsoup
-          callback(null, params);
-        }
-      }
-    }]);
-    return PluginBabel;
-  })();
-
-  var PluginStylus = (function () {
-    function PluginStylus(jotted, options) {
-      babelHelpers.classCallCheck(this, PluginStylus);
-
-      var priority = 20;
-
-      options = extend(options, {});
-
-      // check if stylus is loaded
-      if (typeof window.stylus === 'undefined') {
-        return;
-      }
-
-      // change CSS link label to Stylus
-      jotted.$container.querySelector('a[data-jotted-type="css"]').innerHTML = 'Stylus';
-
-      jotted.on('change', this.change.bind(this), priority);
-    }
-
-    babelHelpers.createClass(PluginStylus, [{
-      key: 'isStylus',
-      value: function isStylus(params) {
-        if (params.type !== 'css') {
-          return false;
-        }
-
-        return params.file.indexOf('.styl') !== -1 || params.file === '';
-      }
-    }, {
-      key: 'change',
-      value: function change(params, callback) {
-        // only parse .styl and blank files
-        if (this.isStylus(params)) {
-          window.stylus(params.content, this.options).render(function (err, res) {
-            if (err) {
-              return callback(err, params);
-            } else {
-              // replace the content with the parsed less
-              params.content = res;
-            }
-
-            callback(null, params);
-          });
-        } else {
-          // make sure we callback either way,
-          // to not break the pubsoup
-          callback(null, params);
-        }
-      }
-    }]);
-    return PluginStylus;
-  })();
-
-  var PluginCoffeeScript = (function () {
-    function PluginCoffeeScript(jotted, options) {
-      babelHelpers.classCallCheck(this, PluginCoffeeScript);
-
-      var priority = 20;
-
-      options = extend(options, {});
-
-      // check if coffeescript is loaded
-      if (typeof window.CoffeeScript === 'undefined') {
-        return;
-      }
-
-      // change JS link label to Less
-      jotted.$container.querySelector('a[data-jotted-type="js"]').innerHTML = 'CoffeeScript';
-
-      jotted.on('change', this.change.bind(this), priority);
-    }
-
-    babelHelpers.createClass(PluginCoffeeScript, [{
-      key: 'isCoffee',
-      value: function isCoffee(params) {
-        if (params.type !== 'js') {
-          return false;
-        }
-
-        return params.file.indexOf('.coffee') !== -1 || params.file === '';
-      }
-    }, {
-      key: 'change',
-      value: function change(params, callback) {
-        // only parse .less and blank files
-        if (this.isCoffee(params)) {
-          try {
-            params.content = window.CoffeeScript.compile(params.content);
-          } catch (err) {
-            return callback(err, params);
-          }
-        }
-
-        callback(null, params);
-      }
-    }]);
-    return PluginCoffeeScript;
-  })();
-
-  var PluginLess = (function () {
-    function PluginLess(jotted, options) {
-      babelHelpers.classCallCheck(this, PluginLess);
-
-      var priority = 20;
-
-      options = extend(options, {});
-
-      // check if less is loaded
-      if (typeof window.less === 'undefined') {
-        return;
-      }
-
-      // change CSS link label to Less
-      jotted.$container.querySelector('a[data-jotted-type="css"]').innerHTML = 'Less';
-
-      jotted.on('change', this.change.bind(this), priority);
-    }
-
-    babelHelpers.createClass(PluginLess, [{
-      key: 'isLess',
-      value: function isLess(params) {
-        if (params.type !== 'css') {
-          return false;
-        }
-
-        return params.file.indexOf('.less') !== -1 || params.file === '';
-      }
-    }, {
-      key: 'change',
-      value: function change(params, callback) {
-        // only parse .less and blank files
-        if (this.isLess(params)) {
-          window.less.render(params.content, this.options, function (err, res) {
-            if (err) {
-              return callback(err, params);
-            } else {
-              // replace the content with the parsed less
-              params.content = res.css;
-            }
-
-            callback(null, params);
-          });
-        } else {
-          // make sure we callback either way,
-          // to not break the pubsoup
-          callback(null, params);
-        }
-      }
-    }]);
-    return PluginLess;
-  })();
-
-  var PluginAce = (function () {
+  var PluginAce = function () {
     function PluginAce(jotted, options) {
       var _this = this;
 
@@ -792,9 +550,9 @@
       }
     }]);
     return PluginAce;
-  })();
+  }();
 
-  var PluginCodeMirror = (function () {
+  var PluginCodeMirror = function () {
     function PluginCodeMirror(jotted, options) {
       var _this = this;
 
@@ -860,7 +618,251 @@
       }
     }]);
     return PluginCodeMirror;
-  })();
+  }();
+
+  var PluginLess = function () {
+    function PluginLess(jotted, options) {
+      babelHelpers.classCallCheck(this, PluginLess);
+
+      var priority = 20;
+
+      options = extend(options, {});
+
+      // check if less is loaded
+      if (typeof window.less === 'undefined') {
+        return;
+      }
+
+      // change CSS link label to Less
+      jotted.$container.querySelector('a[data-jotted-type="css"]').innerHTML = 'Less';
+
+      jotted.on('change', this.change.bind(this), priority);
+    }
+
+    babelHelpers.createClass(PluginLess, [{
+      key: 'isLess',
+      value: function isLess(params) {
+        if (params.type !== 'css') {
+          return false;
+        }
+
+        return params.file.indexOf('.less') !== -1 || params.file === '';
+      }
+    }, {
+      key: 'change',
+      value: function change(params, callback) {
+        // only parse .less and blank files
+        if (this.isLess(params)) {
+          window.less.render(params.content, this.options, function (err, res) {
+            if (err) {
+              return callback(err, params);
+            } else {
+              // replace the content with the parsed less
+              params.content = res.css;
+            }
+
+            callback(null, params);
+          });
+        } else {
+          // make sure we callback either way,
+          // to not break the pubsoup
+          callback(null, params);
+        }
+      }
+    }]);
+    return PluginLess;
+  }();
+
+  var PluginCoffeeScript = function () {
+    function PluginCoffeeScript(jotted, options) {
+      babelHelpers.classCallCheck(this, PluginCoffeeScript);
+
+      var priority = 20;
+
+      options = extend(options, {});
+
+      // check if coffeescript is loaded
+      if (typeof window.CoffeeScript === 'undefined') {
+        return;
+      }
+
+      // change JS link label to Less
+      jotted.$container.querySelector('a[data-jotted-type="js"]').innerHTML = 'CoffeeScript';
+
+      jotted.on('change', this.change.bind(this), priority);
+    }
+
+    babelHelpers.createClass(PluginCoffeeScript, [{
+      key: 'isCoffee',
+      value: function isCoffee(params) {
+        if (params.type !== 'js') {
+          return false;
+        }
+
+        return params.file.indexOf('.coffee') !== -1 || params.file === '';
+      }
+    }, {
+      key: 'change',
+      value: function change(params, callback) {
+        // only parse .less and blank files
+        if (this.isCoffee(params)) {
+          try {
+            params.content = window.CoffeeScript.compile(params.content);
+          } catch (err) {
+            return callback(err, params);
+          }
+        }
+
+        callback(null, params);
+      }
+    }]);
+    return PluginCoffeeScript;
+  }();
+
+  var PluginStylus = function () {
+    function PluginStylus(jotted, options) {
+      babelHelpers.classCallCheck(this, PluginStylus);
+
+      var priority = 20;
+
+      options = extend(options, {});
+
+      // check if stylus is loaded
+      if (typeof window.stylus === 'undefined') {
+        return;
+      }
+
+      // change CSS link label to Stylus
+      jotted.$container.querySelector('a[data-jotted-type="css"]').innerHTML = 'Stylus';
+
+      jotted.on('change', this.change.bind(this), priority);
+    }
+
+    babelHelpers.createClass(PluginStylus, [{
+      key: 'isStylus',
+      value: function isStylus(params) {
+        if (params.type !== 'css') {
+          return false;
+        }
+
+        return params.file.indexOf('.styl') !== -1 || params.file === '';
+      }
+    }, {
+      key: 'change',
+      value: function change(params, callback) {
+        // only parse .styl and blank files
+        if (this.isStylus(params)) {
+          window.stylus(params.content, this.options).render(function (err, res) {
+            if (err) {
+              return callback(err, params);
+            } else {
+              // replace the content with the parsed less
+              params.content = res;
+            }
+
+            callback(null, params);
+          });
+        } else {
+          // make sure we callback either way,
+          // to not break the pubsoup
+          callback(null, params);
+        }
+      }
+    }]);
+    return PluginStylus;
+  }();
+
+  var PluginBabel = function () {
+    function PluginBabel(jotted, options) {
+      babelHelpers.classCallCheck(this, PluginBabel);
+
+      var priority = 20;
+
+      this.options = extend(options, {});
+
+      // check if babel is loaded
+      if (typeof window.Babel !== 'undefined') {
+        // using babel-standalone
+        this.babel = window.Babel;
+      } else if (typeof window.babel !== 'undefined') {
+        // using browser.js from babel-core 5.x
+        this.babel = {
+          transform: window.babel
+        };
+      } else {
+        return;
+      }
+
+      // change js link label
+      jotted.$container.querySelector('a[data-jotted-type="js"]').innerHTML = 'ES2015';
+
+      jotted.on('change', this.change.bind(this), priority);
+    }
+
+    babelHelpers.createClass(PluginBabel, [{
+      key: 'change',
+      value: function change(params, callback) {
+        // only parse js content
+        if (params.type === 'js') {
+          try {
+            params.content = this.babel.transform(params.content, this.options).code;
+          } catch (err) {
+            return callback(err, params);
+          }
+
+          callback(null, params);
+        } else {
+          // make sure we callback either way,
+          // to not break the pubsoup
+          callback(null, params);
+        }
+      }
+    }]);
+    return PluginBabel;
+  }();
+
+  var PluginMarkdown = function () {
+    function PluginMarkdown(jotted, options) {
+      babelHelpers.classCallCheck(this, PluginMarkdown);
+
+      var priority = 20;
+
+      this.options = extend(options, {});
+
+      // check if marked is loaded
+      if (typeof window.marked === 'undefined') {
+        return;
+      }
+
+      window.marked.setOptions(options);
+
+      // change html link label
+      jotted.$container.querySelector('a[data-jotted-type="html"]').innerHTML = 'Markdown';
+
+      jotted.on('change', this.change.bind(this), priority);
+    }
+
+    babelHelpers.createClass(PluginMarkdown, [{
+      key: 'change',
+      value: function change(params, callback) {
+        // only parse html content
+        if (params.type === 'html') {
+          try {
+            params.content = window.marked(params.content);
+          } catch (err) {
+            return callback(err, params);
+          }
+
+          callback(null, params);
+        } else {
+          // make sure we callback either way,
+          // to not break the pubsoup
+          callback(null, params);
+        }
+      }
+    }]);
+    return PluginMarkdown;
+  }();
 
   function BundlePlugins(jotted) {
     jotted.plugin('codemirror', PluginCodeMirror);
@@ -872,7 +874,7 @@
     jotted.plugin('markdown', PluginMarkdown);
   }
 
-  var Jotted = (function () {
+  var Jotted = function () {
     function Jotted($jottedContainer, opts) {
       babelHelpers.classCallCheck(this, Jotted);
 
@@ -1202,7 +1204,7 @@
       }
     }]);
     return Jotted;
-  })();
+  }();
 
   // register plugins
 

@@ -9,7 +9,6 @@ var babel = require('rollup-plugin-babel');
 module.exports = function (grunt) {
   // load all grunt tasks
   require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
-  grunt.loadNpmTasks('assemble');
 
   grunt.initConfig({
     watch: {
@@ -54,32 +53,22 @@ module.exports = function (grunt) {
       },
       livereload: {
         options: {
-          middleware: function (connect) {
-            return [
-              lrSnippet,
-              mountFolder(connect, './site/'),
-              mountFolder(connect, './build/'),
-              mountFolder(connect, './')
-            ];
-          }
+          livereload: true,
+          base: [
+            './site/',
+            './build',
+            './'
+          ]
         }
       },
       dist: {
         options: {
-          middleware: function (connect) {
-            return [
-              mountFolder(connect, './build/')
-            ];
-          }
+          base: './build'
         }
       },
       test: {
         options: {
-          middleware: function (connect) {
-            return [
-              mountFolder(connect, './')
-            ];
-          }
+          base: './'
         }
       }
     },

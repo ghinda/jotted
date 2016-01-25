@@ -15,7 +15,7 @@ describe('Themes', function () {
   })
 
   it('should have all panes visible on the bin theme', function () {
-    dom.$editor.className += ' jotted-theme-bin'
+    dom.$editor.className = 'jotted-theme-bin'
     jotted.core = new Jotted(dom.$editor)
 
     var $panes = dom.$editor.querySelectorAll('.jotted-pane')

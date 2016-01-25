@@ -33,11 +33,6 @@ class Jotted {
       plugins: []
     }))
 
-    // show all tabs, even if empty
-    if (options.showBlank) {
-      util.addClass($jottedContainer, template.showBlankClass())
-    }
-
     // PubSoup
     var pubsoup = this._set('pubsoup', new PubSoup())
     // debounced trigger method
@@ -101,6 +96,13 @@ class Jotted {
     // load files
     for (let type of [ 'html', 'css', 'js' ]) {
       this.load(type)
+    }
+
+    // show all tabs, even if empty
+    if (options.showBlank) {
+      for (let type of [ 'html', 'css', 'js' ]) {
+        util.addClass($container, template.hasFileClass(type))
+      }
     }
   }
 

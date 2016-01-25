@@ -132,8 +132,31 @@
     console.log(arguments);
   }
 
+  function hasClass(node, className) {
+    if (!node.className) {
+      return false;
+    }
+    var tempClass = ' ' + node.className + ' ';
+    className = ' ' + className + ' ';
+
+    if (tempClass.indexOf(className) !== -1) {
+      return true;
+    }
+
+    return false;
+  }
+
   function addClass(node, className) {
-    node.className += ' ' + className;
+    // class is already added
+    if (hasClass(node, className)) {
+      return node.className;
+    }
+
+    if (node.className) {
+      className = ' ' + className;
+    }
+
+    node.className += className;
 
     return node.className;
   }
@@ -170,10 +193,6 @@
 
   function containerClass() {
     return 'jotted';
-  }
-
-  function showBlankClass() {
-    return 'jotted-nav-show-blank';
   }
 
   function hasFileClass(type) {
@@ -902,11 +921,6 @@
         plugins: []
       }));
 
-      // show all tabs, even if empty
-      if (options.showBlank) {
-        addClass($jottedContainer, showBlankClass());
-      }
-
       // PubSoup
       var pubsoup = this._set('pubsoup', new PubSoup());
       // debounced trigger method
@@ -974,6 +988,16 @@
       for (var _i2 = 0; _i2 < _arr2.length; _i2++) {
         var type = _arr2[_i2];
         this.load(type);
+      }
+
+      // show all tabs, even if empty
+      if (options.showBlank) {
+        var _arr3 = ['html', 'css', 'js'];
+
+        for (var _i3 = 0; _i3 < _arr3.length; _i3++) {
+          var type = _arr3[_i3];
+          addClass($container, hasFileClass(type));
+        }
       }
     }
 

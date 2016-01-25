@@ -40,10 +40,6 @@ export function containerClass () {
   return `jotted`
 }
 
-export function showBlankClass () {
-  return `jotted-nav-show-blank`
-}
-
 export function hasFileClass (type) {
   return `jotted-has-${type}`
 }

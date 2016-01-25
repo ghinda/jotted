@@ -87,7 +87,13 @@ function log () {
 }
 
 function hasClass (node, className) {
-  if (node.className.indexOf(className) !== -1) {
+  if (!node.className) {
+    return false
+  }
+  var tempClass = ' ' + node.className + ' '
+  className = ' ' + className + ' '
+
+  if (tempClass.indexOf(className) !== -1) {
     return true
   }
 
@@ -95,7 +101,16 @@ function hasClass (node, className) {
 }
 
 function addClass (node, className) {
-  node.className += ' ' + className
+  // class is already added
+  if (hasClass(node, className)) {
+    return node.className
+  }
+
+  if (node.className) {
+    className = ' ' + className
+  }
+
+  node.className += className
 
   return node.className
 }

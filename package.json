@@ -54,6 +54,7 @@
     "globals": [
       "describe",
       "beforeAll",
+      "beforeEach",
       "it",
       "expect"
     ]

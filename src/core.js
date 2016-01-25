@@ -35,7 +35,7 @@ class Jotted {
 
     // show all tabs, even if empty
     if (options.showBlank) {
-      util.addClass($container, template.showBlankClass())
+      util.addClass($jottedContainer, template.showBlankClass())
     }
 
     // PubSoup

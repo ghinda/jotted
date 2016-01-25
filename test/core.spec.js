@@ -8,11 +8,17 @@ describe('Core', function () {
   var Jotted = window.Jotted
   var jotted = {}
 
-  beforeAll(function () {
+  function cleanDom () {
+    if (dom.$editor) {
+      dom.$editor.parentNode.removeChild(dom.$editor)
+    }
+
     dom.$editor = document.createElement('div')
 
     document.querySelector('.fixture').appendChild(dom.$editor)
-  })
+  }
+
+  beforeAll(cleanDom)
 
   it('should initialize jotted on #editor-core', function () {
     jotted.core = new Jotted(dom.$editor)
@@ -70,6 +76,7 @@ describe('Core', function () {
   })
 
   it('should refresh the entire iframe on each change', function () {
+    cleanDom()
     jotted.core = new Jotted(dom.$editor, {
       files: [{
         type: 'html',
@@ -91,5 +98,17 @@ describe('Core', function () {
     $textareaJS.dispatchEvent(changeEvent)
 
     expect(dom.$editor.querySelector('.jotted-pane-result iframe').contentWindow.document.querySelector('h1').innerHTML).toBe('Default Heading')
+  })
+
+  it('should show all panes when using showBlank', function () {
+    cleanDom()
+    jotted.core = new Jotted(dom.$editor, {
+      showBlank: true
+    })
+
+    var $panes = dom.$editor.querySelectorAll('.jotted-pane')
+    for (var i = 0; i < $panes.length; i++) {
+      expect(window.getComputedStyle($panes[i]).getPropertyValue('visibility')).toBe('visible')
+    }
   })
 })

@@ -904,7 +904,7 @@
 
       // show all tabs, even if empty
       if (options.showBlank) {
-        addClass($container, showBlankClass());
+        addClass($jottedContainer, showBlankClass());
       }
 
       // PubSoup

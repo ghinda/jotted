@@ -100,15 +100,15 @@ describe('Core', function () {
     expect(dom.$editor.querySelector('.jotted-pane-result iframe').contentWindow.document.querySelector('h1').innerHTML).toBe('Default Heading')
   })
 
-  it('should show all panes when using showBlank', function () {
+  it('should show all pane nav tabs when using showBlank', function () {
     cleanDom()
     jotted.core = new Jotted(dom.$editor, {
       showBlank: true
     })
 
-    var $panes = dom.$editor.querySelectorAll('.jotted-pane')
-    for (var i = 0; i < $panes.length; i++) {
-      expect(window.getComputedStyle($panes[i]).getPropertyValue('visibility')).toBe('visible')
+    var $navs = dom.$editor.querySelectorAll('.jotted-nav-item')
+    for (var i = 0; i < $navs.length; i++) {
+      expect($navs[i].offsetParent).not.toBe(null)
     }
   })
 })

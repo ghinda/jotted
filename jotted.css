@@ -59,6 +59,7 @@
 }
 /* always show the result tab nav
  */
+jotted-nav-item,
 .jotted-nav-item-result {
   display: block;
 }
@@ -162,4 +163,35 @@
 }
 .jotted-plugin-codemirror .CodeMirror {
   height: 100%;
+}
+/* themes
+ */
+.jotted-theme-bin {
+  overflow: hidden;
+}
+.jotted-theme-bin .jotted-nav {
+  clear: both;
+}
+.jotted-theme-bin .jotted-pane-result,
+.jotted-theme-bin.jotted-has-html .jotted-pane-html,
+.jotted-theme-bin.jotted-has-css .jotted-pane-css,
+.jotted-theme-bin.jotted-has-js .jotted-pane-js {
+  position: relative;
+  float: left;
+  visibility: visible;
+  width: 50%;
+  outline: 1px solid #f00;
+}
+.jotted-theme-bin.jotted-has-html .jotted-pane,
+.jotted-theme-bin.jotted-has-css .jotted-pane,
+.jotted-theme-bin.jotted-has-js .jotted-pane {
+  width: 50%;
+}
+.jotted-theme-bin.jotted-has-html.jotted-has-css .jotted-pane,
+.jotted-theme-bin.jotted-has-html.jotted-has-js .jotted-pane,
+.jotted-theme-bin.jotted-has-css.jotted-has-js .jotted-pane {
+  width: 33.33%;
+}
+.jotted-theme-bin.jotted-has-html.jotted-has-css.jotted-has-js .jotted-pane {
+  width: 25%;
 }

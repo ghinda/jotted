@@ -7,8 +7,12 @@ describe('Script', function () {
   var dom = {}
   var Jotted = window.Jotted
   var jotted = {}
-
-  beforeAll(function () {
+  
+  beforeEach(function () {
+    if (dom.$script) {
+      dom.$script.parentNode.removeChild(dom.$script)
+    }
+    
     dom.$script = document.createElement('div')
 
     document.querySelector('.fixture').appendChild(dom.$script)
@@ -31,7 +35,7 @@ describe('Script', function () {
     expect(dom.$script.querySelector('iframe').contentWindow.globalThatShouldntExist).not.toBeDefined()
   })
 
-  it('should run script tags with no type attribute', function () {
+  it('should run script tags with no type attribute', function () {    
     // to support stuff like inline babel or jsx
     // used with <script type="text/babel">
     jotted.script = new Jotted(dom.$script, {

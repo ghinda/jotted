@@ -9,6 +9,21 @@
   clear: both;
 }
 
+.jotted-theme-bin .jotted-nav-item {
+  pointer-events: none;
+}
+
+.jotted-theme-bin .jotted-nav-item,
+.jotted-theme-bin .jotted-pane {
+  border-width: 0 1px 0 0;
+  border-style: solid;
+  border-color: #999;
+}
+
+.jotted-theme-bin .jotted-pane:last-child {
+  border: 0;
+}
+
 .jotted-theme-bin .jotted-pane-result,
 .jotted-theme-bin.jotted-has-html .jotted-pane-html,
 .jotted-theme-bin.jotted-has-css .jotted-pane-css,
@@ -16,25 +31,35 @@
   position: relative;
   float: left;
   visibility: visible;
-  width: 50%;
-  outline: 1px solid red;
+}
+
+.jotted-theme-bin .jotted-pane-result,
+.jotted-theme-bin .jotted-nav-item {
+  width: 100%;
 }
 
 /* widths
  */
 
+.jotted-theme-bin.jotted-has-html .jotted-nav-item,
+.jotted-theme-bin.jotted-has-css .jotted-nav-item,
+.jotted-theme-bin.jotted-has-js .jotted-nav-item,
 .jotted-theme-bin.jotted-has-html .jotted-pane,
 .jotted-theme-bin.jotted-has-css .jotted-pane,
 .jotted-theme-bin.jotted-has-js .jotted-pane {
   width: 50%;
 }
 
+.jotted-theme-bin.jotted-has-html.jotted-has-css .jotted-nav-item,
+.jotted-theme-bin.jotted-has-html.jotted-has-js .jotted-nav-item,
+.jotted-theme-bin.jotted-has-css.jotted-has-js .jotted-nav-item,
 .jotted-theme-bin.jotted-has-html.jotted-has-css .jotted-pane,
 .jotted-theme-bin.jotted-has-html.jotted-has-js .jotted-pane,
 .jotted-theme-bin.jotted-has-css.jotted-has-js .jotted-pane {
   width: 33.33%;
 }
 
+.jotted-theme-bin.jotted-has-html.jotted-has-css.jotted-has-js .jotted-nav-item,
 .jotted-theme-bin.jotted-has-html.jotted-has-css.jotted-has-js .jotted-pane {
   width: 25%;
 }

@@ -174,7 +174,7 @@ The plugin function gets two arguments:
 
 The Jotted instance exposes a PubSub-like API, for attaching custom plugin-specific events.
 
-#### on ('eventName', function(params, callback) {}, priority)
+#### on (eventName, function(params, callback) {}, priority)
 
 Use the `on` method to attach methods to an event.
 
@@ -230,6 +230,20 @@ jotted.trigger('change', {
   type: 'html', // can be 'html', 'css' or 'js'
   file: 'index.html', // file url
   content: '<h1>Demo</h1>' // file content
+})
+```
+
+#### done (eventName, function(errors, params) {})
+
+Use the `done` method to trigger a function once an event queue has finished.
+
+The first argument is the event name, while the second is a `Function` receiving an `Array` of errors and the `params` hash.
+
+```javascript
+jotted.done('done', function (errs, params) {
+  if (errs.length) {
+    // show errors
+  }
 })
 ```
 

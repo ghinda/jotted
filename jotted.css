@@ -1,16 +1,11 @@
 /* jotted
  */
-.jotted,
-.jotted *,
-.jotted *:before,
-.jotted *:after {
-  box-sizing: border-box;
-}
 .jotted {
   position: relative;
   overflow: hidden;
   border: 1px solid rgba(51,51,51,0.24);
   border-radius: 2px;
+  box-sizing: border-box;
   font-family: sans-serif;
 }
 /* nav
@@ -57,10 +52,9 @@
   border-color: rgba(51,51,51,0.3);
   color: #222;
 }
-/* when using the showBlank options,
- * and always show the result tab.
+/* always show the result tab nav
  */
-.jotted-nav-show-blank .jotted-nav-item,
+jotted-nav-item,
 .jotted-nav-item-result {
   display: block;
 }
@@ -98,6 +92,7 @@
   height: 100%;
   margin: 0;
   border: 0;
+  box-sizing: border-box;
 }
 .jotted-editor textarea {
   padding: 1em;
@@ -164,4 +159,62 @@
 }
 .jotted-plugin-codemirror .CodeMirror {
   height: 100%;
+}
+/* themes
+ */
+.jotted-nav-item,
+.jotted-pane {
+  box-sizing: border-box;
+}
+.jotted-theme-bin {
+  overflow: hidden;
+}
+.jotted-theme-bin .jotted-nav {
+  clear: both;
+}
+.jotted-theme-bin .jotted-nav-item {
+  background: transparent;
+  pointer-events: none;
+  text-align: center;
+}
+.jotted-theme-bin .jotted-nav-item,
+.jotted-theme-bin .jotted-pane {
+  border-width: 0 1px 0 0;
+  border-style: solid;
+  border-color: #ddd;
+}
+.jotted-theme-bin .jotted-pane:last-child {
+  border: 0;
+}
+.jotted-theme-bin .jotted-pane-result,
+.jotted-theme-bin.jotted-has-html .jotted-pane-html,
+.jotted-theme-bin.jotted-has-css .jotted-pane-css,
+.jotted-theme-bin.jotted-has-js .jotted-pane-js {
+  position: relative;
+  float: left;
+  visibility: visible;
+}
+.jotted-theme-bin .jotted-pane-result,
+.jotted-theme-bin .jotted-nav-item {
+  width: 100%;
+}
+.jotted-theme-bin.jotted-has-html .jotted-nav-item,
+.jotted-theme-bin.jotted-has-css .jotted-nav-item,
+.jotted-theme-bin.jotted-has-js .jotted-nav-item,
+.jotted-theme-bin.jotted-has-html .jotted-pane,
+.jotted-theme-bin.jotted-has-css .jotted-pane,
+.jotted-theme-bin.jotted-has-js .jotted-pane {
+  width: 50%;
+}
+.jotted-theme-bin.jotted-has-html.jotted-has-css .jotted-nav-item,
+.jotted-theme-bin.jotted-has-html.jotted-has-js .jotted-nav-item,
+.jotted-theme-bin.jotted-has-css.jotted-has-js .jotted-nav-item,
+.jotted-theme-bin.jotted-has-html.jotted-has-css .jotted-pane,
+.jotted-theme-bin.jotted-has-html.jotted-has-js .jotted-pane,
+.jotted-theme-bin.jotted-has-css.jotted-has-js .jotted-pane {
+  width: 33.33%;
+}
+.jotted-theme-bin.jotted-has-html.jotted-has-css.jotted-has-js .jotted-nav-item,
+.jotted-theme-bin.jotted-has-html.jotted-has-css.jotted-has-js .jotted-pane {
+  width: 25%;
 }

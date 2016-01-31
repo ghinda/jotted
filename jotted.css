@@ -5,12 +5,8 @@
   overflow: hidden;
   border: 1px solid rgba(51,51,51,0.24);
   border-radius: 2px;
-  font-family: sans-serif;
-}
-.jotted-nav-item,
-.jotted-pane,
-.jotted-editor textarea {
   box-sizing: border-box;
+  font-family: sans-serif;
 }
 /* nav
  */
@@ -96,6 +92,7 @@ jotted-nav-item,
   height: 100%;
   margin: 0;
   border: 0;
+  box-sizing: border-box;
 }
 .jotted-editor textarea {
   padding: 1em;
@@ -165,6 +162,10 @@ jotted-nav-item,
 }
 /* themes
  */
+.jotted-nav-item,
+.jotted-pane {
+  box-sizing: border-box;
+}
 .jotted-theme-bin {
   overflow: hidden;
 }

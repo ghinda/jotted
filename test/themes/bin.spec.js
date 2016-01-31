@@ -38,9 +38,9 @@ describe('Bin Theme', function () {
     })
 
     var $paneHtml = dom.$editor.querySelector('.jotted-pane-html')
-    var containerWidth = parseInt(window.getComputedStyle(dom.$editor).getPropertyValue('width'), 10)
-    var paneWidth = parseInt(window.getComputedStyle($paneHtml).getPropertyValue('width'), 10)
-    expect(paneWidth).toBe((containerWidth - 2) / 2)
+    var containerWidth = dom.$editor.getBoundingClientRect().width
+    var paneWidth = parseInt($paneHtml.getBoundingClientRect().width, 10)
+    expect(paneWidth).toBe(parseInt((containerWidth - 2) / 2, 10))
   })
 
   it('should take up 33.33% of the container with two file types', function () {
@@ -55,8 +55,8 @@ describe('Bin Theme', function () {
     })
 
     var $paneHtml = dom.$editor.querySelector('.jotted-pane-html')
-    var containerWidth = parseInt(window.getComputedStyle(dom.$editor).getPropertyValue('width'), 10)
-    var paneWidth = parseInt(window.getComputedStyle($paneHtml).getPropertyValue('width'), 10)
+    var containerWidth = dom.$editor.getBoundingClientRect().width
+    var paneWidth = parseInt($paneHtml.getBoundingClientRect().width, 10)
     expect(paneWidth).toBe(parseInt((containerWidth - 2) / 3, 10))
   })
 
@@ -75,8 +75,8 @@ describe('Bin Theme', function () {
     })
 
     var $paneHtml = dom.$editor.querySelector('.jotted-pane-html')
-    var containerWidth = parseInt(window.getComputedStyle(dom.$editor).getPropertyValue('width'), 10)
-    var paneWidth = parseInt(window.getComputedStyle($paneHtml).getPropertyValue('width'), 10)
+    var containerWidth = dom.$editor.getBoundingClientRect().width
+    var paneWidth = parseInt($paneHtml.getBoundingClientRect().width, 10)
     expect(paneWidth).toBe(parseInt((containerWidth - 2) / 4, 10))
   })
 })

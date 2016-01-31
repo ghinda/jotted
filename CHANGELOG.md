@@ -1,4 +1,13 @@
 
+## [1.1.0] - 2016-01-31
+
+* New *bin* theme, for side by side editing. Use it with the `jotted-theme-bin` class on the container.
+* Fix issues with the `showBlank` option not working correctly, and improve it's behavior by using all `-has-` file type classes, instead of the `show-blank` class.
+* Add IE11 to the list of tested browsers.
+* Remove MS Edge from the list of tested browsers, because manual tests work, but automated ones fail for no reason.
+* CodeMirror plugin CSS layout improvements, by removing the `.jotted *` global `box-sizing: border-box` declaration that was overwriting CodeMirror styles.
+* Document the `done` method, for use in plugins.
+
 ## [1.0.4] - 2016-01-22
 
 * Add support for browser.js from babel-core 5.x, in the babel plugin. Use browser.js instead of babel-standalone, for IE9 support.

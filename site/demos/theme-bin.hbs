@@ -1,0 +1,34 @@
+---
+layout: demo.html
+title: Bin Theme
+demo: true
+---
+<p>
+  Set the <code>jotted-theme-bin</code> class on the container, to use the <strong>bin</strong> theme.
+</p>
+
+<link rel="stylesheet" href="../bower_components/codemirror/lib/codemirror.css">
+<script src="../bower_components/codemirror/lib/codemirror.js"></script>
+
+<div id="jotted-demo-bin" class="jotted-theme-bin"></div>
+
+<link href="../jotted.css" rel="stylesheet">
+<script src="../jotted.js"></script>
+<script>
+  new Jotted(document.querySelector('#jotted-demo-bin'), {
+    files: [
+      {
+        type: 'html',
+        content: '<h1>Side by side editing</h1>'
+      },
+      {
+        type: 'css',
+        content: 'body {\n  background: #efefef;\n}'
+      }
+    ],
+    pane: 'css',
+    plugins: [
+      'codemirror'
+    ]
+  });
+</script>

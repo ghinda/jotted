@@ -1,17 +1,16 @@
 /* jotted
  */
-.jotted,
-.jotted *,
-.jotted *:before,
-.jotted *:after {
-  box-sizing: border-box;
-}
 .jotted {
   position: relative;
   overflow: hidden;
   border: 1px solid rgba(51,51,51,0.24);
   border-radius: 2px;
   font-family: sans-serif;
+}
+.jotted-nav-item,
+.jotted-pane,
+.jotted-editor textarea {
+  box-sizing: border-box;
 }
 /* nav
  */
@@ -173,13 +172,15 @@ jotted-nav-item,
   clear: both;
 }
 .jotted-theme-bin .jotted-nav-item {
+  background: transparent;
   pointer-events: none;
+  text-align: center;
 }
 .jotted-theme-bin .jotted-nav-item,
 .jotted-theme-bin .jotted-pane {
   border-width: 0 1px 0 0;
   border-style: solid;
-  border-color: #999;
+  border-color: #ddd;
 }
 .jotted-theme-bin .jotted-pane:last-child {
   border: 0;

@@ -3,6 +3,7 @@
 
 .jotted {
   position: relative;
+  height: 12em;
   overflow: hidden;
   border: 1px solid rgba(#333, .24);
   border-radius: 2px;
@@ -15,7 +16,11 @@
  */
 
 .jotted-nav {
+  position: absolute;
+  z-index: 2;
   display: block;
+  width: 100%;
+  height: 2.4em;
   overflow: hidden;
   margin: 0;
   padding: 0;
@@ -86,9 +91,12 @@
 
 .jotted-pane {
   position: absolute;
+  z-index: 1;
   visibility: hidden;
-  height: 12em;
+  height: 100%;
   width: 100%;
+  padding-top: 2.4em;
+  box-sizing: border-box;
 }
 
 .jotted-pane-active-result .jotted-pane-result,

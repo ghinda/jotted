@@ -756,7 +756,6 @@
       for (i = 0; i < $editors.length; i++) {
         var $textarea = $editors[i].querySelector('textarea');
         var type = data($textarea, 'jotted-type');
-        var file = data($textarea, 'jotted-file');
 
         this.editor[type] = window.CodeMirror.fromTextArea($textarea, options);
       }

@@ -204,8 +204,8 @@ section ul li {
   }
 }
 
-#j-header .jotted-pane {
-  height: 18em;
+#j-header {
+  height: 20em;
 }
 
 .header-demo {

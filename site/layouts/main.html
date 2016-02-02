@@ -14,35 +14,24 @@
   <meta name="keywords" content="jot,jotted,html,css,javascript,editor,client-side,self-hosted,demo,jsfiddle,jsbin,codepen,cssdeck,fiddle">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  {{#if demo}}
-    <base href="../">
-    <!--[if IE]><script type="text/javascript">
-    // Fix for IE ignoring relative base tags.
-    (function() {
-        var baseTag = document.getElementsByTagName('base')[0];
-        baseTag.href = baseTag.href;
-    })();
-    </script><![endif]-->
-  {{/if}}
-
   <link href="https://fonts.googleapis.com/css?family=Oxygen:400,300,700" rel="stylesheet" type="text/css">
-  <link rel="stylesheet" href="bower_components/gridlayout/gridlayout.css">
-  <link rel="stylesheet" href="bower_components/prism/themes/prism.css">
-  <link rel="stylesheet" href="jotted.css">
+  <link rel="stylesheet" href="{{base}}bower_components/gridlayout/gridlayout.css">
+  <link rel="stylesheet" href="{{base}}bower_components/prism/themes/prism.css">
+  <link rel="stylesheet" href="{{base}}jotted.css">
 
-  <link rel="stylesheet" href="css/site.css">
+  <link rel="stylesheet" href="{{base}}css/site.css">
 </head>
 <body>
 
-  <script src="jotted.js"></script>
+  <script src="{{base}}jotted.js"></script>
 
   {{> body }}
 
   <!--[if !(lte IE 8)]><!-->
-  <script src="bower_components/prism/prism.js"></script>
+  <script src="{{base}}bower_components/prism/prism.js"></script>
   <!--<![endif]-->
-  <script src="bower_components/gridlayout/gridlayout-ie.js"></script>
+  <script src="{{base}}bower_components/gridlayout/gridlayout-ie.js"></script>
 
-  <script src="js/site.js"></script>
+  <script src="{{base}}js/site.js"></script>
 </body>
 </html>

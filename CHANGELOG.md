@@ -1,4 +1,9 @@
 
+## [1.1.2] - 2016-02-02
+
+* Prevent the codemirror and ace plugins from triggering the `change` event twice when initializing Jotted.
+* Rewrite the iframe content write functionality, to use `srcset` in modern browsers, and src="javascript:'..'" in IE9 and older browsers without support for srcset. Helps performance and fixes issues with Firefox rendering a blank iframe when having an iframe inception.
+
 ## [1.1.1] - 2016-02-02
 
 * Improve the core styles, so that the height is set on the container, instead of on the pane.

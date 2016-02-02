@@ -1,4 +1,10 @@
 
+## [1.1.1] - 2016-02-02
+
+* Improve the core styles, so that the height is set on the container, instead of on the pane.
+* Update the list of valid script tag type values, to contain the full list from the HTML spec.
+* Fix issues with the demos on the site not working on Firefox because of inconsistent base tag behavior.
+
 ## [1.1.0] - 2016-01-31
 
 * New *bin* theme, for side by side editing. Use it with the `jotted-theme-bin` class on the container.

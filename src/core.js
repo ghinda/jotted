@@ -4,7 +4,6 @@
 import * as util from './util.js'
 import * as template from './template.js'
 import * as plugin from './plugin.js'
-import script from './script.js'
 import PubSoup from './pubsoup.js'
 
 class Jotted {
@@ -47,6 +46,9 @@ class Jotted {
       pubsoup.done.apply(pubsoup, arguments)
     })
 
+    // iframe srcdoc support
+    this._set('supportSrcdoc', !!('srcdoc' in document.createElement('iframe')))
+
     // done change on all subscribers,
     // render the results.
     done('change', this.changeCallback.bind(this))
@@ -55,6 +57,9 @@ class Jotted {
     var $container = this._set('$container', $jottedContainer)
     $container.innerHTML = template.container()
     util.addClass($container, template.containerClass())
+
+    var $resultFrame = $container.querySelector('.jotted-pane-result iframe')
+    this._set('$resultFrame', $resultFrame)
 
     // default pane
     var paneActive = this._set('paneActive', options.pane)
@@ -203,70 +208,49 @@ class Jotted {
     })
   }
 
-  runJS (errors, content) {
-    var $container = this._get('$container')
-    var $resultFrame = $container.querySelector('.jotted-pane-result iframe')
-
-    // catch and show js errors
-    try {
-      $resultFrame.contentWindow.eval(content)
-    } catch (err) {
-      // only show eval errors if we don't have other errors from plugins.
-      // useful for preprocessor error reporting (eg. babel, coffeescript).
-      if (!errors.length) {
-        this.status('error', [ err.message ], {
-          type: 'js'
-        })
-      }
-    }
-  }
-
   changeCallback (errors, params) {
     this.status('error', errors, params)
     var options = this._get('options')
-
-    var $container = this._get('$container')
-    var $resultPane = $container.querySelector('.jotted-pane-result')
-    var $resultFrame = $resultPane.querySelector('iframe')
-
-    // if we have script execution enabled,
-    // re-create the iframe,
-    // to stop execution of any previously started js,
-    // and garbage collect it.
-    if (options.runScripts) {
-      $resultPane.removeChild($resultFrame)
-
-      $resultFrame = document.createElement('iframe')
-      $resultPane.appendChild($resultFrame)
-    }
-
-    // refresh the iframe
-    var $frameDoc = $resultFrame.contentWindow.document
-    $frameDoc.open()
-    $frameDoc.write(template.frameContent())
-    $frameDoc.close()
+    var supportSrcdoc = this._get('supportSrcdoc')
+    var $resultFrame = this._get('$resultFrame')
 
     // cache manipulated content
     var cachedContent = this._get('content')
     cachedContent[params.type] = params.content
 
-    // set html
-    $frameDoc.body.innerHTML = cachedContent['html']
+    // don't execute script tags
+    if (!options.runScripts) {
+      // for IE9 support, remove the script tags from HTML content.
+      // when we stop supporting IE9, we can use the sandbox attribute.
+      var fragment = document.createElement('div')
+      fragment.innerHTML = cachedContent['html']
 
-    // set css
-    var $styleInject = document.createElement('style')
-    $styleInject.textContent = cachedContent['css']
-    $frameDoc.head.appendChild($styleInject)
+      // remove all script tags
+      var $scripts = fragment.querySelectorAll('script')
+      for (let i = 0; i < $scripts.length; i++) {
+        $scripts[i].parentNode.removeChild($scripts[i])
+      }
 
-    // set js
-    // if runScripts, run js after inline script tags are loaded
-    if (options.runScripts) {
-      script.call(this, $resultFrame, () => {
-        this.runJS(errors, cachedContent['js'])
-      })
-    } else {
-      // otherwise run it immediately
-      this.runJS(errors, cachedContent['js'])
+      cachedContent['html'] = fragment.innerHTML
+    }
+
+    $resultFrame.setAttribute('srcdoc', template.frameContent(cachedContent['css'], cachedContent['html'], cachedContent['js']))
+
+    // older browsers without iframe srcset support (IE9)
+    if (!supportSrcdoc) {
+      // tips from https://github.com/jugglinmike/srcdoc-polyfill
+      // Copyright (c) 2012 Mike Pennisi
+      // Licensed under the MIT license.
+      var jsUrl = 'javascript:window.frameElement.getAttribute("srcdoc");'
+
+      $resultFrame.setAttribute('src', jsUrl)
+
+      // Explicitly set the iFrame's window.location for
+      // compatibility with IE9, which does not react to changes in
+      // the `src` attribute when it is a `javascript:` URL.
+      if ($resultFrame.contentWindow) {
+        $resultFrame.contentWindow.location = jsUrl
+      }
     }
   }
 

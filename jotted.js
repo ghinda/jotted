@@ -5,9 +5,10 @@
 }(this, function () { 'use strict';
 
   var babelHelpers = {};
-
-  babelHelpers.typeof = function (obj) {
-    return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj;
+  babelHelpers.typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+    return typeof obj;
+  } : function (obj) {
+    return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj;
   };
 
   babelHelpers.classCallCheck = function (instance, Constructor) {
@@ -16,7 +17,7 @@
     }
   };
 
-  babelHelpers.createClass = (function () {
+  babelHelpers.createClass = function () {
     function defineProperties(target, props) {
       for (var i = 0; i < props.length; i++) {
         var descriptor = props[i];
@@ -32,9 +33,10 @@
       if (staticProps) defineProperties(Constructor, staticProps);
       return Constructor;
     };
-  })();
+  }();
 
   babelHelpers;
+
   /* template
    */
 
@@ -81,9 +83,11 @@
   }
 
   function frameContent() {
-    var body = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
+    var style = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
+    var body = arguments.length <= 1 || arguments[1] === undefined ? '' : arguments[1];
+    var script = arguments.length <= 2 || arguments[2] === undefined ? '' : arguments[2];
 
-    return '\n    <!doctype html>\n    <html>\n    <head>\n    </head>\n    <body>\n    ' + body + '\n    </body>\n    </html>\n  ';
+    return '\n    <!doctype html>\n    <html>\n      <head>\n        <style>' + style + '</style>\n      </head>\n      <body>\n        ' + body + '\n        <script>' + script + '</script>\n      </body>\n    </html>\n  ';
   }
 
   function statusLoading(url) {
@@ -237,89 +241,6 @@
     return node.getAttribute('data-' + attr);
   }
 
-  /* re-insert script tags
-   */
-  function insertScript(frameWindow, $script) {
-    var callback = arguments.length <= 2 || arguments[2] === undefined ? function () {} : arguments[2];
-
-    var s = document.createElement('script');
-    s.type = 'text/javascript';
-    if ($script.src) {
-      s.onload = function () {
-        // use the timeout trick to make sure the script is garbage collected,
-        // when the iframe is destroyed.
-        // sometimes when loading large files (eg. babel.js)
-        // and a change is triggered,
-        // the seq runner skips loading jotted.js, and runs the inline script
-        // causing a `Jotted is undefined` error.
-        setTimeout(callback);
-      };
-      s.onerror = callback;
-      s.src = $script.src;
-    } else {
-      s.textContent = $script.textContent;
-    }
-
-    // re-insert the script tag so it executes.
-    frameWindow.document.body.appendChild(s);
-
-    // clean-up
-    $script.parentNode.removeChild($script);
-
-    // run the callback immediately for inline scripts
-    if (!$script.src) {
-      callback();
-    }
-  }
-
-  // re-trigger DOMContentLoaded after the scripts finish loading
-  // because that's the browser behaviour, and some loaded scripts could rely on it
-  // (eg. babel browser.js)
-  function scriptsDone(frameWindow) {
-    var DOMContentLoadedEvent = document.createEvent('Event');
-    DOMContentLoadedEvent.initEvent('DOMContentLoaded', true, true);
-    frameWindow.document.dispatchEvent(DOMContentLoadedEvent);
-  }
-
-  // https://html.spec.whatwg.org/multipage/scripting.html#javascript-mime-type
-  var runScriptTypes = ['application/javascript', 'application/ecmascript', 'application/x-ecmascript', 'application/x-javascript', 'text/ecmascript', 'text/javascript', 'text/javascript1.0', 'text/javascript1.1', 'text/javascript1.2', 'text/javascript1.3', 'text/javascript1.4', 'text/javascript1.5', 'text/jscript', 'text/livescript', 'text/x-ecmascript', 'text/x-javascript'];
-
-  function runScripts($resultFrame) {
-    var _this = this;
-
-    var callback = arguments.length <= 1 || arguments[1] === undefined ? function () {} : arguments[1];
-
-    // get scripts tags from content added with innerhtml
-    var frameWindow = $resultFrame.contentWindow;
-    var $scripts = frameWindow.document.body.querySelectorAll('script');
-    var l = $scripts.length;
-    var runList = [];
-    var typeAttr;
-
-    var _loop = function _loop(i) {
-      typeAttr = $scripts[i].getAttribute('type');
-
-      // only run script tags without type attribute
-      // or with a standard attribute value
-      if (!typeAttr || runScriptTypes.indexOf(typeAttr) !== -1) {
-        runList.push(function (params, callback) {
-          insertScript.call(_this, frameWindow, $scripts[i], callback);
-        });
-      }
-    };
-
-    for (var i = 0; i < l; i++) {
-      _loop(i);
-    }
-
-    // insert the script tags sequentially
-    // so we preserve execution order
-    seq(runList, {}, function () {
-      scriptsDone(frameWindow);
-      callback();
-    });
-  }
-
   var plugins = [];
 
   function find(id) {
@@ -363,7 +284,7 @@
     });
   }
 
-  var PubSoup = (function () {
+  var PubSoup = function () {
     function PubSoup() {
       babelHelpers.classCallCheck(this, PubSoup);
 
@@ -462,9 +383,9 @@
       }
     }]);
     return PubSoup;
-  })();
+  }();
 
-  var PluginMarkdown = (function () {
+  var PluginMarkdown = function () {
     function PluginMarkdown(jotted, options) {
       babelHelpers.classCallCheck(this, PluginMarkdown);
 
@@ -505,9 +426,9 @@
       }
     }]);
     return PluginMarkdown;
-  })();
+  }();
 
-  var PluginBabel = (function () {
+  var PluginBabel = function () {
     function PluginBabel(jotted, options) {
       babelHelpers.classCallCheck(this, PluginBabel);
 
@@ -554,9 +475,9 @@
       }
     }]);
     return PluginBabel;
-  })();
+  }();
 
-  var PluginStylus = (function () {
+  var PluginStylus = function () {
     function PluginStylus(jotted, options) {
       babelHelpers.classCallCheck(this, PluginStylus);
 
@@ -607,9 +528,9 @@
       }
     }]);
     return PluginStylus;
-  })();
+  }();
 
-  var PluginCoffeeScript = (function () {
+  var PluginCoffeeScript = function () {
     function PluginCoffeeScript(jotted, options) {
       babelHelpers.classCallCheck(this, PluginCoffeeScript);
 
@@ -653,9 +574,9 @@
       }
     }]);
     return PluginCoffeeScript;
-  })();
+  }();
 
-  var PluginLess = (function () {
+  var PluginLess = function () {
     function PluginLess(jotted, options) {
       babelHelpers.classCallCheck(this, PluginLess);
 
@@ -706,9 +627,9 @@
       }
     }]);
     return PluginLess;
-  })();
+  }();
 
-  var PluginAce = (function () {
+  var PluginAce = function () {
     function PluginAce(jotted, options) {
       var _this = this;
 
@@ -811,9 +732,9 @@
       }
     }]);
     return PluginAce;
-  })();
+  }();
 
-  var PluginCodeMirror = (function () {
+  var PluginCodeMirror = function () {
     function PluginCodeMirror(jotted, options) {
       var _this = this;
 
@@ -879,7 +800,7 @@
       }
     }]);
     return PluginCodeMirror;
-  })();
+  }();
 
   function BundlePlugins(jotted) {
     jotted.plugin('codemirror', PluginCodeMirror);
@@ -891,7 +812,7 @@
     jotted.plugin('markdown', PluginMarkdown);
   }
 
-  var Jotted = (function () {
+  var Jotted = function () {
     function Jotted($jottedContainer, opts) {
       babelHelpers.classCallCheck(this, Jotted);
 
@@ -933,6 +854,9 @@
         pubsoup.done.apply(pubsoup, arguments);
       });
 
+      // iframe srcdoc support
+      this._set('supportSrcdoc', !!('srcdoc' in document.createElement('iframe')));
+
       // done change on all subscribers,
       // render the results.
       done('change', this.changeCallback.bind(this));
@@ -941,6 +865,9 @@
       var $container = this._set('$container', $jottedContainer);
       $container.innerHTML = container();
       addClass($container, containerClass());
+
+      var $resultFrame = $container.querySelector('.jotted-pane-result iframe');
+      this._set('$resultFrame', $resultFrame);
 
       // default pane
       var paneActive = this._set('paneActive', options.pane);
@@ -1104,74 +1031,50 @@
         });
       }
     }, {
-      key: 'runJS',
-      value: function runJS(errors, content) {
-        var $container = this._get('$container');
-        var $resultFrame = $container.querySelector('.jotted-pane-result iframe');
-
-        // catch and show js errors
-        try {
-          $resultFrame.contentWindow.eval(content);
-        } catch (err) {
-          // only show eval errors if we don't have other errors from plugins.
-          // useful for preprocessor error reporting (eg. babel, coffeescript).
-          if (!errors.length) {
-            this.status('error', [err.message], {
-              type: 'js'
-            });
-          }
-        }
-      }
-    }, {
       key: 'changeCallback',
       value: function changeCallback(errors, params) {
-        var _this2 = this;
-
         this.status('error', errors, params);
         var options = this._get('options');
-
-        var $container = this._get('$container');
-        var $resultPane = $container.querySelector('.jotted-pane-result');
-        var $resultFrame = $resultPane.querySelector('iframe');
-
-        // if we have script execution enabled,
-        // re-create the iframe,
-        // to stop execution of any previously started js,
-        // and garbage collect it.
-        if (options.runScripts) {
-          $resultPane.removeChild($resultFrame);
-
-          $resultFrame = document.createElement('iframe');
-          $resultPane.appendChild($resultFrame);
-        }
-
-        // refresh the iframe
-        var $frameDoc = $resultFrame.contentWindow.document;
-        $frameDoc.open();
-        $frameDoc.write(frameContent());
-        $frameDoc.close();
+        var supportSrcdoc = this._get('supportSrcdoc');
+        var $resultFrame = this._get('$resultFrame');
 
         // cache manipulated content
         var cachedContent = this._get('content');
         cachedContent[params.type] = params.content;
 
-        // set html
-        $frameDoc.body.innerHTML = cachedContent['html'];
+        // don't execute script tags
+        if (!options.runScripts) {
+          // for IE9 support, remove the script tags from HTML content.
+          // when we stop supporting IE9, we can use the sandbox attribute.
+          var fragment = document.createElement('div');
+          fragment.innerHTML = cachedContent['html'];
 
-        // set css
-        var $styleInject = document.createElement('style');
-        $styleInject.textContent = cachedContent['css'];
-        $frameDoc.head.appendChild($styleInject);
+          // remove all script tags
+          var $scripts = fragment.querySelectorAll('script');
+          for (var i = 0; i < $scripts.length; i++) {
+            $scripts[i].parentNode.removeChild($scripts[i]);
+          }
 
-        // set js
-        // if runScripts, run js after inline script tags are loaded
-        if (options.runScripts) {
-          runScripts.call(this, $resultFrame, function () {
-            _this2.runJS(errors, cachedContent['js']);
-          });
-        } else {
-          // otherwise run it immediately
-          this.runJS(errors, cachedContent['js']);
+          cachedContent['html'] = fragment.innerHTML;
+        }
+
+        $resultFrame.setAttribute('srcdoc', frameContent(cachedContent['css'], cachedContent['html'], cachedContent['js']));
+
+        // older browsers without iframe srcset support (IE9)
+        if (!supportSrcdoc) {
+          // tips from https://github.com/jugglinmike/srcdoc-polyfill
+          // Copyright (c) 2012 Mike Pennisi
+          // Licensed under the MIT license.
+          var jsUrl = 'javascript:window.frameElement.getAttribute("srcdoc");';
+
+          $resultFrame.setAttribute('src', jsUrl);
+
+          // Explicitly set the iFrame's window.location for
+          // compatibility with IE9, which does not react to changes in
+          // the `src` attribute when it is a `javascript:` URL.
+          if ($resultFrame.contentWindow) {
+            $resultFrame.contentWindow.location = jsUrl;
+          }
         }
       }
     }, {
@@ -1226,7 +1129,7 @@
       }
     }]);
     return Jotted;
-  })();
+  }();
 
   // register plugins
 

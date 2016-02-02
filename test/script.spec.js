@@ -18,7 +18,7 @@ describe('Script', function () {
     document.querySelector('.fixture').appendChild(dom.$script)
   })
 
-  it('should not run script tags when runScripts is false', function () {
+  it('should not run script tags when runScripts is false', function (done) {
     // to support stuff like inline babel or jsx
     // used with <script type="text/babel">
     jotted.script = new Jotted(dom.$script, {
@@ -32,10 +32,14 @@ describe('Script', function () {
       }]
     })
 
-    expect(dom.$script.querySelector('iframe').contentWindow.globalThatShouldntExist).not.toBeDefined()
+    var $iframe = dom.$script.querySelector('iframe')
+    $iframe.onload = function () {
+      expect($iframe.contentWindow.globalThatShouldntExist).not.toBeDefined()
+      done()
+    }
   })
 
-  it('should run script tags with no type attribute', function () {
+  it('should run script tags with no type attribute', function (done) {
     // to support stuff like inline babel or jsx
     // used with <script type="text/babel">
     jotted.script = new Jotted(dom.$script, {
@@ -48,10 +52,14 @@ describe('Script', function () {
       }]
     })
 
-    expect(dom.$script.querySelector('iframe').contentWindow.globalThatShouldExist).toBe(true)
+    var $iframe = dom.$script.querySelector('iframe')
+    $iframe.onload = function () {
+      expect($iframe.contentWindow.globalThatShouldExist).toBe(true)
+      done()
+    }
   })
 
-  it('should run script tags with text/javascript type attribute', function () {
+  it('should run script tags with text/javascript type attribute', function (done) {
     // to support stuff like inline babel or jsx
     // used with <script type="text/babel">
     jotted.script = new Jotted(dom.$script, {
@@ -64,10 +72,14 @@ describe('Script', function () {
       }]
     })
 
-    expect(dom.$script.querySelector('iframe').contentWindow.globalThatShouldExist).toBe(true)
+    var $iframe = dom.$script.querySelector('iframe')
+    $iframe.onload = function () {
+      expect(dom.$script.querySelector('iframe').contentWindow.globalThatShouldExist).toBe(true)
+      done()
+    }
   })
 
-  it('should not run script tags with type attribute other than text/javascript', function () {
+  it('should not run script tags with type attribute other than text/javascript', function (done) {
     // to support stuff like inline babel or jsx
     // used with <script type="text/babel">
     jotted.script = new Jotted(dom.$script, {
@@ -80,12 +92,14 @@ describe('Script', function () {
       }]
     })
 
-    expect(dom.$script.querySelector('iframe').contentWindow.globalThatShouldntExist).not.toBeDefined()
+    var $iframe = dom.$script.querySelector('iframe')
+    $iframe.onload = function () {
+      expect(dom.$script.querySelector('iframe').contentWindow.globalThatShouldntExist).not.toBeDefined()
+      done()
+    }
   })
 
-  it('should re-trigger DOMContentLoaded after all scripts finished loading', function (done) {
-    // that's the default browser behavior,
-    // and some loaded scripts could rely on it.
+  it('should render inline text/babel jsx with react', function (done) {
     jotted.script = new Jotted(dom.$script, {
       files: [{
         type: 'html',
@@ -93,20 +107,12 @@ describe('Script', function () {
       }]
     })
 
-    // firefox triggers DOMContentLoaded immediately
-    // delay the event listener so we only catch the DOMContentLoaded
-    // triggered by jotted after the scripts are loaded.
-    setTimeout(function () {
-      var $frame = dom.$script.querySelector('iframe').contentWindow
-      $frame.addEventListener('DOMContentLoaded', function () {
-        // give it a sec for react to render
-        setTimeout(function () {
-          expect($frame.document.querySelector('#content').textContent).toContain('Hello, world!')
+    var $iframe = dom.$script.querySelector('iframe')
+    $iframe.onload = function () {
+      expect($iframe.contentWindow.document.querySelector('#content').textContent).toContain('Hello, world!')
 
-          done()
-        })
-      })
-    })
+      done()
+    }
   })
 
   it('should run js only after all inline scripts are loaded', function (done) {
@@ -123,19 +129,11 @@ describe('Script', function () {
       }]
     })
 
-    // firefox triggers DOMContentLoaded immediately
-    // delay the event listener so we only catch the DOMContentLoaded
-    // triggered by jotted after the scripts are loaded.
-    setTimeout(function () {
-      var $frame = dom.$script.querySelector('iframe').contentWindow
-      $frame.addEventListener('DOMContentLoaded', function () {
-        // give it a sec for react to render
-        setTimeout(function () {
-          expect($frame.document.querySelector('#content').textContent).toContain('Hello, world!')
+    var $iframe = dom.$script.querySelector('iframe')
+    $iframe.onload = function () {
+      expect($iframe.contentWindow.document.querySelector('#content').textContent).toContain('Hello, world!')
 
-          done()
-        })
-      })
-    })
+      done()
+    }
   })
 })

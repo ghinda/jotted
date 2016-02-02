@@ -75,7 +75,7 @@ describe('Core', function () {
     }
   })
 
-  it('should refresh the entire iframe on each change', function () {
+  it('should refresh the entire iframe on each change', function (done) {
     cleanDom()
     jotted.core = new Jotted(dom.$editor, {
       files: [{
@@ -97,7 +97,13 @@ describe('Core', function () {
     $textareaJS.value = ''
     $textareaJS.dispatchEvent(changeEvent)
 
-    expect(dom.$editor.querySelector('.jotted-pane-result iframe').contentWindow.document.querySelector('h1').innerHTML).toBe('Default Heading')
+    var $iframe = dom.$editor.querySelector('.jotted-pane-result iframe')
+
+    $iframe.onload = function () {
+      expect(dom.$editor.querySelector('.jotted-pane-result iframe').contentWindow.document.querySelector('h1').innerHTML).toBe('Default Heading')
+      expect(true).toBe(true)
+      done()
+    }
   })
 
   it('should show all pane nav tabs when using showBlank', function () {

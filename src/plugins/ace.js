@@ -9,6 +9,7 @@ export default class PluginAce {
     var i
 
     this.editor = {}
+    this.jotted = jotted
 
     this.modemap = {
       'html': 'html',
@@ -44,29 +45,29 @@ export default class PluginAce {
       editor.getSession().setOptions(editorOptions)
 
       editor.$blockScrolling = Infinity
-
-      editor.on('change', () => {
-        $textarea.value = editor.getValue()
-
-        // trigger a change event
-        jotted.trigger('change', {
-          aceEditor: editor,
-          type: type,
-          file: file,
-          content: $textarea.value
-        })
-      })
     }
 
     jotted.on('change', this.change.bind(this), priority)
   }
 
+  editorChange (params) {
+    return () => {
+      this.jotted.trigger('change', params)
+    }
+  }
+
   change (params, callback) {
     var editor = this.editor[params.type]
 
-    // if the event is not started by the ace change
+    // if the event is not started by the ace change.
+    // triggered only once per editor,
+    // when the textarea is populated/file is loaded.
     if (!params.aceEditor) {
       editor.getSession().setValue(params.content)
+
+      // attach the event only after the file is loaded
+      params.aceEditor = editor
+      editor.on('change', this.editorChange(params))
     }
 
     // manipulate the params and pass them on

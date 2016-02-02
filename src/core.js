@@ -180,6 +180,12 @@ class Jotted {
 
         this.setValue($textarea, res)
       })
+    } else {
+      // trigger a change event on blank editors,
+      // for editor plugins to catch.
+      // (eg. the codemirror and ace plugins attach the change event
+      // only after the initial change/load event)
+      this.setValue($textarea, '')
     }
   }
 

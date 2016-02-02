@@ -631,14 +631,13 @@
 
   var PluginAce = function () {
     function PluginAce(jotted, options) {
-      var _this = this;
-
       babelHelpers.classCallCheck(this, PluginAce);
 
       var priority = 1;
       var i;
 
       this.editor = {};
+      this.jotted = jotted;
 
       this.modemap = {
         'html': 'html',
@@ -657,7 +656,7 @@
 
       var $editors = jotted.$container.querySelectorAll('.jotted-editor');
 
-      var _loop = function _loop() {
+      for (i = 0; i < $editors.length; i++) {
         var $textarea = $editors[i].querySelector('textarea');
         var type = data($textarea, 'jotted-type');
         var file = data($textarea, 'jotted-file');
@@ -665,44 +664,43 @@
         var $aceContainer = document.createElement('div');
         $editors[i].appendChild($aceContainer);
 
-        _this.editor[type] = window.ace.edit($aceContainer);
-        var editor = _this.editor[type];
+        this.editor[type] = window.ace.edit($aceContainer);
+        var editor = this.editor[type];
 
         var editorOptions = extend(options);
 
-        editor.getSession().setMode(_this.aceMode(type, file));
+        editor.getSession().setMode(this.aceMode(type, file));
         editor.getSession().setOptions(editorOptions);
 
         editor.$blockScrolling = Infinity;
-
-        editor.on('change', function () {
-          $textarea.value = editor.getValue();
-
-          // trigger a change event
-          jotted.trigger('change', {
-            aceEditor: editor,
-            type: type,
-            file: file,
-            content: $textarea.value
-          });
-        });
-      };
-
-      for (i = 0; i < $editors.length; i++) {
-        _loop();
       }
 
       jotted.on('change', this.change.bind(this), priority);
     }
 
     babelHelpers.createClass(PluginAce, [{
+      key: 'editorChange',
+      value: function editorChange(params) {
+        var _this = this;
+
+        return function () {
+          _this.jotted.trigger('change', params);
+        };
+      }
+    }, {
       key: 'change',
       value: function change(params, callback) {
         var editor = this.editor[params.type];
 
-        // if the event is not started by the ace change
+        // if the event is not started by the ace change.
+        // triggered only once per editor,
+        // when the textarea is populated/file is loaded.
         if (!params.aceEditor) {
           editor.getSession().setValue(params.content);
+
+          // attach the event only after the file is loaded
+          params.aceEditor = editor;
+          editor.on('change', this.editorChange(params));
         }
 
         // manipulate the params and pass them on
@@ -736,14 +734,13 @@
 
   var PluginCodeMirror = function () {
     function PluginCodeMirror(jotted, options) {
-      var _this = this;
-
       babelHelpers.classCallCheck(this, PluginCodeMirror);
 
       var priority = 1;
       var i;
 
       this.editor = {};
+      this.jotted = jotted;
 
       options = extend(options, {
         lineNumbers: true
@@ -756,42 +753,41 @@
 
       var $editors = jotted.$container.querySelectorAll('.jotted-editor');
 
-      var _loop = function _loop() {
+      for (i = 0; i < $editors.length; i++) {
         var $textarea = $editors[i].querySelector('textarea');
         var type = data($textarea, 'jotted-type');
         var file = data($textarea, 'jotted-file');
 
-        _this.editor[type] = window.CodeMirror.fromTextArea($textarea, options);
-        var editor = _this.editor[type];
-
-        editor.on('change', function () {
-          $textarea.value = editor.getValue();
-
-          // trigger a change event
-          jotted.trigger('change', {
-            cmEditor: editor,
-            type: type,
-            file: file,
-            content: $textarea.value
-          });
-        });
-      };
-
-      for (i = 0; i < $editors.length; i++) {
-        _loop();
+        this.editor[type] = window.CodeMirror.fromTextArea($textarea, options);
       }
 
       jotted.on('change', this.change.bind(this), priority);
     }
 
     babelHelpers.createClass(PluginCodeMirror, [{
+      key: 'editorChange',
+      value: function editorChange(params) {
+        var _this = this;
+
+        return function () {
+          // trigger a change event
+          _this.jotted.trigger('change', params);
+        };
+      }
+    }, {
       key: 'change',
       value: function change(params, callback) {
         var editor = this.editor[params.type];
 
-        // if the event is not started by the codemirror change
+        // if the event is not started by the codemirror change.
+        // triggered only once per editor,
+        // when the textarea is populated/file is loaded.
         if (!params.cmEditor) {
           editor.setValue(params.content);
+
+          // attach the event only after the file is loaded
+          params.cmEditor = editor;
+          editor.on('change', this.editorChange(params));
         }
 
         // manipulate the params and pass them on
@@ -1001,6 +997,12 @@
 
             _this.setValue($textarea, res);
           });
+        } else {
+          // trigger a change event on blank editors,
+          // for editor plugins to catch.
+          // (eg. the codemirror and ace plugins attach the change event
+          // only after the initial change/load event)
+          this.setValue($textarea, '');
         }
       }
     }, {

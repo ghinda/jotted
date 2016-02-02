@@ -9,6 +9,7 @@ export default class PluginCodeMirror {
     var i
 
     this.editor = {}
+    this.jotted = jotted
 
     options = util.extend(options, {
       lineNumbers: true
@@ -24,33 +25,32 @@ export default class PluginCodeMirror {
     for (i = 0; i < $editors.length; i++) {
       let $textarea = $editors[i].querySelector('textarea')
       let type = util.data($textarea, 'jotted-type')
-      let file = util.data($textarea, 'jotted-file')
 
       this.editor[type] = window.CodeMirror.fromTextArea($textarea, options)
-      let editor = this.editor[type]
-
-      editor.on('change', () => {
-        $textarea.value = editor.getValue()
-
-        // trigger a change event
-        jotted.trigger('change', {
-          cmEditor: editor,
-          type: type,
-          file: file,
-          content: $textarea.value
-        })
-      })
     }
 
     jotted.on('change', this.change.bind(this), priority)
   }
 
+  editorChange (params) {
+    return () => {
+      // trigger a change event
+      this.jotted.trigger('change', params)
+    }
+  }
+
   change (params, callback) {
     var editor = this.editor[params.type]
 
-    // if the event is not started by the codemirror change
+    // if the event is not started by the codemirror change.
+    // triggered only once per editor,
+    // when the textarea is populated/file is loaded.
     if (!params.cmEditor) {
       editor.setValue(params.content)
+
+      // attach the event only after the file is loaded
+      params.cmEditor = editor
+      editor.on('change', this.editorChange(params))
     }
 
     // manipulate the params and pass them on

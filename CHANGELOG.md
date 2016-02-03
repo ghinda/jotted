@@ -1,4 +1,8 @@
 
+## [1.1.3] - 2016-02-03
+
+* Add mode detection with syntax highlighting in the CodeMirror plugin.
+
 ## [1.1.2] - 2016-02-02
 
 * Prevent the codemirror and ace plugins from triggering the `change` event twice when initializing Jotted.

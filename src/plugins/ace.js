@@ -11,14 +11,6 @@ export default class PluginAce {
     this.editor = {}
     this.jotted = jotted
 
-    this.modemap = {
-      'html': 'html',
-      'css': 'css',
-      'js': 'javascript',
-      'less': 'less',
-      'coffee': 'coffeescript'
-    }
-
     options = util.extend(options, {})
 
     // check if Ace is loaded
@@ -41,7 +33,7 @@ export default class PluginAce {
 
       let editorOptions = util.extend(options)
 
-      editor.getSession().setMode(this.aceMode(type, file))
+      editor.getSession().setMode('ace/mode/' + util.getMode(type, file))
       editor.getSession().setOptions(editorOptions)
 
       editor.$blockScrolling = Infinity
@@ -73,25 +65,5 @@ export default class PluginAce {
     // manipulate the params and pass them on
     params.content = editor.getValue()
     callback(null, params)
-  }
-
-  aceMode (type, file) {
-    var mode = 'ace/mode/'
-
-    // try the file extension
-    for (let key in this.modemap) {
-      if (file.indexOf('.' + key) !== -1) {
-        return mode + this.modemap[key]
-      }
-    }
-
-    // try the file type (html/css/js)
-    for (let key in this.modemap) {
-      if (type === key) {
-        return mode + this.modemap[key]
-      }
-    }
-
-    return mode + type
   }
 }

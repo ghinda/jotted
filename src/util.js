@@ -134,12 +134,44 @@ function data (node, attr) {
   return node.getAttribute('data-' + attr)
 }
 
+// mode detection based on content type and file extension
+var defaultModemap = {
+  'html': 'html',
+  'css': 'css',
+  'js': 'javascript',
+  'less': 'less',
+  'styl': 'stylus',
+  'coffee': 'coffeescript'
+}
+
+function getMode (type = '', file = '', customModemap = {}) {
+  var modemap = extend(customModemap, defaultModemap)
+
+  // try the file extension
+  for (let key in modemap) {
+    let keyLength = key.length
+    if (file.slice(-keyLength++) === '.' + key) {
+      return modemap[key]
+    }
+  }
+
+  // try the file type (html/css/js)
+  for (let key in modemap) {
+    if (type === key) {
+      return modemap[key]
+    }
+  }
+
+  return type
+}
+
 export {
   extend,
   fetch,
   seq,
   debounce,
   log,
+  getMode,
 
   data,
   hasClass,

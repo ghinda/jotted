@@ -241,6 +241,41 @@
     return node.getAttribute('data-' + attr);
   }
 
+  // mode detection based on content type and file extension
+  var defaultModemap = {
+    'html': 'html',
+    'css': 'css',
+    'js': 'javascript',
+    'less': 'less',
+    'styl': 'stylus',
+    'coffee': 'coffeescript'
+  };
+
+  function getMode() {
+    var type = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
+    var file = arguments.length <= 1 || arguments[1] === undefined ? '' : arguments[1];
+    var customModemap = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+
+    var modemap = extend(customModemap, defaultModemap);
+
+    // try the file extension
+    for (var key in modemap) {
+      var keyLength = key.length;
+      if (file.slice(- keyLength++) === '.' + key) {
+        return modemap[key];
+      }
+    }
+
+    // try the file type (html/css/js)
+    for (var key in modemap) {
+      if (type === key) {
+        return modemap[key];
+      }
+    }
+
+    return type;
+  }
+
   var plugins = [];
 
   function find(id) {
@@ -639,14 +674,6 @@
       this.editor = {};
       this.jotted = jotted;
 
-      this.modemap = {
-        'html': 'html',
-        'css': 'css',
-        'js': 'javascript',
-        'less': 'less',
-        'coffee': 'coffeescript'
-      };
-
       options = extend(options, {});
 
       // check if Ace is loaded
@@ -669,7 +696,7 @@
 
         var editorOptions = extend(options);
 
-        editor.getSession().setMode(this.aceMode(type, file));
+        editor.getSession().setMode('ace/mode/' + getMode(type, file));
         editor.getSession().setOptions(editorOptions);
 
         editor.$blockScrolling = Infinity;
@@ -707,27 +734,6 @@
         params.content = editor.getValue();
         callback(null, params);
       }
-    }, {
-      key: 'aceMode',
-      value: function aceMode(type, file) {
-        var mode = 'ace/mode/';
-
-        // try the file extension
-        for (var key in this.modemap) {
-          if (file.indexOf('.' + key) !== -1) {
-            return mode + this.modemap[key];
-          }
-        }
-
-        // try the file type (html/css/js)
-        for (var key in this.modemap) {
-          if (type === key) {
-            return mode + this.modemap[key];
-          }
-        }
-
-        return mode + type;
-      }
     }]);
     return PluginAce;
   }();
@@ -741,6 +747,11 @@
 
       this.editor = {};
       this.jotted = jotted;
+
+      // custom modemap for codemirror
+      var modemap = {
+        'html': 'htmlmixed'
+      };
 
       options = extend(options, {
         lineNumbers: true
@@ -756,8 +767,10 @@
       for (i = 0; i < $editors.length; i++) {
         var $textarea = $editors[i].querySelector('textarea');
         var type = data($textarea, 'jotted-type');
+        var file = data($textarea, 'jotted-file');
 
         this.editor[type] = window.CodeMirror.fromTextArea($textarea, options);
+        this.editor[type].setOption('mode', getMode(type, file, modemap));
       }
 
       jotted.on('change', this.change.bind(this), priority);

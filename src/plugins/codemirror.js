@@ -11,6 +11,11 @@ export default class PluginCodeMirror {
     this.editor = {}
     this.jotted = jotted
 
+    // custom modemap for codemirror
+    var modemap = {
+      'html': 'htmlmixed'
+    }
+
     options = util.extend(options, {
       lineNumbers: true
     })
@@ -25,8 +30,10 @@ export default class PluginCodeMirror {
     for (i = 0; i < $editors.length; i++) {
       let $textarea = $editors[i].querySelector('textarea')
       let type = util.data($textarea, 'jotted-type')
+      let file = util.data($textarea, 'jotted-file')
 
       this.editor[type] = window.CodeMirror.fromTextArea($textarea, options)
+      this.editor[type].setOption('mode', util.getMode(type, file, modemap))
     }
 
     jotted.on('change', this.change.bind(this), priority)

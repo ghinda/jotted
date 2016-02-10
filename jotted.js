@@ -445,6 +445,7 @@
       jotted.$container.appendChild($pane);
       jotted.$container.querySelector('.jotted-nav').appendChild($nav);
 
+      var $container = jotted.$container.querySelector('.jotted-console-container');
       var $output = jotted.$container.querySelector('.jotted-console-output');
       var $input = jotted.$container.querySelector('.jotted-console-input input');
       var $inputForm = jotted.$container.querySelector('.jotted-console-input');
@@ -466,6 +467,7 @@
       window.addEventListener('message', this.getMessage.bind(this));
 
       // plugin public properties
+      this.$container = $container;
       this.$input = $input;
       this.$output = $output;
       this.$iframe = $iframe;
@@ -575,8 +577,9 @@
         // clear the console value
         this.$input.value = '';
 
-        // scroll the input into view
-        this.$input.scrollIntoView();
+        // scroll console pane to bottom
+        // to keep the input into view
+        this.$container.scrollTop = this.$container.scrollHeight;
 
         e.preventDefault();
       }

@@ -1,0 +1,27 @@
+---
+layout: demo.html
+title: Console Plugin
+demo: true
+---
+<div id="jotted-demo-console"></div>
+
+<link href="../jotted.css" rel="stylesheet">
+<script src="../jotted.js"></script>
+<script>
+  new Jotted(document.querySelector('#jotted-demo-console'), {
+    files: [
+      {
+        type: 'html',
+        content: '<h1>Side by side editing</h1>'
+      },
+      {
+        type: 'js',
+        content: 'var zer = 1; console.log("test");'
+      }
+    ],
+    pane: 'console',
+    plugins: [
+      'console'
+    ]
+  });
+</script>

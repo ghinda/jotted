@@ -80,7 +80,6 @@ class Jotted {
     }
 
     // change events
-    $container.addEventListener('change', util.debounce(this.change.bind(this), options.debounce))
     $container.addEventListener('keyup', util.debounce(this.change.bind(this), options.debounce))
 
     // pane change

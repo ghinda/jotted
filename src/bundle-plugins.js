@@ -1,4 +1,4 @@
-/* jotted
+/* bundle plugins
  */
 
 // register bundled plugins
@@ -9,6 +9,7 @@ import PluginCoffeeScript from './plugins/coffeescript.js'
 import PluginStylus from './plugins/stylus.js'
 import PluginBabel from './plugins/babel.js'
 import PluginMarkdown from './plugins/markdown.js'
+import PluginConsole from './plugins/console.js'
 
 export default function BundlePlugins (jotted) {
   jotted.plugin('codemirror', PluginCodeMirror)
@@ -18,4 +19,5 @@ export default function BundlePlugins (jotted) {
   jotted.plugin('stylus', PluginStylus)
   jotted.plugin('babel', PluginBabel)
   jotted.plugin('markdown', PluginMarkdown)
+  jotted.plugin('console', PluginConsole)
 }

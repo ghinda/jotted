@@ -34,7 +34,7 @@ describe('Console Plugin', function () {
     expect(dom.$console.querySelector('.jotted-pane-console')).not.toBe(null)
   })
 
-  it('should add show logs', function () {
+  it('should show logs', function () {
     jotted.console = new Jotted(dom.$console, {
       plugins: ['console']
     })
@@ -63,7 +63,7 @@ describe('Console Plugin', function () {
 
     dom.$console.querySelector('.jotted-console-input').dispatchEvent(submitEvent)
 
-    expect(dom.$console.querySelector('.jotted-console-output').innerHTML).toContain('someVar is not defined')
+    expect(dom.$console.querySelector('.jotted-console-log-error')).not.toBe(null)
   })
 
   it('should capture console.logs', function (done) {

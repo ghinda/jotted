@@ -224,6 +224,7 @@ jotted-nav-item,
   box-sizing: border-box;
   display: block;
   width: 100%;
+  height: 2.4em;
   border: 0;
   padding: 0 1em 0 2.4em;
   background: transparent;

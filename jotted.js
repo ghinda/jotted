@@ -483,7 +483,7 @@
           return;
         }
 
-        var data = e.data;
+        var data = JSON.parse(e.data);
         if (data.type === 'jotted-console-log') {
           this.log(data.message);
         }
@@ -508,16 +508,23 @@
     }, {
       key: 'capture',
       value: function capture() {
+        // IE9 with devtools closed
+        if (typeof window.console === 'undefined' || typeof window.console.log === 'undefined') {
+          window.console = {
+            log: function log() {}
+          };
+        }
+
         // for IE9 support
         var oldConsoleLog = Function.prototype.bind.call(window.console.log, window.console);
 
         window.console.log = function () {
           // send log messages to the parent window
           [].slice.call(arguments).forEach(function (message) {
-            window.parent.postMessage({
+            window.parent.postMessage(JSON.stringify({
               type: 'jotted-console-log',
               message: message
-            }, '*');
+            }), '*');
           });
 
           // in IE9, console.log is object instead of function

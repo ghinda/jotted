@@ -424,9 +424,11 @@
     function PluginConsole(jotted, options) {
       babelHelpers.classCallCheck(this, PluginConsole);
 
-      var priority = 30;
-
       options = extend(options, {});
+
+      var priority = 30;
+      var history = [];
+      var historyIndex = 0;
 
       var $iframe = jotted.$container.querySelector('.jotted-pane-result iframe');
 
@@ -451,6 +453,9 @@
       // submit the input form
       $inputForm.addEventListener('submit', this.submit.bind(this));
 
+      // console history
+      $input.addEventListener('keydown', this.history.bind(this));
+
       // clear button
       $clear.addEventListener('click', this.clear.bind(this));
 
@@ -464,6 +469,8 @@
       this.$input = $input;
       this.$output = $output;
       this.$iframe = $iframe;
+      this.history = history;
+      this.historyIndex = historyIndex;
     }
 
     babelHelpers.createClass(PluginConsole, [{
@@ -543,6 +550,10 @@
           return e.preventDefault();
         }
 
+        // add run to history
+        this.history.push(inputValue);
+        this.historyIndex = this.history.length;
+
         // log input value
         this.log(inputValue, 'history');
 
@@ -573,6 +584,33 @@
       key: 'clear',
       value: function clear() {
         this.$output.innerHTML = '';
+      }
+    }, {
+      key: 'history',
+      value: function history(e) {
+        var UP = 38;
+        var DOWN = 40;
+        var gotHistory = false;
+        var selectionStart = this.$input.selectionStart;
+
+        // only if we have previous history
+        // and the cursor is at the start
+        if (e.keyCode === UP && this.historyIndex !== 0 && selectionStart === 0) {
+          this.historyIndex--;
+          gotHistory = true;
+        }
+
+        // only if we have future history
+        // and the cursor is at the end
+        if (e.keyCode === DOWN && this.historyIndex !== this.history.length - 1 && selectionStart === this.$input.value.length) {
+          this.historyIndex++;
+          gotHistory = true;
+        }
+
+        // only if history changed
+        if (gotHistory) {
+          this.$input.value = this.history[this.historyIndex];
+        }
       }
     }]);
     return PluginConsole;

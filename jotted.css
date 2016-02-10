@@ -235,8 +235,8 @@ jotted-nav-item,
   top: 3.6em;
   right: 0.4em;
   padding: 0.4em 1em;
-  border: 1px solid rgba(51,51,51,0.12);
-  background: rgba(51,51,51,0.08);
+  border: 1px solid rgba(51,51,51,0.16);
+  background: rgba(51,51,51,0.12);
   border-radius: 2px;
   cursor: pointer;
 }

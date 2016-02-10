@@ -26,6 +26,7 @@ export default class PluginConsole {
           <input type="text">
         </form>
       </div>
+      <button class="jotted-console-clear">Clear</button>
     `
 
     jotted.$container.appendChild($pane)
@@ -34,9 +35,13 @@ export default class PluginConsole {
     var $output = jotted.$container.querySelector('.jotted-console-output')
     var $input = jotted.$container.querySelector('.jotted-console-input input')
     var $inputForm = jotted.$container.querySelector('.jotted-console-input')
+    var $clear = jotted.$container.querySelector('.jotted-console-clear')
 
     // submit the input form
     $inputForm.addEventListener('submit', this.submit.bind(this))
+
+    // clear button
+    $clear.addEventListener('click', this.clear.bind(this))
 
     // capture the console on each change
     jotted.on('change', this.change.bind(this), priority)
@@ -111,6 +116,11 @@ export default class PluginConsole {
   submit (e) {
     var inputValue = this.$input.value.trim()
 
+    // if input is blank, do nothing
+    if (inputValue === '') {
+      return e.preventDefault()
+    }
+
     // log input value
     this.log(inputValue, 'history')
 
@@ -132,6 +142,13 @@ export default class PluginConsole {
     // clear the console value
     this.$input.value = ''
 
+    // scroll the input into view
+    this.$input.scrollIntoView()
+
     e.preventDefault()
+  }
+
+  clear () {
+    this.$output.innerHTML = ''
   }
 }

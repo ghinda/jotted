@@ -149,8 +149,7 @@ new Jotted(document.querySelector('#demo'), {
 
 ### Other
 
-* `share`: Creates a shareable URL of the edited snapshot. **WIP**
-* `store`: Stores the edited code in `localStorage`. **WIP**
+* `console`: Lightweight JavaScript console, similar to the one in the browser's developer tools.
 
 
 ## Plugin API

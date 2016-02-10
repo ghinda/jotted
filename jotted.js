@@ -438,7 +438,7 @@
       var $pane = document.createElement('div');
       addClass($pane, 'jotted-pane jotted-pane-console');
 
-      $pane.innerHTML = '\n      <div class="jotted-console-container">\n        <ul class="jotted-console-output"></ul>\n        <form class="jotted-console-input">\n          <input type="text">\n        </form>\n      </div>\n    ';
+      $pane.innerHTML = '\n      <div class="jotted-console-container">\n        <ul class="jotted-console-output"></ul>\n        <form class="jotted-console-input">\n          <input type="text">\n        </form>\n      </div>\n      <button class="jotted-console-clear">Clear</button>\n    ';
 
       jotted.$container.appendChild($pane);
       jotted.$container.querySelector('.jotted-nav').appendChild($nav);
@@ -446,9 +446,13 @@
       var $output = jotted.$container.querySelector('.jotted-console-output');
       var $input = jotted.$container.querySelector('.jotted-console-input input');
       var $inputForm = jotted.$container.querySelector('.jotted-console-input');
+      var $clear = jotted.$container.querySelector('.jotted-console-clear');
 
       // submit the input form
       $inputForm.addEventListener('submit', this.submit.bind(this));
+
+      // clear button
+      $clear.addEventListener('click', this.clear.bind(this));
 
       // capture the console on each change
       jotted.on('change', this.change.bind(this), priority);
@@ -534,6 +538,11 @@
       value: function submit(e) {
         var inputValue = this.$input.value.trim();
 
+        // if input is blank, do nothing
+        if (inputValue === '') {
+          return e.preventDefault();
+        }
+
         // log input value
         this.log(inputValue, 'history');
 
@@ -555,7 +564,15 @@
         // clear the console value
         this.$input.value = '';
 
+        // scroll the input into view
+        this.$input.scrollIntoView();
+
         e.preventDefault();
+      }
+    }, {
+      key: 'clear',
+      value: function clear() {
+        this.$output.innerHTML = '';
       }
     }]);
     return PluginConsole;

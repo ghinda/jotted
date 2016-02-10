@@ -3,7 +3,15 @@ layout: demo.html
 title: Console Plugin
 demo: true
 ---
-<div id="jotted-demo-console"></div>
+<p>
+  The <strong>console</strong> plugins adds an extra <strong>JS Console</strong> tab. It's a lightweight version of the browser's console, running  in the iframe context.
+</p>
+
+<p>
+  It also captures <code>console.log</code> calls you make, but it doesn't log errors in your code.
+</p>
+
+<div id="jotted-demo-console" style="height: 28em"></div>
 
 <link href="../jotted.css" rel="stylesheet">
 <script src="../jotted.js"></script>
@@ -16,7 +24,7 @@ demo: true
       },
       {
         type: 'js',
-        content: 'var zer = 1; console.log("test");'
+        content: 'var someVar = 1;\nconsole.log("log someVar", someVar);'
       }
     ],
     pane: 'console',

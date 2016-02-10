@@ -17,17 +17,86 @@
   color: #222;
 }
 
+/* scroll container
+ */
 .jotted-console-container {
   height: 100%;
   overflow: auto;
+
+  font-family: monospace;
 }
 
+/* output
+ */
 .jotted-console-output {
   margin: 0;
   padding: 0;
   list-style-type: none;
+
+  line-height: 2.8em;
 }
 
 .jotted-console-log {
-  padding: 1em;
+  padding: 0 1em;
+}
+
+.jotted-console-log-history {
+  border-width: 1px 0;
+  border-style: solid;
+  border-color: rgba(#333, .08);
+  background: rgba(#333, .04);
+}
+
+.jotted-console-log-error {
+  background: #FFCCBC;
+
+  color: #550000;
+}
+
+/* input form
+ */
+.jotted-console-input {
+  position: relative;
+  background: rgba(#333, .12);
+}
+
+.jotted-console-input:before {
+  content: '>';
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 1;
+  padding: 0 1em;
+  pointer-events: none;
+
+  font-family: inherit;
+  font-weight: bold;
+  line-height: 2.4em;
+}
+
+.jotted-console-input input {
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  border: 0;
+  padding: 0 1em 0 2.4em;
+  background: transparent;
+
+  line-height: 2.4em;
+  font-family: inherit;
+}
+
+/* clear button
+ */
+
+.jotted-console-clear {
+  position: absolute;
+  top: 3.6em;
+  right: .4em;
+  padding: .4em 1em;
+  border: 1px solid rgba(#333, .12);
+  background: rgba(#333, .08);
+  border-radius: 2px;
+
+  cursor: pointer;
 }

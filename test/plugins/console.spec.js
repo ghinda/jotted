@@ -80,8 +80,9 @@ describe('Console Plugin', function () {
       // give it a second for the postMessage to go around
       setTimeout(function () {
         expect(dom.$console.querySelector('.jotted-console-output').innerHTML).toContain('someString')
+
         done()
-      })
+      }, 200)
     }
   })
 })

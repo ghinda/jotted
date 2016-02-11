@@ -24,7 +24,7 @@
     "ace-builds": "~1.2.3",
     "codemirror": "~5.11.0",
     "less": "~2.5.0",
-    "jasmine-core": "jasmine#~2.4.1",
+    "jasmine-core": "^2.4.1",
     "jasmine-jsreporter": "~0.1.2",
     "coffee-script": "coffeescript#~1.10.0",
     "he": "~0.5.0",

@@ -1,4 +1,10 @@
 
+## [1.2.0] - 2016-02-11
+
+* New Console plugin, for a lightweight JavaScript console similar to the one in the browser (or on JS Bin/CodePen). Includes history support when pressing Up and Down keys.
+* Remove the `change` handler on textareas, to not trigger another render on focusing-out the textareas.
+* Replace Jasmine with Mocha+Chai for testing.
+
 ## [1.1.3] - 2016-02-03
 
 * Add mode detection with syntax highlighting in the CodeMirror plugin.

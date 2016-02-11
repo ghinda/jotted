@@ -171,6 +171,9 @@ jotted-nav-item,
 .jotted-nav-item-console {
   display: block;
 }
+.jotted-pane-console {
+  background: #fff;
+}
 .jotted-pane-active-console .jotted-pane-console {
   position: relative;
   visibility: visible;
@@ -233,13 +236,17 @@ jotted-nav-item,
 }
 .jotted-console-clear {
   position: absolute;
-  top: 3.6em;
-  right: 0.4em;
-  padding: 0.4em 1em;
-  border: 1px solid rgba(51,51,51,0.16);
-  background: rgba(51,51,51,0.12);
+  top: 3.3em;
+  right: 1.4em;
+  padding: 0 1em;
+  border: 1px solid #ccc;
+  background: rgba(230,230,230,0.6);
   border-radius: 2px;
   cursor: pointer;
+  line-height: 1.6em;
+}
+.jotted-console-clear:hover {
+  background: #ececec;
 }
 /* themes
  */

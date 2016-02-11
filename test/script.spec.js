@@ -15,7 +15,7 @@ describe('Script', function () {
 
     dom.$script = document.createElement('div')
 
-    document.querySelector('.fixture').appendChild(dom.$script)
+    document.querySelector('.fixtures').appendChild(dom.$script)
   })
 
   it('should not run script tags when runScripts is false', function (done) {
@@ -34,7 +34,7 @@ describe('Script', function () {
 
     var $iframe = dom.$script.querySelector('iframe')
     $iframe.onload = function () {
-      expect($iframe.contentWindow.globalThatShouldntExist).not.toBeDefined()
+      expect($iframe.contentWindow.globalThatShouldntExist).to.be.undefined
       done()
     }
   })
@@ -54,7 +54,7 @@ describe('Script', function () {
 
     var $iframe = dom.$script.querySelector('iframe')
     $iframe.onload = function () {
-      expect($iframe.contentWindow.globalThatShouldExist).toBe(true)
+      expect($iframe.contentWindow.globalThatShouldExist).to.be.true
       done()
     }
   })
@@ -74,7 +74,7 @@ describe('Script', function () {
 
     var $iframe = dom.$script.querySelector('iframe')
     $iframe.onload = function () {
-      expect(dom.$script.querySelector('iframe').contentWindow.globalThatShouldExist).toBe(true)
+      expect(dom.$script.querySelector('iframe').contentWindow.globalThatShouldExist).to.be.true
       done()
     }
   })
@@ -94,12 +94,14 @@ describe('Script', function () {
 
     var $iframe = dom.$script.querySelector('iframe')
     $iframe.onload = function () {
-      expect(dom.$script.querySelector('iframe').contentWindow.globalThatShouldntExist).not.toBeDefined()
+      expect(dom.$script.querySelector('iframe').contentWindow.globalThatShouldntExist).to.be.undefined
       done()
     }
   })
 
   it('should render inline text/babel jsx with react', function (done) {
+    this.timeout(10000)
+
     jotted.script = new Jotted(dom.$script, {
       files: [{
         type: 'html',
@@ -109,7 +111,7 @@ describe('Script', function () {
 
     var $iframe = dom.$script.querySelector('iframe')
     $iframe.onload = function () {
-      expect($iframe.contentWindow.document.querySelector('#content').textContent).toContain('Hello, world!')
+      expect($iframe.contentWindow.document.querySelector('#content').textContent).to.contain('Hello, world!')
 
       done()
     }
@@ -131,7 +133,7 @@ describe('Script', function () {
 
     var $iframe = dom.$script.querySelector('iframe')
     $iframe.onload = function () {
-      expect($iframe.contentWindow.document.querySelector('#content').textContent).toContain('Hello, world!')
+      expect($iframe.contentWindow.document.querySelector('#content').textContent).to.contain('Hello, world!')
 
       done()
     }

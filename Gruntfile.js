@@ -123,10 +123,12 @@ module.exports = function (grunt) {
         }
       }
     },
-    'saucelabs-jasmine': {
+    'saucelabs-mocha': {
       all: {
         options: {
-          urls: [ 'http://127.0.0.1:9000/test' ],
+          urls: [
+            'http://127.0.0.1:9000/test'
+          ],
           detailedError: true,
           browsers: [
             {
@@ -256,7 +258,7 @@ module.exports = function (grunt) {
   grunt.registerTask('test', [
     'default',
     'connect:test',
-    'saucelabs-jasmine'
+    'saucelabs-mocha'
   ]);
 
   grunt.registerTask('default', [

@@ -6,32 +6,70 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title></title>
 
-  <link rel="stylesheet" href="/bower_components/jasmine-core/lib/jasmine-core/jasmine.css">
+  <link rel="stylesheet" href="/bower_components/mocha/mocha.css">
   <link rel="stylesheet" href="/jotted.css">
 
   <link rel="stylesheet" href="tests.css">
 </head>
 <body>
 
-  <div class="fixture"></div>
+  <div id="mocha">
+    <p>
+      <a href=".">Index</a>
+    </p>
+  </div>
+
+  <div class="fixtures"></div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.js"></script>
   <script src="/jotted.js"></script>
 
-  <script src="/bower_components/jasmine-core/lib/jasmine-core/jasmine.js"></script>
-  <script src="/bower_components/jasmine-core/lib/jasmine-core/jasmine-html.js"></script>
-  <script src="/bower_components/jasmine-core/lib/jasmine-core/boot.js"></script>
-  <script src="/bower_components/jasmine-jsreporter/jasmine-jsreporter.js"></script>
+  <script src="/bower_components/mocha/mocha.js"></script>
+  <script src="/bower_components/chai/chai.js"></script>
 
   <script>
-    jasmine.getEnv().addReporter(new jasmineRequire.JSReporter2());
-    window.jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
+    mocha.setup('bdd');
+    window.expect = chai.expect;
   </script>
 
-  <script src="core.spec.js"></script>
-  <script src="script.spec.js"></script>
-  <script src="themes/bin.spec.js"></script>
-  <script src="plugins/console.spec.js"></script>
+  <script src="./core.spec.js"></script>
+  <script src="./script.spec.js"></script>
+  <script src="./plugins/console.spec.js"></script>
+  <script src="./themes/bin.spec.js"></script>
+
+  <script>
+    onload = function() {
+      var runner = mocha.run();
+
+      var failedTests = [];
+      runner.on('end', function(){
+        window.mochaResults = runner.stats;
+        window.mochaResults.reports = failedTests;
+      });
+
+      runner.on('fail', logFailure);
+
+      function logFailure(test, err) {
+
+        var flattenTitles = function(test) {
+          var titles = [];
+          while (test.parent.title) {
+            titles.push(test.parent.title);
+            test = test.parent;
+          }
+          return titles.reverse();
+        };
+
+        failedTests.push({
+          name: test.title,
+          result: false,
+          message: err.message,
+          stack: err.stack,
+          titles: flattenTitles(test)
+        });
+      };
+    };
+  </script>
 
 </body>
 </html>

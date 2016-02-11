@@ -24,12 +24,12 @@
     "ace-builds": "~1.2.3",
     "codemirror": "~5.11.0",
     "less": "~2.5.0",
-    "jasmine-core": "^2.4.1",
-    "jasmine-jsreporter": "~0.1.2",
     "coffee-script": "coffeescript#~1.10.0",
     "he": "~0.5.0",
     "gridlayout": "~1.0.2",
-    "prism": "~1.3.0"
+    "prism": "~1.3.0",
+    "mocha": "^2.4.5",
+    "chai": "^3.5.0"
   },
   "dependencies": {}
 }

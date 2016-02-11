@@ -15,7 +15,7 @@ describe('Bin Theme', function () {
     dom.$editor = document.createElement('div')
     dom.$editor.className = 'jotted-theme-bin'
 
-    document.querySelector('.fixture').appendChild(dom.$editor)
+    document.querySelector('.fixtures').appendChild(dom.$editor)
   })
 
   it('should have all panes visible on the bin theme when using showBlank', function () {
@@ -25,7 +25,7 @@ describe('Bin Theme', function () {
 
     var $panes = dom.$editor.querySelectorAll('.jotted-pane')
     for (var i = 0; i < $panes.length; i++) {
-      expect(window.getComputedStyle($panes[i]).getPropertyValue('visibility')).toBe('visible')
+      expect(window.getComputedStyle($panes[i]).getPropertyValue('visibility')).to.equal('visible')
     }
   })
 
@@ -40,7 +40,7 @@ describe('Bin Theme', function () {
     var $paneHtml = dom.$editor.querySelector('.jotted-pane-html')
     var containerWidth = dom.$editor.getBoundingClientRect().width
     var paneWidth = parseInt($paneHtml.getBoundingClientRect().width, 10)
-    expect(paneWidth).toBe(parseInt((containerWidth - 2) / 2, 10))
+    expect(paneWidth).to.equal(parseInt((containerWidth - 2) / 2, 10))
   })
 
   it('should take up 33.33% of the container with two file types', function () {
@@ -57,7 +57,7 @@ describe('Bin Theme', function () {
     var $paneHtml = dom.$editor.querySelector('.jotted-pane-html')
     var containerWidth = dom.$editor.getBoundingClientRect().width
     var paneWidth = parseInt($paneHtml.getBoundingClientRect().width, 10)
-    expect(paneWidth).toBe(parseInt((containerWidth - 2) / 3, 10))
+    expect(paneWidth).to.equal(parseInt((containerWidth - 2) / 3, 10))
   })
 
   it('should take up 25% of the container with three file types', function () {
@@ -77,6 +77,6 @@ describe('Bin Theme', function () {
     var $paneHtml = dom.$editor.querySelector('.jotted-pane-html')
     var containerWidth = dom.$editor.getBoundingClientRect().width
     var paneWidth = parseInt($paneHtml.getBoundingClientRect().width, 10)
-    expect(paneWidth).toBe(parseInt((containerWidth - 2) / 4, 10))
+    expect(paneWidth).to.equal(parseInt((containerWidth - 2) / 4, 10))
   })
 })

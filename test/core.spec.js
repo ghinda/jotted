@@ -8,75 +8,94 @@ describe('Core', function () {
   var Jotted = window.Jotted
   var jotted = {}
 
-  function cleanDom () {
+  beforeEach(function () {
     if (dom.$editor) {
       dom.$editor.parentNode.removeChild(dom.$editor)
     }
 
     dom.$editor = document.createElement('div')
 
-    document.querySelector('.fixture').appendChild(dom.$editor)
-  }
-
-  beforeAll(cleanDom)
+    document.querySelector('.fixtures').appendChild(dom.$editor)
+  })
 
   it('should initialize jotted on #editor-core', function () {
     jotted.core = new Jotted(dom.$editor)
 
-    expect(jotted.core).toBeDefined()
+    expect(jotted.core).to.not.be.undefined
   })
 
   it('should add the jotted class to the container', function () {
-    expect(dom.$editor.className).toContain('jotted')
+    jotted.core = new Jotted(dom.$editor)
+
+    expect(dom.$editor.className).to.contain('jotted')
   })
 
   it('should add the navigation markup', function () {
-    expect(dom.$editor.querySelector('.jotted-nav')).not.toBe(null)
+    jotted.core = new Jotted(dom.$editor)
+
+    expect(dom.$editor.querySelector('.jotted-nav')).to.not.be.null
   })
 
   it('should add four panes', function () {
-    expect(dom.$editor.querySelectorAll('.jotted-pane').length).toBe(4)
+    jotted.core = new Jotted(dom.$editor)
+
+    expect(dom.$editor.querySelectorAll('.jotted-pane').length).to.equal(4)
   })
 
   it('should create three editor containers', function () {
-    expect(dom.$editor.querySelectorAll('.jotted-editor').length).toBe(3)
+    jotted.core = new Jotted(dom.$editor)
+
+    expect(dom.$editor.querySelectorAll('.jotted-editor').length).to.equal(3)
   })
 
   it('should create three editor textareas', function () {
-    expect(dom.$editor.querySelectorAll('.jotted-editor textarea').length).toBe(3)
+    jotted.core = new Jotted(dom.$editor)
+
+    expect(dom.$editor.querySelectorAll('.jotted-editor textarea').length).to.equal(3)
   })
 
   it('should create the result iframe', function () {
-    expect(dom.$editor.querySelector('.jotted-pane-result iframe')).not.toBe(null)
+    jotted.core = new Jotted(dom.$editor)
+
+    expect(dom.$editor.querySelector('.jotted-pane-result iframe')).to.not.be.null
   })
 
   it('should have the result pane visible', function () {
-    expect(window.getComputedStyle(dom.$editor.querySelector('.jotted-pane-result')).getPropertyValue('visibility')).toBe('visible')
+    jotted.core = new Jotted(dom.$editor)
+
+    expect(window.getComputedStyle(dom.$editor.querySelector('.jotted-pane-result')).getPropertyValue('visibility')).to.equal('visible')
   })
 
   it('should have the other panes hidden', function () {
+    jotted.core = new Jotted(dom.$editor)
+
     var $panes = dom.$editor.querySelectorAll('.jotted-pane')
     for (var i = 1; i < $panes.length; i++) {
-      expect(window.getComputedStyle($panes[i]).getPropertyValue('visibility')).toBe('hidden')
+      expect(window.getComputedStyle($panes[i]).getPropertyValue('visibility')).to.equal('hidden')
     }
   })
 
   it('should contain the pubsoup methods', function () {
-    [ 'on', 'off', 'done', 'trigger' ].forEach(function (key) {
-      expect(typeof jotted.core[key]).toBeDefined()
+    jotted.core = new Jotted(dom.$editor)
+
+    var props = [ 'on', 'off', 'done', 'trigger' ]
+
+    props.forEach(function (key) {
+      expect(typeof jotted.core[key]).to.not.be.undefined
     })
   })
 
   it('should throw error when jotted container is not found', function () {
+    jotted.core = new Jotted(dom.$editor)
+
     try {
       jotted._nonexistant = new Jotted(document.getElementById('editor-nonexistant'))
     } catch (e) {
-      expect(e.toString()).toContain('Can\'t find Jotted container')
+      expect(e.toString()).to.contain('Can\'t find Jotted container')
     }
   })
 
   it('should refresh the entire iframe on each change', function (done) {
-    cleanDom()
     jotted.core = new Jotted(dom.$editor, {
       files: [{
         type: 'html',
@@ -100,21 +119,19 @@ describe('Core', function () {
     var $iframe = dom.$editor.querySelector('.jotted-pane-result iframe')
 
     $iframe.onload = function () {
-      expect(dom.$editor.querySelector('.jotted-pane-result iframe').contentWindow.document.querySelector('h1').innerHTML).toBe('Default Heading')
-      expect(true).toBe(true)
+      expect(dom.$editor.querySelector('.jotted-pane-result iframe').contentWindow.document.querySelector('h1').innerHTML).to.equal('Default Heading')
       done()
     }
   })
 
   it('should show all pane nav tabs when using showBlank', function () {
-    cleanDom()
     jotted.core = new Jotted(dom.$editor, {
       showBlank: true
     })
 
     var $navs = dom.$editor.querySelectorAll('.jotted-nav-item')
     for (var i = 0; i < $navs.length; i++) {
-      expect($navs[i].offsetParent).not.toBe(null)
+      expect($navs[i].offsetParent).to.not.be.null
     }
   })
 })

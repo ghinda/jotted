@@ -19,7 +19,10 @@
         type: 'js',
         url: 'demo-home/ripple.js'
       }],
-      plugins: [ 'codemirror' ]
+      plugins: [
+        'codemirror',
+        'console'
+      ]
     })
   }
 })()

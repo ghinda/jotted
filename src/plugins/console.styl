@@ -5,6 +5,10 @@
   display: block;
 }
 
+.jotted-pane-console {
+  background: #fff;
+}
+
 .jotted-pane-active-console .jotted-pane-console {
   position: relative;
   visibility: visible;
@@ -92,12 +96,18 @@
 
 .jotted-console-clear {
   position: absolute;
-  top: 3.6em;
-  right: .4em;
-  padding: .4em 1em;
-  border: 1px solid rgba(#333, .16);
-  background: rgba(#333, .12);
+  top: 3.3em;
+  right: 1.4em;
+  padding: 0 1em;
+  border: 1px solid #ccc;
+  background: rgba(#e6e6e6, .6);
   border-radius: 2px;
 
   cursor: pointer;
+  line-height: 1.6em;
 }
+
+.jotted-console-clear:hover {
+  background: #ececec;
+}
+

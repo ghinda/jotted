@@ -1,4 +1,8 @@
 
+## [1.2.1] - 2016-02-11
+
+* White background for the Console pane, and more styling tweaks.
+
 ## [1.2.0] - 2016-02-11
 
 * New Console plugin, for a lightweight JavaScript console similar to the one in the browser (or on JS Bin/CodePen). Includes history support when pressing Up and Down keys.

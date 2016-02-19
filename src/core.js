@@ -315,13 +315,32 @@ class Jotted {
   trigger () {
     var options = this._get('options')
     var pubsoup = this._get('pubsoup')
-    var timers = {}
+    // cooldown timer
+    var cooldown = {}
+    // multiple calls
+    var multiple = {}
 
     return function (topic, { type = 'default' } = {}) {
-      clearTimeout(timers[type])
-
-      timers[type] = setTimeout(() => {
+      if (cooldown[type]) {
+        // if we had multiple calls before the cooldown
+        multiple[type] = true
+      } else {
+        // trigger immediately once cooldown is over
         pubsoup.publish.apply(pubsoup, arguments)
+      }
+
+      clearTimeout(cooldown[type])
+
+      // set cooldown timer
+      cooldown[type] = setTimeout(() => {
+        // if we had multiple calls before the cooldown,
+        // trigger the function again at the end.
+        if (multiple[type]) {
+          pubsoup.publish.apply(pubsoup, arguments)
+        }
+
+        multiple[type] = null
+        cooldown[type] = null
       }, options.debounce)
     }
   }

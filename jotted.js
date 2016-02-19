@@ -176,15 +176,27 @@
   }
 
   function debounce(fn, delay) {
-    var timer = null;
+    var cooldown = null;
+    var multiple = null;
     return function () {
-      var _this = this;
+      var _this = this,
+          _arguments = arguments;
 
-      var args = arguments;
-      clearTimeout(timer);
+      if (cooldown) {
+        multiple = true;
+      } else {
+        fn.apply(this, arguments);
+      }
 
-      timer = setTimeout(function () {
-        fn.apply(_this, args);
+      clearTimeout(cooldown);
+
+      cooldown = setTimeout(function () {
+        if (multiple) {
+          fn.apply(_this, _arguments);
+        }
+
+        cooldown = null;
+        multiple = null;
       }, delay);
     };
   }
@@ -1426,7 +1438,10 @@
       value: function trigger() {
         var options = this._get('options');
         var pubsoup = this._get('pubsoup');
-        var timers = {};
+        // cooldown timer
+        var cooldown = {};
+        // multiple calls
+        var multiple = {};
 
         return function (topic) {
           var _arguments = arguments;
@@ -1436,10 +1451,26 @@
           var _ref$type = _ref.type;
           var type = _ref$type === undefined ? 'default' : _ref$type;
 
-          clearTimeout(timers[type]);
+          if (cooldown[type]) {
+            // if we had multiple calls before the cooldown
+            multiple[type] = true;
+          } else {
+            // trigger immediately once cooldown is over
+            pubsoup.publish.apply(pubsoup, arguments);
+          }
 
-          timers[type] = setTimeout(function () {
-            pubsoup.publish.apply(pubsoup, _arguments);
+          clearTimeout(cooldown[type]);
+
+          // set cooldown timer
+          cooldown[type] = setTimeout(function () {
+            // if we had multiple calls before the cooldown,
+            // trigger the function again at the end.
+            if (multiple[type]) {
+              pubsoup.publish.apply(pubsoup, _arguments);
+            }
+
+            multiple[type] = null;
+            cooldown[type] = null;
           }, options.debounce);
         };
       }

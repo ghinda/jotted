@@ -80,6 +80,7 @@ jotted-nav-item,
   width: 100%;
   padding-top: 2.4em;
   box-sizing: border-box;
+  background: #fff;
 }
 .jotted-pane-active-result .jotted-pane-result,
 .jotted-pane-active-html .jotted-pane-html,
@@ -255,8 +256,8 @@ jotted-nav-item,
 }
 .jotted-button-play {
   position: absolute;
-  top: 0;
-  right: 0;
+  top: 0.4em;
+  right: 0.4em;
   z-index: 3;
 }
 /* themes

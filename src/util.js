@@ -71,12 +71,24 @@ function seq (arr, params, callback = function () {}) {
 }
 
 function debounce (fn, delay) {
-  var timer = null
+  var cooldown = null
+  var multiple = null
   return function () {
-    clearTimeout(timer)
-
-    timer = setTimeout(() => {
+    if (cooldown) {
+      multiple = true
+    } else {
       fn.apply(this, arguments)
+    }
+
+    clearTimeout(cooldown)
+
+    cooldown = setTimeout(() => {
+      if (multiple) {
+        fn.apply(this, arguments)
+      }
+
+      cooldown = null
+      multiple = null
     }, delay)
   }
 }

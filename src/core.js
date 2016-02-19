@@ -34,8 +34,8 @@ class Jotted {
 
     // PubSoup
     var pubsoup = this._set('pubsoup', new PubSoup())
-    // debounced trigger method
-    this._set('trigger', util.debounce(pubsoup.publish.bind(pubsoup), options.debounce))
+
+    this._set('trigger', this.trigger())
     this._set('on', function () {
       pubsoup.subscribe.apply(pubsoup, arguments)
     })
@@ -202,11 +202,8 @@ class Jotted {
       return
     }
 
-    // don't use .trigger,
-    // so we don't debounce different change calls (html, css, js)
-    // causing only one of them to be inserted.
-    // the textarea change event is debounced when attached.
-    this._get('pubsoup').publish('change', {
+    // trigger the change event
+    this.trigger('change', {
       type: util.data(e.target, 'jotted-type'),
       file: util.data(e.target, 'jotted-file'),
       content: e.target.value
@@ -239,7 +236,18 @@ class Jotted {
       cachedContent['html'] = fragment.innerHTML
     }
 
-    $resultFrame.setAttribute('srcdoc', template.frameContent(cachedContent['css'], cachedContent['html'], cachedContent['js']))
+    var oldFrameContent = this._get('frameContent')
+    var frameContent = this._set('frameContent', template.frameContent(cachedContent['css'], cachedContent['html'], cachedContent['js']))
+
+    // don't render,
+    // if previous and new frame content are the same.
+    // mostly for the `play` plugin,
+    // so we don't re-render the same content on each change.
+    if (frameContent === oldFrameContent) {
+      return
+    }
+
+    $resultFrame.setAttribute('srcdoc', frameContent)
 
     // older browsers without iframe srcset support (IE9)
     if (!supportSrcdoc) {
@@ -300,6 +308,22 @@ class Jotted {
     util.removeClass($status[params.type], template.statusClass(statusType))
     util.removeClass(this._get('$container'), template.statusActiveClass(params.type))
     $status[params.type].innerHTML = ''
+  }
+
+  // debounced trigger method
+  // custom debouncer to use a different timer per type
+  trigger () {
+    var options = this._get('options')
+    var pubsoup = this._get('pubsoup')
+    var timers = {}
+
+    return function (topic, { type = 'default' } = {}) {
+      clearTimeout(timers[type])
+
+      timers[type] = setTimeout(() => {
+        pubsoup.publish.apply(pubsoup, arguments)
+      }, options.debounce)
+    }
   }
 }
 

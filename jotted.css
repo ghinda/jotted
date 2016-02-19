@@ -156,6 +156,20 @@ jotted-nav-item,
 .jotted-status-error p:before {
   background: #c0392b;
 }
+/* buttons
+ * used by plugins
+ */
+.jotted-button {
+  padding: 0 1em;
+  border: 1px solid #ccc;
+  background: rgba(230,230,230,0.6);
+  border-radius: 2px;
+  cursor: pointer;
+  line-height: 1.6em;
+}
+.jotted-button:hover {
+  background: #ececec;
+}
 /* plugins
  */
 .jotted-plugin-ace .jotted-editor > textarea {
@@ -238,15 +252,12 @@ jotted-nav-item,
   position: absolute;
   top: 3.3em;
   right: 1.4em;
-  padding: 0 1em;
-  border: 1px solid #ccc;
-  background: rgba(230,230,230,0.6);
-  border-radius: 2px;
-  cursor: pointer;
-  line-height: 1.6em;
 }
-.jotted-console-clear:hover {
-  background: #ececec;
+.jotted-button-play {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 3;
 }
 /* themes
  */

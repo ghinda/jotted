@@ -73,11 +73,10 @@ function seq (arr, params, callback = function () {}) {
 function debounce (fn, delay) {
   var timer = null
   return function () {
-    var args = arguments
     clearTimeout(timer)
 
     timer = setTimeout(() => {
-      fn.apply(this, args)
+      fn.apply(this, arguments)
     }, delay)
   }
 }

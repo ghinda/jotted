@@ -28,7 +28,7 @@ export default class PluginConsole {
           <input type="text">
         </form>
       </div>
-      <button class="jotted-console-clear">Clear</button>
+      <button class="jotted-button jotted-console-clear">Clear</button>
     `
 
     jotted.$container.appendChild($pane)

@@ -1,0 +1,23 @@
+---
+layout: demo.html
+title: Play Plugin
+demo: true
+---
+
+<div id="jotted-demo-play" class="jotted-theme-bin"></div>
+
+<link href="../jotted.css" rel="stylesheet">
+<script src="../jotted.js"></script>
+<script>
+  new Jotted(document.querySelector('#jotted-demo-play'), {
+    files: [
+      {
+        type: 'html',
+        content: 'test'
+      }
+    ],
+    plugins: [
+      'play'
+    ]
+  });
+</script>

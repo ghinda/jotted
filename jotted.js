@@ -420,6 +420,67 @@
     return PubSoup;
   }();
 
+  var PluginPlay = function () {
+    function PluginPlay(jotted, options) {
+      babelHelpers.classCallCheck(this, PluginPlay);
+
+      options = extend(options, {});
+
+      // cached code
+      var cache = {};
+      // latest version of the code.
+      // replaces the cache when the run button is pressed.
+      var code = {};
+
+      // run button
+      var $button = document.createElement('button');
+      $button.className = 'jotted-button jotted-button-play';
+      $button.innerHTML = 'Run';
+
+      jotted.$container.appendChild($button);
+      $button.addEventListener('click', this.run.bind(this));
+
+      // capture the code on each change
+      jotted.on('change', this.change.bind(this));
+
+      // public
+      this.cache = cache;
+      this.code = code;
+      this.jotted = jotted;
+    }
+
+    babelHelpers.createClass(PluginPlay, [{
+      key: 'change',
+      value: function change(params, callback) {
+        // always cache the latest code
+        this.code[params.type] = params;
+
+        // replace the params with the latest cache
+        if (this.cache[params.type]) {
+          callback(null, this.cache[params.type]);
+        } else {
+          // cache the first run
+          this.cache[params.type] = params;
+
+          callback(null, params);
+        }
+      }
+    }, {
+      key: 'run',
+      value: function run() {
+        // trigger change on each type with the latest code
+        for (var type in this.code) {
+          // update the cache with the latest code
+          this.cache[type] = this.code[type];
+
+          // trigger the change
+          this.jotted.trigger('change', this.code[type]);
+        }
+      }
+    }]);
+    return PluginPlay;
+  }();
+
   var PluginConsole = function () {
     function PluginConsole(jotted, options) {
       babelHelpers.classCallCheck(this, PluginConsole);
@@ -440,7 +501,7 @@
       var $pane = document.createElement('div');
       addClass($pane, 'jotted-pane jotted-pane-console');
 
-      $pane.innerHTML = '\n      <div class="jotted-console-container">\n        <ul class="jotted-console-output"></ul>\n        <form class="jotted-console-input">\n          <input type="text">\n        </form>\n      </div>\n      <button class="jotted-console-clear">Clear</button>\n    ';
+      $pane.innerHTML = '\n      <div class="jotted-console-container">\n        <ul class="jotted-console-output"></ul>\n        <form class="jotted-console-input">\n          <input type="text">\n        </form>\n      </div>\n      <button class="jotted-button jotted-console-clear">Clear</button>\n    ';
 
       jotted.$container.appendChild($pane);
       jotted.$container.querySelector('.jotted-nav').appendChild($nav);
@@ -1025,6 +1086,7 @@
     jotted.plugin('babel', PluginBabel);
     jotted.plugin('markdown', PluginMarkdown);
     jotted.plugin('console', PluginConsole);
+    jotted.plugin('play', PluginPlay);
   }
 
   var Jotted = function () {
@@ -1057,8 +1119,8 @@
 
       // PubSoup
       var pubsoup = this._set('pubsoup', new PubSoup());
-      // debounced trigger method
-      this._set('trigger', debounce(pubsoup.publish.bind(pubsoup), options.debounce));
+
+      this._set('trigger', this.trigger());
       this._set('on', function () {
         pubsoup.subscribe.apply(pubsoup, arguments);
       });
@@ -1240,11 +1302,8 @@
           return;
         }
 
-        // don't use .trigger,
-        // so we don't debounce different change calls (html, css, js)
-        // causing only one of them to be inserted.
-        // the textarea change event is debounced when attached.
-        this._get('pubsoup').publish('change', {
+        // trigger the change event
+        this.trigger('change', {
           type: data(e.target, 'jotted-type'),
           file: data(e.target, 'jotted-file'),
           content: e.target.value
@@ -1278,7 +1337,18 @@
           cachedContent['html'] = fragment.innerHTML;
         }
 
-        $resultFrame.setAttribute('srcdoc', frameContent(cachedContent['css'], cachedContent['html'], cachedContent['js']));
+        var oldFrameContent = this._get('frameContent');
+        var frameContent$$ = this._set('frameContent', frameContent(cachedContent['css'], cachedContent['html'], cachedContent['js']));
+
+        // don't render,
+        // if previous and new frame content are the same.
+        // mostly for the `play` plugin,
+        // so we don't re-render the same content on each change.
+        if (frameContent$$ === oldFrameContent) {
+          return;
+        }
+
+        $resultFrame.setAttribute('srcdoc', frameContent$$);
 
         // older browsers without iframe srcset support (IE9)
         if (!supportSrcdoc) {
@@ -1346,6 +1416,32 @@
         removeClass($status[params.type], statusClass(statusType));
         removeClass(this._get('$container'), statusActiveClass(params.type));
         $status[params.type].innerHTML = '';
+      }
+
+      // debounced trigger method
+      // custom debouncer to use a different timer per type
+
+    }, {
+      key: 'trigger',
+      value: function trigger() {
+        var options = this._get('options');
+        var pubsoup = this._get('pubsoup');
+        var timers = {};
+
+        return function (topic) {
+          var _arguments = arguments;
+
+          var _ref = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+
+          var _ref$type = _ref.type;
+          var type = _ref$type === undefined ? 'default' : _ref$type;
+
+          clearTimeout(timers[type]);
+
+          timers[type] = setTimeout(function () {
+            pubsoup.publish.apply(pubsoup, _arguments);
+          }, options.debounce);
+        };
       }
     }]);
     return Jotted;

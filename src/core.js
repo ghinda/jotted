@@ -79,8 +79,9 @@ class Jotted {
       this.markup(type)
     }
 
-    // change events
+    // textarea change events
     $container.addEventListener('keyup', util.debounce(this.change.bind(this), options.debounce))
+    $container.addEventListener('change', util.debounce(this.change.bind(this), options.debounce))
 
     // pane change
     $container.addEventListener('click', this.pane.bind(this))

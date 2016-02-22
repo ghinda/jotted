@@ -467,6 +467,8 @@
         // always cache the latest code
         this.code[params.type] = params;
 
+        console.log(params.content);
+
         // replace the params with the latest cache
         if (this.cache[params.type]) {
           callback(null, this.cache[params.type]);
@@ -1178,8 +1180,9 @@
         this.markup(type);
       }
 
-      // change events
+      // textarea change events
       $container.addEventListener('keyup', debounce(this.change.bind(this), options.debounce));
+      $container.addEventListener('change', debounce(this.change.bind(this), options.debounce));
 
       // pane change
       $container.addEventListener('click', this.pane.bind(this));

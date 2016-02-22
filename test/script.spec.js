@@ -118,6 +118,8 @@ describe('Script', function () {
   })
 
   it('should run js only after all inline scripts are loaded', function (done) {
+    this.timeout(10000)
+
     jotted.script = new Jotted(dom.$script, {
       files: [{
         type: 'html',

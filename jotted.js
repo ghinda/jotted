@@ -467,8 +467,6 @@
         // always cache the latest code
         this.code[params.type] = params;
 
-        console.log(params.content);
-
         // replace the params with the latest cache
         if (this.cache[params.type]) {
           callback(null, this.cache[params.type]);

@@ -163,13 +163,14 @@ jotted-nav-item,
 .jotted-button {
   padding: 0 1em;
   border: 1px solid #ccc;
-  background: rgba(230,230,230,0.6);
+  background: rgba(236,236,236,0.92);
+  background: linear-gradient(rgba(249,249,249,0.92), rgba(236,236,236,0.92));
   border-radius: 2px;
   cursor: pointer;
   line-height: 1.6em;
 }
 .jotted-button:hover {
-  background: #ececec;
+  background: #f9f9f9;
 }
 /* plugins
  */
@@ -256,8 +257,8 @@ jotted-nav-item,
 }
 .jotted-button-play {
   position: absolute;
-  top: 0.4em;
-  right: 0.4em;
+  top: 0.52em;
+  right: 0.52em;
   z-index: 3;
 }
 /* themes

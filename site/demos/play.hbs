@@ -4,6 +4,17 @@ title: Play Plugin
 demo: true
 ---
 
+<p>
+  The <strong>play</strong> plugin disables auto-run and adds a <strong>Run</strong> button that manually updates the preview iframe.
+</p>
+
+<link rel="stylesheet" href="../bower_components/codemirror/lib/codemirror.css">
+<script src="../bower_components/codemirror/lib/codemirror.js"></script>
+<script src="../bower_components/codemirror/mode/javascript/javascript.js"></script>
+<script src="../bower_components/codemirror/mode/css/css.js"></script>
+<script src="../bower_components/codemirror/mode/xml/xml.js"></script>
+<script src="../bower_components/codemirror/mode/htmlmixed/htmlmixed.js"></script>
+
 <div id="jotted-demo-play" class="jotted-theme-bin"></div>
 
 <link href="../jotted.css" rel="stylesheet">
@@ -13,11 +24,16 @@ demo: true
     files: [
       {
         type: 'html',
-        content: 'test'
+        content: '<h1>\n  Play Plugin\n</h1>'
+      },
+      {
+        type: 'css',
+        content: 'body {\n  background: yellow;\n}'
       }
     ],
     plugins: [
-      'play'
+      'play',
+      'codemirror'
     ]
   });
 </script>

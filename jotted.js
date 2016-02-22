@@ -465,14 +465,14 @@
       key: 'change',
       value: function change(params, callback) {
         // always cache the latest code
-        this.code[params.type] = params;
+        this.code[params.type] = extend(params);
 
         // replace the params with the latest cache
         if (this.cache[params.type]) {
           callback(null, this.cache[params.type]);
         } else {
           // cache the first run
-          this.cache[params.type] = params;
+          this.cache[params.type] = extend(params);
 
           callback(null, params);
         }
@@ -483,7 +483,7 @@
         // trigger change on each type with the latest code
         for (var type in this.code) {
           // update the cache with the latest code
-          this.cache[type] = this.code[type];
+          this.cache[type] = extend(this.code[type]);
 
           // trigger the change
           this.jotted.trigger('change', this.code[type]);

@@ -3,6 +3,8 @@
 
 // register bundled plugins
 import PluginRender from './plugins/render.js'
+import PluginScriptless from './plugins/scriptless.js'
+
 import PluginAce from './plugins/ace.js'
 import PluginCodeMirror from './plugins/codemirror.js'
 import PluginLess from './plugins/less.js'
@@ -15,6 +17,8 @@ import PluginPlay from './plugins/play.js'
 
 export default function BundlePlugins (jotted) {
   jotted.plugin('render', PluginRender)
+  jotted.plugin('scriptless', PluginScriptless)
+
   jotted.plugin('ace', PluginAce)
   jotted.plugin('codemirror', PluginCodeMirror)
   jotted.plugin('less', PluginLess)

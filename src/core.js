@@ -35,6 +35,11 @@ class Jotted {
     // the render plugin is mandatory
     options.plugins.push('render')
 
+    // use the scriptless plugin if runScripts is false
+    if (options.runScripts === false) {
+      options.plugins.push('scriptless')
+    }
+
     // PubSoup
     var pubsoup = this._set('pubsoup', new PubSoup())
 

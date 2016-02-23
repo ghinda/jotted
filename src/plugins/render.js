@@ -26,7 +26,7 @@ export default class PluginRender {
       js: ''
     }
 
-     // TODO remove on each run?
+    // catch domready events from the iframe
     window.addEventListener('message', this.domready.bind(this))
 
     // render on each change
@@ -42,46 +42,35 @@ export default class PluginRender {
   }
 
   change (params, callback) {
-//     var options = this._get('options')
-
     // cache manipulated content
     this.content[params.type] = params.content
 
-    // don't execute script tags
-//     if (!options.runScripts) {
-//       // for IE9 support, remove the script tags from HTML content.
-//       // when we stop supporting IE9, we can use the sandbox attribute.
-//       var fragment = document.createElement('div')
-//       fragment.innerHTML = cachedContent['html']
-//
-//       // remove all script tags
-//       var $scripts = fragment.querySelectorAll('script')
-//       for (let i = 0; i < $scripts.length; i++) {
-//         $scripts[i].parentNode.removeChild($scripts[i])
-//       }
-//
-//       cachedContent['html'] = fragment.innerHTML
-//     }
-
+    // because messages sent with postMessage are not destroyed
+    // when re-rendering the iframe, we'll get multiple messages,
+    // from destroyed iframes.
+    // we need to manually keep track of the latest render,
+    // and only consider a single domready event for it.
     this.renderIndex++
 
-    var load = `function () {
+    // inject the domcontentloaded script to know
+    // when the iframe is rendered.
+    var domContentLoadedScript = `<script>
+    (function () {
       window.addEventListener('DOMContentLoaded', function () {
         window.parent.postMessage(JSON.stringify({
           type: 'jotted-dom-ready',
           renderIndex: ${this.renderIndex}
         }), '*')
       })
-    }`
+    }())
+    </script>`
+    this.content['html'] += domContentLoadedScript
 
-    var scriptTag = `<script>(${load})();</script>`
-    this.content['html'] += scriptTag
-
+    // check existing and to-be-rendered content
     var oldFrameContent = this.frameContent
     var frameContent = template.frameContent(this.content['css'], this.content['html'], this.content['js'])
 
-    // don't render,
-    // if previous and new frame content are the same.
+    // don't render if previous and new frame content are the same.
     // mostly for the `play` plugin,
     // so we don't re-render the same content on each change.
     if (frameContent === oldFrameContent) {
@@ -89,7 +78,8 @@ export default class PluginRender {
       return
     }
 
-    // TODO set private global
+    // cache the current callback as a global,
+    // so we can call it from the message callback.
     this.latestCallback = function () {
       callback(null, params)
     }
@@ -121,9 +111,12 @@ export default class PluginRender {
     }
 
     var data = JSON.parse(e.data)
-    // TODO document renderIndex
+    // we manually keep track of the last render index.
+    // see why above.
+    // e.source is unreliable, because it reports the new window object
+    // even if it comes from an already-destroyed iframe.
     if (
-      this.renderIndex !== data.renderIndex &&
+      this.renderIndex === data.renderIndex &&
       data.type === 'jotted-dom-ready'
     ) {
       this.latestCallback()

@@ -75,14 +75,11 @@ describe('Console Plugin', function () {
       plugins: ['console']
     })
 
-    var $iframe = dom.$console.querySelector('iframe')
-    $iframe.onload = function () {
+    jotted.console.done('change', function () {
       // give it a second for the postMessage to go around
-      setTimeout(function () {
+      setTimeout(window.util.check(done, function () {
         expect(dom.$console.querySelector('.jotted-console-output').innerHTML).to.contain('someString')
-
-        done()
-      }, 200)
-    }
+      }), 200)
+    })
   })
 })

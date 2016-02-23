@@ -107,21 +107,33 @@ describe('Core', function () {
     })
 
     var changeEvent = document.createEvent('Event')
-    changeEvent.initEvent('DOMContentLoaded', true, true)
+    changeEvent.initEvent('change', true, true)
 
     var $textareaJS = dom.$editor.querySelector('.jotted-pane-js textarea')
-    $textareaJS.value = 'document.querySelector("h1").innerHTML = "Different Heading"'
-    $textareaJS.dispatchEvent(changeEvent)
 
-    $textareaJS.value = ''
-    $textareaJS.dispatchEvent(changeEvent)
+    // first render
+    var change1 = function () {
+      jotted.core.off('change', change1)
+      jotted.core.done('change', change2)
 
-    var $iframe = dom.$editor.querySelector('.jotted-pane-result iframe')
-
-    $iframe.onload = function () {
-      expect(dom.$editor.querySelector('.jotted-pane-result iframe').contentWindow.document.querySelector('h1').innerHTML).to.equal('Default Heading')
-      done()
+      $textareaJS.value = 'document.querySelector("h1").innerHTML = "Different Heading"'
+      $textareaJS.dispatchEvent(changeEvent)
     }
+
+    // second render
+    var change2 = function () {
+      jotted.core.off('change', change2)
+      jotted.core.done('change', checkContent)
+
+      $textareaJS.value = ''
+      $textareaJS.dispatchEvent(changeEvent)
+    }
+
+    var checkContent = window.util.check(done, function () {
+      expect(dom.$editor.querySelector('.jotted-pane-result iframe').contentWindow.document.querySelector('h1').innerHTML).to.equal('Default Heading')
+    })
+
+    jotted.core.done('change', change1)
   })
 
   it('should show all pane nav tabs when using showBlank', function () {

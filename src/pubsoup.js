@@ -25,26 +25,36 @@ export default class PubSoup {
     })
   }
 
-  unsubscribe (topic, subscriber) {
-    var foundTopic = this.find(topic)
-    foundTopic.forEach(function (t) {
-      // if no subscriber is specified
-      // remove all subscribers
-      if (!subscriber) {
-        t.length = 0
+  // removes a function from an array
+  remover (arr, fn) {
+    arr.forEach(function () {
+      // if no fn is specified
+      // clean-up the array
+      if (!fn) {
+        arr.length = 0
         return
       }
 
-      // find the subscriber in the topic
-      var index = [].indexOf.call(t, subscriber)
+      // find the fn in the arr
+      var index = [].indexOf.call(arr, fn)
 
-      // show an error if we didn't find the subscriber
+      // we didn't find it in the array
       if (index === -1) {
-        return util.log('Subscriber not found in topic')
+        return
       }
 
-      t.splice(index, 1)
+      arr.splice(index, 1)
     })
+  }
+
+  unsubscribe (topic, subscriber) {
+    // remove from subscribers
+    var foundTopic = this.find(topic)
+    this.remover(foundTopic, subscriber)
+
+    // remove from callbacks
+    this.callbacks[topic] = this.callbacks[topic] || []
+    this.remover(this.callbacks[topic], subscriber)
   }
 
   // sequentially runs a method on all plugins

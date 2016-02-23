@@ -201,10 +201,6 @@
     };
   }
 
-  function log() {
-    console.log(arguments);
-  }
-
   function hasClass(node, className) {
     if (!node.className) {
       return false;
@@ -359,28 +355,41 @@
           return a._priority > b._priority ? 1 : b._priority > a._priority ? -1 : 0;
         });
       }
+
+      // removes a function from an array
+
     }, {
-      key: 'unsubscribe',
-      value: function unsubscribe(topic, subscriber) {
-        var foundTopic = this.find(topic);
-        foundTopic.forEach(function (t) {
-          // if no subscriber is specified
-          // remove all subscribers
-          if (!subscriber) {
-            t.length = 0;
+      key: 'remover',
+      value: function remover(arr, fn) {
+        arr.forEach(function () {
+          // if no fn is specified
+          // clean-up the array
+          if (!fn) {
+            arr.length = 0;
             return;
           }
 
-          // find the subscriber in the topic
-          var index = [].indexOf.call(t, subscriber);
+          // find the fn in the arr
+          var index = [].indexOf.call(arr, fn);
 
-          // show an error if we didn't find the subscriber
+          // we didn't find it in the array
           if (index === -1) {
-            return log('Subscriber not found in topic');
+            return;
           }
 
-          t.splice(index, 1);
+          arr.splice(index, 1);
         });
+      }
+    }, {
+      key: 'unsubscribe',
+      value: function unsubscribe(topic, subscriber) {
+        // remove from subscribers
+        var foundTopic = this.find(topic);
+        this.remover(foundTopic, subscriber);
+
+        // remove from callbacks
+        this.callbacks[topic] = this.callbacks[topic] || [];
+        this.remover(this.callbacks[topic], subscriber);
       }
 
       // sequentially runs a method on all plugins
@@ -486,7 +495,7 @@
           this.cache[type] = extend(this.code[type]);
 
           // trigger the change
-          this.jotted.trigger('change', this.code[type]);
+          this.jotted.trigger('change', this.cache[type]);
         }
       }
     }]);
@@ -943,6 +952,78 @@
     return PluginLess;
   }();
 
+  var PluginCodeMirror = function () {
+    function PluginCodeMirror(jotted, options) {
+      babelHelpers.classCallCheck(this, PluginCodeMirror);
+
+      var priority = 1;
+      var i;
+
+      this.editor = {};
+      this.jotted = jotted;
+
+      // custom modemap for codemirror
+      var modemap = {
+        'html': 'htmlmixed'
+      };
+
+      options = extend(options, {
+        lineNumbers: true
+      });
+
+      // check if CodeMirror is loaded
+      if (typeof window.CodeMirror === 'undefined') {
+        return;
+      }
+
+      var $editors = jotted.$container.querySelectorAll('.jotted-editor');
+
+      for (i = 0; i < $editors.length; i++) {
+        var $textarea = $editors[i].querySelector('textarea');
+        var type = data($textarea, 'jotted-type');
+        var file = data($textarea, 'jotted-file');
+
+        this.editor[type] = window.CodeMirror.fromTextArea($textarea, options);
+        this.editor[type].setOption('mode', getMode(type, file, modemap));
+      }
+
+      jotted.on('change', this.change.bind(this), priority);
+    }
+
+    babelHelpers.createClass(PluginCodeMirror, [{
+      key: 'editorChange',
+      value: function editorChange(params) {
+        var _this = this;
+
+        return function () {
+          // trigger a change event
+          _this.jotted.trigger('change', params);
+        };
+      }
+    }, {
+      key: 'change',
+      value: function change(params, callback) {
+        var editor = this.editor[params.type];
+
+        // if the event is not started by the codemirror change.
+        // triggered only once per editor,
+        // when the textarea is populated/file is loaded.
+        if (!params.cmEditor) {
+          editor.setValue(params.content);
+
+          // attach the event only after the file is loaded
+          params.cmEditor = editor;
+          editor.on('change', this.editorChange(params));
+        }
+
+        // manipulate the params and pass them on
+        params.content = editor.getValue();
+        callback(null, params);
+      }
+    }]);
+    return PluginCodeMirror;
+  }();
+
   var PluginAce = function () {
     function PluginAce(jotted, options) {
       babelHelpers.classCallCheck(this, PluginAce);
@@ -1017,81 +1098,137 @@
     return PluginAce;
   }();
 
-  var PluginCodeMirror = function () {
-    function PluginCodeMirror(jotted, options) {
-      babelHelpers.classCallCheck(this, PluginCodeMirror);
+  var PluginRender = function () {
+    function PluginRender(jotted, options) {
+      babelHelpers.classCallCheck(this, PluginRender);
 
-      var priority = 1;
-      var i;
+      options = extend(options, {});
 
-      this.editor = {};
-      this.jotted = jotted;
+      // latest render number
+      var renderIndex = 0;
 
-      // custom modemap for codemirror
-      var modemap = {
-        'html': 'htmlmixed'
+      // iframe srcdoc support
+      var supportSrcdoc = !!('srcdoc' in document.createElement('iframe'));
+      var $resultFrame = jotted.$container.querySelector('.jotted-pane-result iframe');
+
+      var frameContent$$ = '';
+      var latestCallback = function latestCallback() {};
+
+      // cached content
+      var content = {
+        html: '',
+        css: '',
+        js: ''
       };
 
-      options = extend(options, {
-        lineNumbers: true
-      });
+      // TODO remove on each run?
+      window.addEventListener('message', this.domready.bind(this));
 
-      // check if CodeMirror is loaded
-      if (typeof window.CodeMirror === 'undefined') {
-        return;
-      }
+      // render on each change
+      jotted.on('change', this.change.bind(this), 100);
 
-      var $editors = jotted.$container.querySelectorAll('.jotted-editor');
-
-      for (i = 0; i < $editors.length; i++) {
-        var $textarea = $editors[i].querySelector('textarea');
-        var type = data($textarea, 'jotted-type');
-        var file = data($textarea, 'jotted-file');
-
-        this.editor[type] = window.CodeMirror.fromTextArea($textarea, options);
-        this.editor[type].setOption('mode', getMode(type, file, modemap));
-      }
-
-      jotted.on('change', this.change.bind(this), priority);
+      // public
+      this.supportSrcdoc = supportSrcdoc;
+      this.renderIndex = renderIndex;
+      this.latestCallback = latestCallback;
+      this.content = content;
+      this.frameContent = frameContent$$;
+      this.$resultFrame = $resultFrame;
     }
 
-    babelHelpers.createClass(PluginCodeMirror, [{
-      key: 'editorChange',
-      value: function editorChange(params) {
-        var _this = this;
-
-        return function () {
-          // trigger a change event
-          _this.jotted.trigger('change', params);
-        };
-      }
-    }, {
+    babelHelpers.createClass(PluginRender, [{
       key: 'change',
       value: function change(params, callback) {
-        var editor = this.editor[params.type];
+        //     var options = this._get('options')
 
-        // if the event is not started by the codemirror change.
-        // triggered only once per editor,
-        // when the textarea is populated/file is loaded.
-        if (!params.cmEditor) {
-          editor.setValue(params.content);
+        // cache manipulated content
+        this.content[params.type] = params.content;
 
-          // attach the event only after the file is loaded
-          params.cmEditor = editor;
-          editor.on('change', this.editorChange(params));
+        // don't execute script tags
+        //     if (!options.runScripts) {
+        //       // for IE9 support, remove the script tags from HTML content.
+        //       // when we stop supporting IE9, we can use the sandbox attribute.
+        //       var fragment = document.createElement('div')
+        //       fragment.innerHTML = cachedContent['html']
+        //
+        //       // remove all script tags
+        //       var $scripts = fragment.querySelectorAll('script')
+        //       for (let i = 0; i < $scripts.length; i++) {
+        //         $scripts[i].parentNode.removeChild($scripts[i])
+        //       }
+        //
+        //       cachedContent['html'] = fragment.innerHTML
+        //     }
+
+        this.renderIndex++;
+
+        var load = 'function () {\n      window.addEventListener(\'DOMContentLoaded\', function () {\n        window.parent.postMessage(JSON.stringify({\n          type: \'jotted-dom-ready\',\n          renderIndex: ' + this.renderIndex + '\n        }), \'*\')\n      })\n    }';
+
+        var scriptTag = '<script>(' + load + ')();</script>';
+        this.content['html'] += scriptTag;
+
+        var oldFrameContent = this.frameContent;
+        var frameContent$$ = frameContent(this.content['css'], this.content['html'], this.content['js']);
+
+        // don't render,
+        // if previous and new frame content are the same.
+        // mostly for the `play` plugin,
+        // so we don't re-render the same content on each change.
+        if (frameContent$$ === oldFrameContent) {
+          callback(null, params);
+          return;
         }
 
-        // manipulate the params and pass them on
-        params.content = editor.getValue();
-        callback(null, params);
+        // TODO set private global
+        this.latestCallback = function () {
+          console.log('domreadycallback');
+          callback(null, params);
+        };
+
+        this.$resultFrame.setAttribute('srcdoc', frameContent$$);
+
+        // older browsers without iframe srcset support (IE9)
+        if (!this.supportSrcdoc) {
+          // tips from https://github.com/jugglinmike/srcdoc-polyfill
+          // Copyright (c) 2012 Mike Pennisi
+          // Licensed under the MIT license.
+          var jsUrl = 'javascript:window.frameElement.getAttribute("srcdoc");';
+
+          this.$resultFrame.setAttribute('src', jsUrl);
+
+          // Explicitly set the iFrame's window.location for
+          // compatibility with IE9, which does not react to changes in
+          // the `src` attribute when it is a `javascript:` URL.
+          if (this.$resultFrame.contentWindow) {
+            this.$resultFrame.contentWindow.location = jsUrl;
+          }
+        }
+      }
+    }, {
+      key: 'domready',
+      value: function domready(e) {
+        // only catch messages from the iframe
+        if (e.source !== this.$resultFrame.contentWindow) {
+          return;
+        }
+
+        var data = JSON.parse(e.data);
+        if (this.renderIndex !== data.renderIndex) {
+          return;
+        }
+
+        if (data.type === 'jotted-dom-ready') {
+          this.latestCallback();
+        }
       }
     }]);
-    return PluginCodeMirror;
+    return PluginRender;
   }();
 
   function BundlePlugins(jotted) {
-    jotted.plugin('codemirror', PluginCodeMirror);
+    jotted.plugin('render', PluginRender);
     jotted.plugin('ace', PluginAce);
+    jotted.plugin('codemirror', PluginCodeMirror);
     jotted.plugin('less', PluginLess);
     jotted.plugin('coffeescript', PluginCoffeeScript);
     jotted.plugin('stylus', PluginStylus);
@@ -1129,6 +1266,9 @@
         plugins: []
       }));
 
+      // the render plugin is mandatory
+      options.plugins.push('render');
+
       // PubSoup
       var pubsoup = this._set('pubsoup', new PubSoup());
 
@@ -1143,31 +1283,18 @@
         pubsoup.done.apply(pubsoup, arguments);
       });
 
-      // iframe srcdoc support
-      this._set('supportSrcdoc', !!('srcdoc' in document.createElement('iframe')));
-
-      // done change on all subscribers,
-      // render the results.
-      done('change', this.changeCallback.bind(this));
+      // after all plugins run
+      // show errors
+      done('change', this.errors.bind(this));
 
       // DOM
       var $container = this._set('$container', $jottedContainer);
       $container.innerHTML = container();
       addClass($container, containerClass());
 
-      var $resultFrame = $container.querySelector('.jotted-pane-result iframe');
-      this._set('$resultFrame', $resultFrame);
-
       // default pane
       var paneActive = this._set('paneActive', options.pane);
       addClass($container, paneActiveClass(paneActive));
-
-      // file content caching
-      this._set('content', {
-        html: '',
-        css: '',
-        js: ''
-      });
 
       // status nodes
       this._set('$status', {});
@@ -1178,9 +1305,15 @@
         this.markup(type);
       }
 
-      // textarea change events
-      $container.addEventListener('keyup', debounce(this.change.bind(this), options.debounce));
-      $container.addEventListener('change', debounce(this.change.bind(this), options.debounce));
+      // textarea change events.
+      // allow disabling the debouncer, mostly for testing.
+      if (options.debounce === false) {
+        $container.addEventListener('keyup', this.change.bind(this));
+        $container.addEventListener('change', this.change.bind(this));
+      } else {
+        $container.addEventListener('keyup', debounce(this.change.bind(this), options.debounce));
+        $container.addEventListener('change', debounce(this.change.bind(this), options.debounce));
+      }
 
       // pane change
       $container.addEventListener('click', this.pane.bind(this));
@@ -1323,62 +1456,9 @@
         });
       }
     }, {
-      key: 'changeCallback',
-      value: function changeCallback(errors, params) {
-        this.status('error', errors, params);
-        var options = this._get('options');
-        var supportSrcdoc = this._get('supportSrcdoc');
-        var $resultFrame = this._get('$resultFrame');
-
-        // cache manipulated content
-        var cachedContent = this._get('content');
-        cachedContent[params.type] = params.content;
-
-        // don't execute script tags
-        if (!options.runScripts) {
-          // for IE9 support, remove the script tags from HTML content.
-          // when we stop supporting IE9, we can use the sandbox attribute.
-          var fragment = document.createElement('div');
-          fragment.innerHTML = cachedContent['html'];
-
-          // remove all script tags
-          var $scripts = fragment.querySelectorAll('script');
-          for (var i = 0; i < $scripts.length; i++) {
-            $scripts[i].parentNode.removeChild($scripts[i]);
-          }
-
-          cachedContent['html'] = fragment.innerHTML;
-        }
-
-        var oldFrameContent = this._get('frameContent');
-        var frameContent$$ = this._set('frameContent', frameContent(cachedContent['css'], cachedContent['html'], cachedContent['js']));
-
-        // don't render,
-        // if previous and new frame content are the same.
-        // mostly for the `play` plugin,
-        // so we don't re-render the same content on each change.
-        if (frameContent$$ === oldFrameContent) {
-          return;
-        }
-
-        $resultFrame.setAttribute('srcdoc', frameContent$$);
-
-        // older browsers without iframe srcset support (IE9)
-        if (!supportSrcdoc) {
-          // tips from https://github.com/jugglinmike/srcdoc-polyfill
-          // Copyright (c) 2012 Mike Pennisi
-          // Licensed under the MIT license.
-          var jsUrl = 'javascript:window.frameElement.getAttribute("srcdoc");';
-
-          $resultFrame.setAttribute('src', jsUrl);
-
-          // Explicitly set the iFrame's window.location for
-          // compatibility with IE9, which does not react to changes in
-          // the `src` attribute when it is a `javascript:` URL.
-          if ($resultFrame.contentWindow) {
-            $resultFrame.contentWindow.location = jsUrl;
-          }
-        }
+      key: 'errors',
+      value: function errors(errs, params) {
+        this.status('error', errs, params);
       }
     }, {
       key: 'pane',

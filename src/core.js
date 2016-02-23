@@ -32,6 +32,9 @@ class Jotted {
       plugins: []
     }))
 
+    // the render plugin is mandatory
+    options.plugins.push('render')
+
     // PubSoup
     var pubsoup = this._set('pubsoup', new PubSoup())
 
@@ -46,31 +49,18 @@ class Jotted {
       pubsoup.done.apply(pubsoup, arguments)
     })
 
-    // iframe srcdoc support
-    this._set('supportSrcdoc', !!('srcdoc' in document.createElement('iframe')))
-
-    // done change on all subscribers,
-    // render the results.
-    done('change', this.changeCallback.bind(this))
+    // after all plugins run
+    // show errors
+    done('change', this.errors.bind(this))
 
     // DOM
     var $container = this._set('$container', $jottedContainer)
     $container.innerHTML = template.container()
     util.addClass($container, template.containerClass())
 
-    var $resultFrame = $container.querySelector('.jotted-pane-result iframe')
-    this._set('$resultFrame', $resultFrame)
-
     // default pane
     var paneActive = this._set('paneActive', options.pane)
     util.addClass($container, template.paneActiveClass(paneActive))
-
-    // file content caching
-    this._set('content', {
-      html: '',
-      css: '',
-      js: ''
-    })
 
     // status nodes
     this._set('$status', {})
@@ -79,9 +69,15 @@ class Jotted {
       this.markup(type)
     }
 
-    // textarea change events
-    $container.addEventListener('keyup', util.debounce(this.change.bind(this), options.debounce))
-    $container.addEventListener('change', util.debounce(this.change.bind(this), options.debounce))
+    // textarea change events.
+    // allow disabling the debouncer, mostly for testing.
+    if (options.debounce === false) {
+      $container.addEventListener('keyup', this.change.bind(this))
+      $container.addEventListener('change', this.change.bind(this))
+    } else {
+      $container.addEventListener('keyup', util.debounce(this.change.bind(this), options.debounce))
+      $container.addEventListener('change', util.debounce(this.change.bind(this), options.debounce))
+    }
 
     // pane change
     $container.addEventListener('click', this.pane.bind(this))
@@ -211,61 +207,8 @@ class Jotted {
     })
   }
 
-  changeCallback (errors, params) {
-    this.status('error', errors, params)
-    var options = this._get('options')
-    var supportSrcdoc = this._get('supportSrcdoc')
-    var $resultFrame = this._get('$resultFrame')
-
-    // cache manipulated content
-    var cachedContent = this._get('content')
-    cachedContent[params.type] = params.content
-
-    // don't execute script tags
-    if (!options.runScripts) {
-      // for IE9 support, remove the script tags from HTML content.
-      // when we stop supporting IE9, we can use the sandbox attribute.
-      var fragment = document.createElement('div')
-      fragment.innerHTML = cachedContent['html']
-
-      // remove all script tags
-      var $scripts = fragment.querySelectorAll('script')
-      for (let i = 0; i < $scripts.length; i++) {
-        $scripts[i].parentNode.removeChild($scripts[i])
-      }
-
-      cachedContent['html'] = fragment.innerHTML
-    }
-
-    var oldFrameContent = this._get('frameContent')
-    var frameContent = this._set('frameContent', template.frameContent(cachedContent['css'], cachedContent['html'], cachedContent['js']))
-
-    // don't render,
-    // if previous and new frame content are the same.
-    // mostly for the `play` plugin,
-    // so we don't re-render the same content on each change.
-    if (frameContent === oldFrameContent) {
-      return
-    }
-
-    $resultFrame.setAttribute('srcdoc', frameContent)
-
-    // older browsers without iframe srcset support (IE9)
-    if (!supportSrcdoc) {
-      // tips from https://github.com/jugglinmike/srcdoc-polyfill
-      // Copyright (c) 2012 Mike Pennisi
-      // Licensed under the MIT license.
-      var jsUrl = 'javascript:window.frameElement.getAttribute("srcdoc");'
-
-      $resultFrame.setAttribute('src', jsUrl)
-
-      // Explicitly set the iFrame's window.location for
-      // compatibility with IE9, which does not react to changes in
-      // the `src` attribute when it is a `javascript:` URL.
-      if ($resultFrame.contentWindow) {
-        $resultFrame.contentWindow.location = jsUrl
-      }
-    }
+  errors (errs, params) {
+    this.status('error', errs, params)
   }
 
   pane (e) {

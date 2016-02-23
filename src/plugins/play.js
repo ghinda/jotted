@@ -53,7 +53,7 @@ export default class PluginPlay {
       this.cache[type] = util.extend(this.code[type])
 
       // trigger the change
-      this.jotted.trigger('change', this.code[type])
+      this.jotted.trigger('change', this.cache[type])
     }
   }
 }

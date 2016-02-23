@@ -43,12 +43,12 @@ export default class PluginRender {
 
     // check existing and to-be-rendered content
     var oldFrameContent = this.frameContent
-    var frameContent = template.frameContent(this.content['css'], this.content['html'], this.content['js'])
+    this.frameContent = template.frameContent(this.content['css'], this.content['html'], this.content['js'])
 
     // don't render if previous and new frame content are the same.
     // mostly for the `play` plugin,
     // so we don't re-render the same content on each change.
-    if (frameContent === oldFrameContent) {
+    if (this.frameContent === oldFrameContent) {
       callback(null, params)
       return
     }
@@ -59,7 +59,7 @@ export default class PluginRender {
       callback(null, params)
     }
 
-    this.$resultFrame.setAttribute('srcdoc', frameContent)
+    this.$resultFrame.setAttribute('srcdoc', this.frameContent)
 
     // older browsers without iframe srcset support (IE9)
     if (!this.supportSrcdoc) {

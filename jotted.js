@@ -1159,7 +1159,7 @@
       var supportSrcdoc = !!('srcdoc' in document.createElement('iframe'));
       var $resultFrame = jotted.$container.querySelector('.jotted-pane-result iframe');
 
-      var frameContent$$ = '';
+      var frameContent = '';
       var latestCallback = function latestCallback() {};
 
       // cached content
@@ -1179,7 +1179,7 @@
       this.supportSrcdoc = supportSrcdoc;
       this.latestCallback = latestCallback;
       this.content = content;
-      this.frameContent = frameContent$$;
+      this.frameContent = frameContent;
       this.$resultFrame = $resultFrame;
     }
 
@@ -1191,12 +1191,12 @@
 
         // check existing and to-be-rendered content
         var oldFrameContent = this.frameContent;
-        var frameContent$$ = frameContent(this.content['css'], this.content['html'], this.content['js']);
+        this.frameContent = frameContent(this.content['css'], this.content['html'], this.content['js']);
 
         // don't render if previous and new frame content are the same.
         // mostly for the `play` plugin,
         // so we don't re-render the same content on each change.
-        if (frameContent$$ === oldFrameContent) {
+        if (this.frameContent === oldFrameContent) {
           callback(null, params);
           return;
         }
@@ -1207,7 +1207,7 @@
           callback(null, params);
         };
 
-        this.$resultFrame.setAttribute('srcdoc', frameContent$$);
+        this.$resultFrame.setAttribute('srcdoc', this.frameContent);
 
         // older browsers without iframe srcset support (IE9)
         if (!this.supportSrcdoc) {

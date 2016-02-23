@@ -75,11 +75,8 @@ describe('Console Plugin', function () {
       plugins: ['console']
     })
 
-    jotted.console.done('change', function () {
-      // give it a second for the postMessage to go around
-      setTimeout(window.util.check(done, function () {
-        expect(dom.$console.querySelector('.jotted-console-output').innerHTML).to.contain('someString')
-      }), 200)
-    })
+    jotted.console.done('change', window.util.check(done, function () {
+      expect(dom.$console.querySelector('.jotted-console-output').innerHTML).to.contain('someString')
+    }))
   })
 })

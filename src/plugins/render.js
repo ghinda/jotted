@@ -9,9 +9,6 @@ export default class PluginRender {
   constructor (jotted, options) {
     options = util.extend(options, {})
 
-    // latest render number
-    var renderIndex = 0
-
     // iframe srcdoc support
     var supportSrcdoc = !!('srcdoc' in document.createElement('iframe'))
     var $resultFrame = jotted.$container.querySelector('.jotted-pane-result iframe')
@@ -34,7 +31,6 @@ export default class PluginRender {
 
     // public
     this.supportSrcdoc = supportSrcdoc
-    this.renderIndex = renderIndex
     this.latestCallback = latestCallback
     this.content = content
     this.frameContent = frameContent
@@ -44,27 +40,6 @@ export default class PluginRender {
   change (params, callback) {
     // cache manipulated content
     this.content[params.type] = params.content
-
-    // because messages sent with postMessage are not destroyed
-    // when re-rendering the iframe, we'll get multiple messages,
-    // from destroyed iframes.
-    // we need to manually keep track of the latest render,
-    // and only consider a single domready event for it.
-    this.renderIndex++
-
-    // inject the domcontentloaded script to know
-    // when the iframe is rendered.
-    var domContentLoadedScript = `<script>
-    (function () {
-      window.addEventListener('DOMContentLoaded', function () {
-        window.parent.postMessage(JSON.stringify({
-          type: 'jotted-dom-ready',
-          renderIndex: ${this.renderIndex}
-        }), '*')
-      })
-    }())
-    </script>`
-    this.content['html'] += domContentLoadedScript
 
     // check existing and to-be-rendered content
     var oldFrameContent = this.frameContent
@@ -111,14 +86,7 @@ export default class PluginRender {
     }
 
     var data = JSON.parse(e.data)
-    // we manually keep track of the last render index.
-    // see why above.
-    // e.source is unreliable, because it reports the new window object
-    // even if it comes from an already-destroyed iframe.
-    if (
-      this.renderIndex === data.renderIndex &&
-      data.type === 'jotted-dom-ready'
-    ) {
+    if (data.type === 'jotted-dom-ready') {
       this.latestCallback()
     }
   }

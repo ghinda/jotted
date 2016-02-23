@@ -82,6 +82,16 @@ export function frameContent (style = '', body = '', script = '') {
       </head>
       <body>
         ${body}
+
+        <script>
+          (function () {
+            window.addEventListener('DOMContentLoaded', function () {
+              window.parent.postMessage(JSON.stringify({
+                type: 'jotted-dom-ready'
+              }), '*')
+            })
+          }())
+        </script>
         <script>${script}</script>
       </body>
     </html>

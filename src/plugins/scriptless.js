@@ -14,7 +14,7 @@ export default class PluginScriptless {
 
   change (params, callback) {
     if (params.type !== 'html') {
-      return
+      return callback(null, params)
     }
 
     // for IE9 support, remove the script tags from HTML content.
@@ -23,12 +23,14 @@ export default class PluginScriptless {
     fragment.innerHTML = params.content
 
     // remove all script tags
-    // TODO only remove script tags with valid types
+    // TODO only remove script tags with valid types that would be executed
     var $scripts = fragment.querySelectorAll('script')
     for (let i = 0; i < $scripts.length; i++) {
       $scripts[i].parentNode.removeChild($scripts[i])
     }
 
     params.content = fragment.innerHTML
+
+    callback(null, params)
   }
 }

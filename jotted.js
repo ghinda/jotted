@@ -87,7 +87,7 @@
     var body = arguments.length <= 1 || arguments[1] === undefined ? '' : arguments[1];
     var script = arguments.length <= 2 || arguments[2] === undefined ? '' : arguments[2];
 
-    return '\n    <!doctype html>\n    <html>\n      <head>\n        <style>' + style + '</style>\n      </head>\n      <body>\n        ' + body + '\n        <script>' + script + '</script>\n      </body>\n    </html>\n  ';
+    return '\n    <!doctype html>\n    <html>\n      <head>\n        <style>' + style + '</style>\n      </head>\n      <body>\n        ' + body + '\n\n        <script>\n          (function () {\n            window.addEventListener(\'DOMContentLoaded\', function () {\n              window.parent.postMessage(JSON.stringify({\n                type: \'jotted-dom-ready\'\n              }), \'*\')\n            })\n          }())\n        </script>\n        <script>' + script + '</script>\n      </body>\n    </html>\n  ';
   }
 
   function statusLoading(url) {
@@ -1112,7 +1112,7 @@
       key: 'change',
       value: function change(params, callback) {
         if (params.type !== 'html') {
-          return;
+          return callback(null, params);
         }
 
         // for IE9 support, remove the script tags from HTML content.
@@ -1121,13 +1121,15 @@
         fragment.innerHTML = params.content;
 
         // remove all script tags
-        // TODO only remove script tags with valid types
+        // TODO only remove script tags with valid types that would be executed
         var $scripts = fragment.querySelectorAll('script');
         for (var i = 0; i < $scripts.length; i++) {
           $scripts[i].parentNode.removeChild($scripts[i]);
         }
 
         params.content = fragment.innerHTML;
+
+        callback(null, params);
       }
     }]);
     return PluginScriptless;
@@ -1138,9 +1140,6 @@
       babelHelpers.classCallCheck(this, PluginRender);
 
       options = extend(options, {});
-
-      // latest render number
-      var renderIndex = 0;
 
       // iframe srcdoc support
       var supportSrcdoc = !!('srcdoc' in document.createElement('iframe'));
@@ -1164,7 +1163,6 @@
 
       // public
       this.supportSrcdoc = supportSrcdoc;
-      this.renderIndex = renderIndex;
       this.latestCallback = latestCallback;
       this.content = content;
       this.frameContent = frameContent$$;
@@ -1176,18 +1174,6 @@
       value: function change(params, callback) {
         // cache manipulated content
         this.content[params.type] = params.content;
-
-        // because messages sent with postMessage are not destroyed
-        // when re-rendering the iframe, we'll get multiple messages,
-        // from destroyed iframes.
-        // we need to manually keep track of the latest render,
-        // and only consider a single domready event for it.
-        this.renderIndex++;
-
-        // inject the domcontentloaded script to know
-        // when the iframe is rendered.
-        var domContentLoadedScript = '<script>\n    (function () {\n      window.addEventListener(\'DOMContentLoaded\', function () {\n        window.parent.postMessage(JSON.stringify({\n          type: \'jotted-dom-ready\',\n          renderIndex: ' + this.renderIndex + '\n        }), \'*\')\n      })\n    }())\n    </script>';
-        this.content['html'] += domContentLoadedScript;
 
         // check existing and to-be-rendered content
         var oldFrameContent = this.frameContent;
@@ -1235,11 +1221,7 @@
         }
 
         var data = JSON.parse(e.data);
-        // we manually keep track of the last render index.
-        // see why above.
-        // e.source is unreliable, because it reports the new window object
-        // even if it comes from an already-destroyed iframe.
-        if (this.renderIndex === data.renderIndex && data.type === 'jotted-dom-ready') {
+        if (data.type === 'jotted-dom-ready') {
           this.latestCallback();
         }
       }

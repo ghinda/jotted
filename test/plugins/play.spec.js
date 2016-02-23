@@ -61,7 +61,7 @@ describe('Play Plugin', function () {
         content: '<h1>Original</h1>'
       }],
       plugins: ['play'],
-      debounce: false
+      debounce: 0
     })
 
     var changeEvent = document.createEvent('Event')
@@ -80,16 +80,24 @@ describe('Play Plugin', function () {
       $textareaHTML.dispatchEvent(changeEvent)
     }
 
-    var change2 = function () {
+    var change2 = function (errs, params) {
       jotted.play.off('change', change2)
       jotted.play.done('change', checkContent)
 
       dom.$play.querySelector('.jotted-button-play').dispatchEvent(clickEvent)
     }
 
-    var checkContent = window.util.check(done, function () {
-      expect(dom.$play.querySelector('.jotted-pane-result   iframe').contentWindow.document.querySelector('h1').innerHTML).to.equal('Changed Text')
-    })
+    var checkContent = function (errs, params) {
+      // only after the html is rendered
+      if (params.type === 'html') {
+        try {
+          expect(dom.$play.querySelector('.jotted-pane-result   iframe').contentWindow.document.querySelector('h1').innerHTML).to.equal('Changed Text')
+          done()
+        } catch (err) {
+          done(err)
+        }
+      }
+    }
 
     jotted.play.done('change', change1)
   })

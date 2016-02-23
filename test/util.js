@@ -3,10 +3,11 @@
 
 window.util = (function () {
   function check (done, fn) {
-    var args = arguments
     var scope = this
 
     return function () {
+      var args = arguments
+
       try {
         fn.apply(scope, args)
         done()

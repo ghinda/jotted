@@ -1331,14 +1331,8 @@
       }
 
       // textarea change events.
-      // allow disabling the debouncer, mostly for testing.
-      if (options.debounce === false) {
-        $container.addEventListener('keyup', this.change.bind(this));
-        $container.addEventListener('change', this.change.bind(this));
-      } else {
-        $container.addEventListener('keyup', debounce(this.change.bind(this), options.debounce));
-        $container.addEventListener('change', debounce(this.change.bind(this), options.debounce));
-      }
+      $container.addEventListener('keyup', debounce(this.change.bind(this), options.debounce));
+      $container.addEventListener('change', debounce(this.change.bind(this), options.debounce));
 
       // pane change
       $container.addEventListener('click', this.pane.bind(this));

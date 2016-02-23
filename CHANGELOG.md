@@ -5,6 +5,8 @@
 * Add a slight gradient to the buttons used by plugins.
 * Listen to the `change` event on the textareas. Fixes issues with changing text without triggering `keyup` (cut/paste/blur).
 * Improvements to the change event debouncers. Fixes issues with change events with different `type`s being debounced as the same event.
+* Refactor the render the runScripts functionality as two separate plugins.
+* Lots of improvements to the rendering pipeline. `done('change', ..)` will now always trigger once the preview iframe dom has been rendered.
 * Don't re-render the preview iframe if the new change event has the same content as the one already rendered.
 
 

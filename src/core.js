@@ -40,6 +40,13 @@ class Jotted {
       options.plugins.push('scriptless')
     }
 
+    // cached content for the change method
+    this._set('cachedContent', {
+      html: '',
+      css: '',
+      js: ''
+    })
+
     // PubSoup
     var pubsoup = this._set('pubsoup', new PubSoup())
 
@@ -75,9 +82,6 @@ class Jotted {
     }
 
     // textarea change events.
-//     $container.addEventListener('keyup', this.change.bind(this))
-//     $container.addEventListener('change', this.change.bind(this))
-
     $container.addEventListener('keyup', util.debounce(this.change.bind(this), options.debounce))
     $container.addEventListener('change', util.debounce(this.change.bind(this), options.debounce))
 
@@ -197,15 +201,26 @@ class Jotted {
   }
 
   change (e) {
-    if (!util.data(e.target, 'jotted-type')) {
+    var type = util.data(e.target, 'jotted-type')
+    if (!type) {
       return
     }
 
+    // don't trigger change if the content hasn't changed.
+    // eg. when blurring the textarea.
+    var cachedContent = this._get('cachedContent')
+    if (cachedContent[type] === e.target.value) {
+      return
+    }
+
+    // cache latest content
+    cachedContent[type] = e.target.value
+
     // trigger the change event
     this.trigger('change', {
-      type: util.data(e.target, 'jotted-type'),
+      type: type,
       file: util.data(e.target, 'jotted-file'),
-      content: e.target.value
+      content: cachedContent[type]
     })
   }
 

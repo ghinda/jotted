@@ -5,7 +5,9 @@ import * as util from '../util.js'
 
 export default class PluginConsole {
   constructor (jotted, options) {
-    options = util.extend(options, {})
+    options = util.extend(options, {
+      autoClear: false
+    })
 
     var priority = 30
     var history = []
@@ -49,6 +51,11 @@ export default class PluginConsole {
     // clear button
     $clear.addEventListener('click', this.clear.bind(this))
 
+    // clear the console on each change
+    if (options.autoClear === true) {
+      jotted.on('change', this.autoClear.bind(this), priority - 1)
+    }
+
     // capture the console on each change
     jotted.on('change', this.change.bind(this), priority)
 
@@ -74,6 +81,12 @@ export default class PluginConsole {
     if (data.type === 'jotted-console-log') {
       this.log(data.message)
     }
+  }
+
+  autoClear (params, callback) {
+    this.clear()
+
+    callback(null, params)
   }
 
   change (params, callback) {

@@ -506,7 +506,9 @@
     function PluginConsole(jotted, options) {
       babelHelpers.classCallCheck(this, PluginConsole);
 
-      options = extend(options, {});
+      options = extend(options, {
+        autoClear: false
+      });
 
       var priority = 30;
       var history = [];
@@ -542,6 +544,11 @@
       // clear button
       $clear.addEventListener('click', this.clear.bind(this));
 
+      // clear the console on each change
+      if (options.autoClear === true) {
+        jotted.on('change', this.autoClear.bind(this), priority - 1);
+      }
+
       // capture the console on each change
       jotted.on('change', this.change.bind(this), priority);
 
@@ -569,6 +576,13 @@
         if (data.type === 'jotted-console-log') {
           this.log(data.message);
         }
+      }
+    }, {
+      key: 'autoClear',
+      value: function autoClear(params, callback) {
+        this.clear();
+
+        callback(null, params);
       }
     }, {
       key: 'change',
@@ -1294,6 +1308,13 @@
         options.plugins.push('scriptless');
       }
 
+      // cached content for the change method
+      this._set('cachedContent', {
+        html: '',
+        css: '',
+        js: ''
+      });
+
       // PubSoup
       var pubsoup = this._set('pubsoup', new PubSoup());
 
@@ -1331,9 +1352,6 @@
       }
 
       // textarea change events.
-      //     $container.addEventListener('keyup', this.change.bind(this))
-      //     $container.addEventListener('change', this.change.bind(this))
-
       $container.addEventListener('keyup', debounce(this.change.bind(this), options.debounce));
       $container.addEventListener('change', debounce(this.change.bind(this), options.debounce));
 
@@ -1466,15 +1484,26 @@
     }, {
       key: 'change',
       value: function change(e) {
-        if (!data(e.target, 'jotted-type')) {
+        var type = data(e.target, 'jotted-type');
+        if (!type) {
           return;
         }
 
+        // don't trigger change if the content hasn't changed.
+        // eg. when blurring the textarea.
+        var cachedContent = this._get('cachedContent');
+        if (cachedContent[type] === e.target.value) {
+          return;
+        }
+
+        // cache latest content
+        cachedContent[type] = e.target.value;
+
         // trigger the change event
         this.trigger('change', {
-          type: data(e.target, 'jotted-type'),
+          type: type,
           file: data(e.target, 'jotted-file'),
-          content: e.target.value
+          content: cachedContent[type]
         });
       }
     }, {

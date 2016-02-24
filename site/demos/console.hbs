@@ -24,8 +24,12 @@ demo: true
       }
     ],
     pane: 'console',
-    plugins: [
-      'console'
-    ]
+    plugins: [{
+      name: 'console',
+      options: {
+        // to clear the console on each change
+        // autoClear: true
+      }
+    }]
   });
 </script>

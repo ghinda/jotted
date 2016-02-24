@@ -61,7 +61,7 @@ describe('Play Plugin', function () {
         content: '<h1>Original</h1>'
       }],
       plugins: ['play'],
-      debounce: 0
+      debounce: false
     })
 
     var changeEvent = document.createEvent('Event')

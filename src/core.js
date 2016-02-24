@@ -43,7 +43,17 @@ class Jotted {
     // PubSoup
     var pubsoup = this._set('pubsoup', new PubSoup())
 
-    this._set('trigger', this.trigger())
+    // allow disabling the trigger debouncer.
+    // mostly for testing: when trigger events happen rapidly
+    // multiple events of the same type would be caught once.
+    if (options.debounce === false) {
+      this._set('trigger', function () {
+        pubsoup.publish.apply(pubsoup, arguments)
+      })
+    } else {
+      this._set('trigger', this.trigger())
+    }
+
     this._set('on', function () {
       pubsoup.subscribe.apply(pubsoup, arguments)
     })
@@ -75,6 +85,9 @@ class Jotted {
     }
 
     // textarea change events.
+//     $container.addEventListener('keyup', this.change.bind(this))
+//     $container.addEventListener('change', this.change.bind(this))
+
     $container.addEventListener('keyup', util.debounce(this.change.bind(this), options.debounce))
     $container.addEventListener('change', util.debounce(this.change.bind(this), options.debounce))
 

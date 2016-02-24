@@ -1,7 +1,8 @@
 
-## [1.3.0] - 2016-02-22
+## [1.3.0] - 2016-02-24
 
 * New Play plugin. Adds a Run button on the nav bar and stops auto-run for code changes. Clicking the Run button will update the iframe preview with the latest code.
+* New `autoClear: true` option for the Console plugin, to clear the console on each change.
 * Add a slight gradient to the buttons used by plugins.
 * Listen to the `change` event on the textareas. Fixes issues with changing text without triggering `keyup` (cut/paste/blur).
 * Improvements to the change event debouncers. Fixes issues with change events with different `type`s being debounced as the same event.
@@ -9,6 +10,7 @@
 * Lots of improvements to the rendering pipeline. `done('change', ..)` will now always trigger once the preview iframe dom has been rendered.
 * Don't re-render the preview iframe if the new change event has the same content as the one already rendered.
 * When using `runScripts: false`, only remove script tags without a type attribute or with a valid JavaScript mime-type. These are the ones that would be executed by the browser.
+* Prevent the change event from triggering on the textareas when the content is the same.
 
 
 ## [1.2.1] - 2016-02-11

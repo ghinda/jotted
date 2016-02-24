@@ -43,17 +43,7 @@ class Jotted {
     // PubSoup
     var pubsoup = this._set('pubsoup', new PubSoup())
 
-    // allow disabling the trigger debouncer.
-    // mostly for testing: when trigger events happen rapidly
-    // multiple events of the same type would be caught once.
-    if (options.debounce === false) {
-      this._set('trigger', function () {
-        pubsoup.publish.apply(pubsoup, arguments)
-      })
-    } else {
-      this._set('trigger', this.trigger())
-    }
-
+    this._set('trigger', this.trigger())
     this._set('on', function () {
       pubsoup.subscribe.apply(pubsoup, arguments)
     })
@@ -271,6 +261,16 @@ class Jotted {
   trigger () {
     var options = this._get('options')
     var pubsoup = this._get('pubsoup')
+
+    // allow disabling the trigger debouncer.
+    // mostly for testing: when trigger events happen rapidly
+    // multiple events of the same type would be caught once.
+    if (options.debounce === false) {
+      return function () {
+        pubsoup.publish.apply(pubsoup, arguments)
+      }
+    }
+
     // cooldown timer
     var cooldown = {}
     // multiple calls

@@ -8,6 +8,7 @@
 * Refactor the render the runScripts functionality as two separate plugins.
 * Lots of improvements to the rendering pipeline. `done('change', ..)` will now always trigger once the preview iframe dom has been rendered.
 * Don't re-render the preview iframe if the new change event has the same content as the one already rendered.
+* When using `runScripts: false`, only remove script tags without a type attribute or with a valid JavaScript mime-type. These are the ones that would be executed by the browser.
 
 
 ## [1.2.1] - 2016-02-11

@@ -87,7 +87,7 @@
     var body = arguments.length <= 1 || arguments[1] === undefined ? '' : arguments[1];
     var script = arguments.length <= 2 || arguments[2] === undefined ? '' : arguments[2];
 
-    return '\n    <!doctype html>\n    <html>\n      <head>\n        <style>' + style + '</style>\n      </head>\n      <body>\n        ' + body + '\n        <script>' + script + '</script>\n      </body>\n    </html>\n  ';
+    return '\n    <!doctype html>\n    <html>\n      <head>\n        <style>' + style + '</style>\n      </head>\n      <body>\n        ' + body + '\n\n        <script>\n          (function () {\n            window.addEventListener(\'DOMContentLoaded\', function () {\n              window.parent.postMessage(JSON.stringify({\n                type: \'jotted-dom-ready\'\n              }), \'*\')\n            })\n          }())\n        </script>\n        <script>' + script + '</script>\n      </body>\n    </html>\n  ';
   }
 
   function statusLoading(url) {
@@ -176,21 +176,29 @@
   }
 
   function debounce(fn, delay) {
-    var timer = null;
+    var cooldown = null;
+    var multiple = null;
     return function () {
-      var _this = this;
+      var _this = this,
+          _arguments = arguments;
 
-      var args = arguments;
-      clearTimeout(timer);
+      if (cooldown) {
+        multiple = true;
+      } else {
+        fn.apply(this, arguments);
+      }
 
-      timer = setTimeout(function () {
-        fn.apply(_this, args);
+      clearTimeout(cooldown);
+
+      cooldown = setTimeout(function () {
+        if (multiple) {
+          fn.apply(_this, _arguments);
+        }
+
+        cooldown = null;
+        multiple = null;
       }, delay);
     };
-  }
-
-  function log() {
-    console.log(arguments);
   }
 
   function hasClass(node, className) {
@@ -347,28 +355,41 @@
           return a._priority > b._priority ? 1 : b._priority > a._priority ? -1 : 0;
         });
       }
+
+      // removes a function from an array
+
     }, {
-      key: 'unsubscribe',
-      value: function unsubscribe(topic, subscriber) {
-        var foundTopic = this.find(topic);
-        foundTopic.forEach(function (t) {
-          // if no subscriber is specified
-          // remove all subscribers
-          if (!subscriber) {
-            t.length = 0;
+      key: 'remover',
+      value: function remover(arr, fn) {
+        arr.forEach(function () {
+          // if no fn is specified
+          // clean-up the array
+          if (!fn) {
+            arr.length = 0;
             return;
           }
 
-          // find the subscriber in the topic
-          var index = [].indexOf.call(t, subscriber);
+          // find the fn in the arr
+          var index = [].indexOf.call(arr, fn);
 
-          // show an error if we didn't find the subscriber
+          // we didn't find it in the array
           if (index === -1) {
-            return log('Subscriber not found in topic');
+            return;
           }
 
-          t.splice(index, 1);
+          arr.splice(index, 1);
         });
+      }
+    }, {
+      key: 'unsubscribe',
+      value: function unsubscribe(topic, subscriber) {
+        // remove from subscribers
+        var foundTopic = this.find(topic);
+        this.remover(foundTopic, subscriber);
+
+        // remove from callbacks
+        this.callbacks[topic] = this.callbacks[topic] || [];
+        this.remover(this.callbacks[topic], subscriber);
       }
 
       // sequentially runs a method on all plugins
@@ -420,11 +441,74 @@
     return PubSoup;
   }();
 
+  var PluginPlay = function () {
+    function PluginPlay(jotted, options) {
+      babelHelpers.classCallCheck(this, PluginPlay);
+
+      options = extend(options, {});
+
+      // cached code
+      var cache = {};
+      // latest version of the code.
+      // replaces the cache when the run button is pressed.
+      var code = {};
+
+      // run button
+      var $button = document.createElement('button');
+      $button.className = 'jotted-button jotted-button-play';
+      $button.innerHTML = 'Run';
+
+      jotted.$container.appendChild($button);
+      $button.addEventListener('click', this.run.bind(this));
+
+      // capture the code on each change
+      jotted.on('change', this.change.bind(this));
+
+      // public
+      this.cache = cache;
+      this.code = code;
+      this.jotted = jotted;
+    }
+
+    babelHelpers.createClass(PluginPlay, [{
+      key: 'change',
+      value: function change(params, callback) {
+        // always cache the latest code
+        this.code[params.type] = extend(params);
+
+        // replace the params with the latest cache
+        if (this.cache[params.type]) {
+          callback(null, this.cache[params.type]);
+        } else {
+          // cache the first run
+          this.cache[params.type] = extend(params);
+
+          callback(null, params);
+        }
+      }
+    }, {
+      key: 'run',
+      value: function run() {
+        // trigger change on each type with the latest code
+        for (var type in this.code) {
+          // update the cache with the latest code
+          this.cache[type] = extend(this.code[type]);
+
+          // trigger the change
+          this.jotted.trigger('change', this.cache[type]);
+        }
+      }
+    }]);
+    return PluginPlay;
+  }();
+
   var PluginConsole = function () {
     function PluginConsole(jotted, options) {
       babelHelpers.classCallCheck(this, PluginConsole);
 
-      options = extend(options, {});
+      options = extend(options, {
+        autoClear: false
+      });
 
       var priority = 30;
       var history = [];
@@ -440,7 +524,7 @@
       var $pane = document.createElement('div');
       addClass($pane, 'jotted-pane jotted-pane-console');
 
-      $pane.innerHTML = '\n      <div class="jotted-console-container">\n        <ul class="jotted-console-output"></ul>\n        <form class="jotted-console-input">\n          <input type="text">\n        </form>\n      </div>\n      <button class="jotted-console-clear">Clear</button>\n    ';
+      $pane.innerHTML = '\n      <div class="jotted-console-container">\n        <ul class="jotted-console-output"></ul>\n        <form class="jotted-console-input">\n          <input type="text">\n        </form>\n      </div>\n      <button class="jotted-button jotted-console-clear">Clear</button>\n    ';
 
       jotted.$container.appendChild($pane);
       jotted.$container.querySelector('.jotted-nav').appendChild($nav);
@@ -459,6 +543,11 @@
 
       // clear button
       $clear.addEventListener('click', this.clear.bind(this));
+
+      // clear the console on each change
+      if (options.autoClear === true) {
+        jotted.on('change', this.autoClear.bind(this), priority - 1);
+      }
 
       // capture the console on each change
       jotted.on('change', this.change.bind(this), priority);
@@ -487,6 +576,13 @@
         if (data.type === 'jotted-console-log') {
           this.log(data.message);
         }
+      }
+    }, {
+      key: 'autoClear',
+      value: function autoClear(params, callback) {
+        this.clear();
+
+        callback(null, params);
       }
     }, {
       key: 'change',
@@ -870,6 +966,78 @@
     return PluginLess;
   }();
 
+  var PluginCodeMirror = function () {
+    function PluginCodeMirror(jotted, options) {
+      babelHelpers.classCallCheck(this, PluginCodeMirror);
+
+      var priority = 1;
+      var i;
+
+      this.editor = {};
+      this.jotted = jotted;
+
+      // custom modemap for codemirror
+      var modemap = {
+        'html': 'htmlmixed'
+      };
+
+      options = extend(options, {
+        lineNumbers: true
+      });
+
+      // check if CodeMirror is loaded
+      if (typeof window.CodeMirror === 'undefined') {
+        return;
+      }
+
+      var $editors = jotted.$container.querySelectorAll('.jotted-editor');
+
+      for (i = 0; i < $editors.length; i++) {
+        var $textarea = $editors[i].querySelector('textarea');
+        var type = data($textarea, 'jotted-type');
+        var file = data($textarea, 'jotted-file');
+
+        this.editor[type] = window.CodeMirror.fromTextArea($textarea, options);
+        this.editor[type].setOption('mode', getMode(type, file, modemap));
+      }
+
+      jotted.on('change', this.change.bind(this), priority);
+    }
+
+    babelHelpers.createClass(PluginCodeMirror, [{
+      key: 'editorChange',
+      value: function editorChange(params) {
+        var _this = this;
+
+        return function () {
+          // trigger a change event
+          _this.jotted.trigger('change', params);
+        };
+      }
+    }, {
+      key: 'change',
+      value: function change(params, callback) {
+        var editor = this.editor[params.type];
+
+        // if the event is not started by the codemirror change.
+        // triggered only once per editor,
+        // when the textarea is populated/file is loaded.
+        if (!params.cmEditor) {
+          editor.setValue(params.content);
+
+          // attach the event only after the file is loaded
+          params.cmEditor = editor;
+          editor.on('change', this.editorChange(params));
+        }
+
+        // manipulate the params and pass them on
+        params.content = editor.getValue();
+        callback(null, params);
+      }
+    }]);
+    return PluginCodeMirror;
+  }();
+
   var PluginAce = function () {
     function PluginAce(jotted, options) {
       babelHelpers.classCallCheck(this, PluginAce);
@@ -944,87 +1112,164 @@
     return PluginAce;
   }();
 
-  var PluginCodeMirror = function () {
-    function PluginCodeMirror(jotted, options) {
-      babelHelpers.classCallCheck(this, PluginCodeMirror);
+  var PluginScriptless = function () {
+    function PluginScriptless(jotted, options) {
+      babelHelpers.classCallCheck(this, PluginScriptless);
 
-      var priority = 1;
-      var i;
+      options = extend(options, {});
 
-      this.editor = {};
-      this.jotted = jotted;
+      // https://html.spec.whatwg.org/multipage/scripting.html
+      var runScriptTypes = ['application/javascript', 'application/ecmascript', 'application/x-ecmascript', 'application/x-javascript', 'text/ecmascript', 'text/javascript', 'text/javascript1.0', 'text/javascript1.1', 'text/javascript1.2', 'text/javascript1.3', 'text/javascript1.4', 'text/javascript1.5', 'text/jscript', 'text/livescript', 'text/x-ecmascript', 'text/x-javascript'];
 
-      // custom modemap for codemirror
-      var modemap = {
-        'html': 'htmlmixed'
-      };
+      // remove script tags on each change
+      jotted.on('change', this.change.bind(this));
 
-      options = extend(options, {
-        lineNumbers: true
-      });
-
-      // check if CodeMirror is loaded
-      if (typeof window.CodeMirror === 'undefined') {
-        return;
-      }
-
-      var $editors = jotted.$container.querySelectorAll('.jotted-editor');
-
-      for (i = 0; i < $editors.length; i++) {
-        var $textarea = $editors[i].querySelector('textarea');
-        var type = data($textarea, 'jotted-type');
-        var file = data($textarea, 'jotted-file');
-
-        this.editor[type] = window.CodeMirror.fromTextArea($textarea, options);
-        this.editor[type].setOption('mode', getMode(type, file, modemap));
-      }
-
-      jotted.on('change', this.change.bind(this), priority);
+      // public
+      this.runScriptTypes = runScriptTypes;
     }
 
-    babelHelpers.createClass(PluginCodeMirror, [{
-      key: 'editorChange',
-      value: function editorChange(params) {
-        var _this = this;
-
-        return function () {
-          // trigger a change event
-          _this.jotted.trigger('change', params);
-        };
-      }
-    }, {
+    babelHelpers.createClass(PluginScriptless, [{
       key: 'change',
       value: function change(params, callback) {
-        var editor = this.editor[params.type];
-
-        // if the event is not started by the codemirror change.
-        // triggered only once per editor,
-        // when the textarea is populated/file is loaded.
-        if (!params.cmEditor) {
-          editor.setValue(params.content);
-
-          // attach the event only after the file is loaded
-          params.cmEditor = editor;
-          editor.on('change', this.editorChange(params));
+        if (params.type !== 'html') {
+          return callback(null, params);
         }
 
-        // manipulate the params and pass them on
-        params.content = editor.getValue();
+        // for IE9 support, remove the script tags from HTML content.
+        // when we stop supporting IE9, we can use the sandbox attribute.
+        var fragment = document.createElement('div');
+        fragment.innerHTML = params.content;
+
+        var typeAttr = null;
+
+        // remove all script tags
+        var $scripts = fragment.querySelectorAll('script');
+        for (var i = 0; i < $scripts.length; i++) {
+          typeAttr = $scripts[i].getAttribute('type');
+
+          // only remove script tags without the type attribute
+          // or with a javascript mime attribute value.
+          // the ones that are run by the browser.
+          if (!typeAttr || this.runScriptTypes.indexOf(typeAttr) !== -1) {
+            $scripts[i].parentNode.removeChild($scripts[i]);
+          }
+        }
+
+        params.content = fragment.innerHTML;
+
         callback(null, params);
       }
     }]);
-    return PluginCodeMirror;
+    return PluginScriptless;
+  }();
+
+  var PluginRender = function () {
+    function PluginRender(jotted, options) {
+      babelHelpers.classCallCheck(this, PluginRender);
+
+      options = extend(options, {});
+
+      // iframe srcdoc support
+      var supportSrcdoc = !!('srcdoc' in document.createElement('iframe'));
+      var $resultFrame = jotted.$container.querySelector('.jotted-pane-result iframe');
+
+      var frameContent = '';
+      var latestCallback = function latestCallback() {};
+
+      // cached content
+      var content = {
+        html: '',
+        css: '',
+        js: ''
+      };
+
+      // catch domready events from the iframe
+      window.addEventListener('message', this.domready.bind(this));
+
+      // render on each change
+      jotted.on('change', this.change.bind(this), 100);
+
+      // public
+      this.supportSrcdoc = supportSrcdoc;
+      this.latestCallback = latestCallback;
+      this.content = content;
+      this.frameContent = frameContent;
+      this.$resultFrame = $resultFrame;
+    }
+
+    babelHelpers.createClass(PluginRender, [{
+      key: 'change',
+      value: function change(params, callback) {
+        // cache manipulated content
+        this.content[params.type] = params.content;
+
+        // check existing and to-be-rendered content
+        var oldFrameContent = this.frameContent;
+        this.frameContent = frameContent(this.content['css'], this.content['html'], this.content['js']);
+
+        // don't render if previous and new frame content are the same.
+        // mostly for the `play` plugin,
+        // so we don't re-render the same content on each change.
+        if (this.frameContent === oldFrameContent) {
+          callback(null, params);
+          return;
+        }
+
+        // cache the current callback as a global,
+        // so we can call it from the message callback.
+        this.latestCallback = function () {
+          callback(null, params);
+        };
+
+        this.$resultFrame.setAttribute('srcdoc', this.frameContent);
+
+        // older browsers without iframe srcset support (IE9)
+        if (!this.supportSrcdoc) {
+          // tips from https://github.com/jugglinmike/srcdoc-polyfill
+          // Copyright (c) 2012 Mike Pennisi
+          // Licensed under the MIT license.
+          var jsUrl = 'javascript:window.frameElement.getAttribute("srcdoc");';
+
+          this.$resultFrame.setAttribute('src', jsUrl);
+
+          // Explicitly set the iFrame's window.location for
+          // compatibility with IE9, which does not react to changes in
+          // the `src` attribute when it is a `javascript:` URL.
+          if (this.$resultFrame.contentWindow) {
+            this.$resultFrame.contentWindow.location = jsUrl;
+          }
+        }
+      }
+    }, {
+      key: 'domready',
+      value: function domready(e) {
+        // only catch messages from the iframe
+        if (e.source !== this.$resultFrame.contentWindow) {
+          return;
+        }
+
+        var data = JSON.parse(e.data);
+        if (data.type === 'jotted-dom-ready') {
+          this.latestCallback();
+        }
+      }
+    }]);
+    return PluginRender;
   }();
 
   function BundlePlugins(jotted) {
-    jotted.plugin('codemirror', PluginCodeMirror);
+    jotted.plugin('render', PluginRender);
+    jotted.plugin('scriptless', PluginScriptless);
+
     jotted.plugin('ace', PluginAce);
+    jotted.plugin('codemirror', PluginCodeMirror);
     jotted.plugin('less', PluginLess);
     jotted.plugin('coffeescript', PluginCoffeeScript);
     jotted.plugin('stylus', PluginStylus);
     jotted.plugin('babel', PluginBabel);
     jotted.plugin('markdown', PluginMarkdown);
     jotted.plugin('console', PluginConsole);
+    jotted.plugin('play', PluginPlay);
   }
 
   var Jotted = function () {
@@ -1055,10 +1300,25 @@
         plugins: []
       }));
 
+      // the render plugin is mandatory
+      options.plugins.push('render');
+
+      // use the scriptless plugin if runScripts is false
+      if (options.runScripts === false) {
+        options.plugins.push('scriptless');
+      }
+
+      // cached content for the change method
+      this._set('cachedContent', {
+        html: '',
+        css: '',
+        js: ''
+      });
+
       // PubSoup
       var pubsoup = this._set('pubsoup', new PubSoup());
-      // debounced trigger method
-      this._set('trigger', debounce(pubsoup.publish.bind(pubsoup), options.debounce));
+
+      this._set('trigger', this.trigger());
       this._set('on', function () {
         pubsoup.subscribe.apply(pubsoup, arguments);
       });
@@ -1069,31 +1329,18 @@
         pubsoup.done.apply(pubsoup, arguments);
       });
 
-      // iframe srcdoc support
-      this._set('supportSrcdoc', !!('srcdoc' in document.createElement('iframe')));
-
-      // done change on all subscribers,
-      // render the results.
-      done('change', this.changeCallback.bind(this));
+      // after all plugins run
+      // show errors
+      done('change', this.errors.bind(this));
 
       // DOM
       var $container = this._set('$container', $jottedContainer);
       $container.innerHTML = container();
       addClass($container, containerClass());
 
-      var $resultFrame = $container.querySelector('.jotted-pane-result iframe');
-      this._set('$resultFrame', $resultFrame);
-
       // default pane
       var paneActive = this._set('paneActive', options.pane);
       addClass($container, paneActiveClass(paneActive));
-
-      // file content caching
-      this._set('content', {
-        html: '',
-        css: '',
-        js: ''
-      });
 
       // status nodes
       this._set('$status', {});
@@ -1104,8 +1351,9 @@
         this.markup(type);
       }
 
-      // change events
+      // textarea change events.
       $container.addEventListener('keyup', debounce(this.change.bind(this), options.debounce));
+      $container.addEventListener('change', debounce(this.change.bind(this), options.debounce));
 
       // pane change
       $container.addEventListener('click', this.pane.bind(this));
@@ -1236,66 +1484,32 @@
     }, {
       key: 'change',
       value: function change(e) {
-        if (!data(e.target, 'jotted-type')) {
+        var type = data(e.target, 'jotted-type');
+        if (!type) {
           return;
         }
 
-        // don't use .trigger,
-        // so we don't debounce different change calls (html, css, js)
-        // causing only one of them to be inserted.
-        // the textarea change event is debounced when attached.
-        this._get('pubsoup').publish('change', {
-          type: data(e.target, 'jotted-type'),
+        // don't trigger change if the content hasn't changed.
+        // eg. when blurring the textarea.
+        var cachedContent = this._get('cachedContent');
+        if (cachedContent[type] === e.target.value) {
+          return;
+        }
+
+        // cache latest content
+        cachedContent[type] = e.target.value;
+
+        // trigger the change event
+        this.trigger('change', {
+          type: type,
           file: data(e.target, 'jotted-file'),
-          content: e.target.value
+          content: cachedContent[type]
         });
       }
     }, {
-      key: 'changeCallback',
-      value: function changeCallback(errors, params) {
-        this.status('error', errors, params);
-        var options = this._get('options');
-        var supportSrcdoc = this._get('supportSrcdoc');
-        var $resultFrame = this._get('$resultFrame');
-
-        // cache manipulated content
-        var cachedContent = this._get('content');
-        cachedContent[params.type] = params.content;
-
-        // don't execute script tags
-        if (!options.runScripts) {
-          // for IE9 support, remove the script tags from HTML content.
-          // when we stop supporting IE9, we can use the sandbox attribute.
-          var fragment = document.createElement('div');
-          fragment.innerHTML = cachedContent['html'];
-
-          // remove all script tags
-          var $scripts = fragment.querySelectorAll('script');
-          for (var i = 0; i < $scripts.length; i++) {
-            $scripts[i].parentNode.removeChild($scripts[i]);
-          }
-
-          cachedContent['html'] = fragment.innerHTML;
-        }
-
-        $resultFrame.setAttribute('srcdoc', frameContent(cachedContent['css'], cachedContent['html'], cachedContent['js']));
-
-        // older browsers without iframe srcset support (IE9)
-        if (!supportSrcdoc) {
-          // tips from https://github.com/jugglinmike/srcdoc-polyfill
-          // Copyright (c) 2012 Mike Pennisi
-          // Licensed under the MIT license.
-          var jsUrl = 'javascript:window.frameElement.getAttribute("srcdoc");';
-
-          $resultFrame.setAttribute('src', jsUrl);
-
-          // Explicitly set the iFrame's window.location for
-          // compatibility with IE9, which does not react to changes in
-          // the `src` attribute when it is a `javascript:` URL.
-          if ($resultFrame.contentWindow) {
-            $resultFrame.contentWindow.location = jsUrl;
-          }
-        }
+      key: 'errors',
+      value: function errors(errs, params) {
+        this.status('error', errs, params);
       }
     }, {
       key: 'pane',
@@ -1346,6 +1560,61 @@
         removeClass($status[params.type], statusClass(statusType));
         removeClass(this._get('$container'), statusActiveClass(params.type));
         $status[params.type].innerHTML = '';
+      }
+
+      // debounced trigger method
+      // custom debouncer to use a different timer per type
+
+    }, {
+      key: 'trigger',
+      value: function trigger() {
+        var options = this._get('options');
+        var pubsoup = this._get('pubsoup');
+
+        // allow disabling the trigger debouncer.
+        // mostly for testing: when trigger events happen rapidly
+        // multiple events of the same type would be caught once.
+        if (options.debounce === false) {
+          return function () {
+            pubsoup.publish.apply(pubsoup, arguments);
+          };
+        }
+
+        // cooldown timer
+        var cooldown = {};
+        // multiple calls
+        var multiple = {};
+
+        return function (topic) {
+          var _arguments = arguments;
+
+          var _ref = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+
+          var _ref$type = _ref.type;
+          var type = _ref$type === undefined ? 'default' : _ref$type;
+
+          if (cooldown[type]) {
+            // if we had multiple calls before the cooldown
+            multiple[type] = true;
+          } else {
+            // trigger immediately once cooldown is over
+            pubsoup.publish.apply(pubsoup, arguments);
+          }
+
+          clearTimeout(cooldown[type]);
+
+          // set cooldown timer
+          cooldown[type] = setTimeout(function () {
+            // if we had multiple calls before the cooldown,
+            // trigger the function again at the end.
+            if (multiple[type]) {
+              pubsoup.publish.apply(pubsoup, _arguments);
+            }
+
+            multiple[type] = null;
+            cooldown[type] = null;
+          }, options.debounce);
+        };
       }
     }]);
     return Jotted;

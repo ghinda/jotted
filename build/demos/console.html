@@ -93,7 +93,12 @@
             </li>
             <li>
               <a href="console.html">
-                Console
+                Console Plugin
+              </a>
+            </li>
+            <li>
+              <a href="play.html">
+                Play Plugin
               </a>
             </li>
             <li>
@@ -118,11 +123,11 @@
     <div class="demo-content">
 <pre><code>
 &lt;p&gt;
-  The &lt;strong&gt;console&lt;/strong&gt; plugins adds an extra &lt;strong&gt;JS Console&lt;/strong&gt; tab. It&#39;s a lightweight version of the browser&#39;s console, running  in the iframe context.
+  The &lt;strong&gt;console&lt;/strong&gt; plugin adds an extra &lt;strong&gt;JS Console&lt;/strong&gt; tab. It&#39;s a lightweight version of the browser&#39;s console, running  in the iframe context.
 &lt;/p&gt;
 
 &lt;p&gt;
-  It also captures &lt;code&gt;console.log&lt;/code&gt; calls you make, but it doesn&#39;t log errors in your code.
+  It also captures any &lt;code&gt;console.log&lt;/code&gt; calls, but it doesn&#39;t log errors in your code.
 &lt;/p&gt;
 
 &lt;div id=&quot;jotted-demo-console&quot; style=&quot;height: 28em&quot;&gt;&lt;/div&gt;
@@ -138,9 +143,13 @@
       }
     ],
     pane: &#39;console&#39;,
-    plugins: [
-      &#39;console&#39;
-    ]
+    plugins: [{
+      name: &#39;console&#39;,
+      options: {
+        // to clear the console on each change
+        // autoClear: true
+      }
+    }]
   });
 &lt;/script&gt;</code></pre>
     </div>

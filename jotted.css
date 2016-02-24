@@ -80,6 +80,7 @@ jotted-nav-item,
   width: 100%;
   padding-top: 2.4em;
   box-sizing: border-box;
+  background: #fff;
 }
 .jotted-pane-active-result .jotted-pane-result,
 .jotted-pane-active-html .jotted-pane-html,
@@ -155,6 +156,21 @@ jotted-nav-item,
 }
 .jotted-status-error p:before {
   background: #c0392b;
+}
+/* buttons
+ * used by plugins
+ */
+.jotted-button {
+  padding: 0 1em;
+  border: 1px solid #ccc;
+  background: rgba(236,236,236,0.92);
+  background: linear-gradient(rgba(249,249,249,0.92), rgba(236,236,236,0.92));
+  border-radius: 2px;
+  cursor: pointer;
+  line-height: 1.6em;
+}
+.jotted-button:hover {
+  background: #f9f9f9;
 }
 /* plugins
  */
@@ -238,15 +254,12 @@ jotted-nav-item,
   position: absolute;
   top: 3.3em;
   right: 1.4em;
-  padding: 0 1em;
-  border: 1px solid #ccc;
-  background: rgba(230,230,230,0.6);
-  border-radius: 2px;
-  cursor: pointer;
-  line-height: 1.6em;
 }
-.jotted-console-clear:hover {
-  background: #ececec;
+.jotted-button-play {
+  position: absolute;
+  top: 0.52em;
+  right: 0.52em;
+  z-index: 3;
 }
 /* themes
  */

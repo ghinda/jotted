@@ -1,4 +1,12 @@
 
+## [1.3.1] - 2016-02-29
+
+* Fix compatibility issues between the Console and Play plugins.
+* Make sure we don't insert the console.log capture snippet multiple times.
+* Always force rendering when pressing the Run button in the Play plugin, even if the content hasn't changed.
+* Don't clear the console with autoClear unless content has changed, or forceRender was used.
+
+
 ## [1.3.0] - 2016-02-24
 
 * New Play plugin. Adds a Run button on the nav bar and stops auto-run for code changes. Clicking the Run button will update the iframe preview with the latest code.

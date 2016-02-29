@@ -447,7 +447,7 @@
 
       options = extend(options, {});
 
-      var priority = 20;
+      var priority = 10;
       // cached code
       var cache = {};
       // latest version of the code.

@@ -20,15 +20,15 @@ demo: true
     files: [
       {
         type: 'js',
-        content: 'var someVar = 1;\nconsole.log("log someVar", someVar);'
+        content: 'var someVar = Date.now();\nconsole.log("log someVar", someVar);'
       }
     ],
     pane: 'console',
     plugins: [{
       name: 'console',
       options: {
-        // to clear the console on each change
-        // autoClear: true
+        // clear the console on each change
+        autoClear: true
       }
     }]
   });

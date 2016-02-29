@@ -12,6 +12,12 @@ export default class PluginConsole {
     var priority = 30
     var history = []
     var historyIndex = 0
+    var logCaptureSnippet = `(${this.capture.toString()})();`
+    var contentCache = {
+      html: '',
+      css: '',
+      js: ''
+    }
 
     var $iframe = jotted.$container.querySelector('.jotted-pane-result iframe')
 
@@ -69,6 +75,8 @@ export default class PluginConsole {
     this.$iframe = $iframe
     this.history = history
     this.historyIndex = historyIndex
+    this.logCaptureSnippet = logCaptureSnippet
+    this.contentCache = contentCache
   }
 
   getMessage (e) {
@@ -84,7 +92,21 @@ export default class PluginConsole {
   }
 
   autoClear (params, callback) {
-    this.clear()
+    var snippetlessContent = params.content
+
+    // remove the snippet from cached js content
+    if (params.type === 'js') {
+      snippetlessContent = snippetlessContent.replace(this.logCaptureSnippet, '')
+    }
+
+    // for compatibility with the Play plugin,
+    // clear the console only if something has changed or force rendering.
+    if (params.forceRender === true || this.contentCache[params.type] !== snippetlessContent) {
+      this.clear()
+    }
+
+    // always cache the latest content
+    this.contentCache[params.type] = snippetlessContent
 
     callback(null, params)
   }
@@ -97,7 +119,13 @@ export default class PluginConsole {
       return callback(null, params)
     }
 
-    params.content = `(${this.capture.toString()})();\n${params.content}`
+    // check if the snippet is already added.
+    // the Play plugin caches the changed params and triggers change
+    // with the cached response, causing the snippet to be inserted
+    // multiple times, on each trigger.
+    if (params.content.indexOf(this.logCaptureSnippet) === -1) {
+      params.content = `${this.logCaptureSnippet}${params.content}`
+    }
 
     callback(null, params)
   }

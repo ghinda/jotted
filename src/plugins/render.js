@@ -48,7 +48,8 @@ export default class PluginRender {
     // don't render if previous and new frame content are the same.
     // mostly for the `play` plugin,
     // so we don't re-render the same content on each change.
-    if (this.frameContent === oldFrameContent) {
+    // unless we set forceRender.
+    if (params.forceRender !== true && this.frameContent === oldFrameContent) {
       callback(null, params)
       return
     }

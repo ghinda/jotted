@@ -8,6 +8,7 @@ export default class PluginPlay {
   constructor (jotted, options) {
     options = util.extend(options, {})
 
+    var priority = 10
     // cached code
     var cache = {}
     // latest version of the code.
@@ -23,7 +24,7 @@ export default class PluginPlay {
     $button.addEventListener('click', this.run.bind(this))
 
     // capture the code on each change
-    jotted.on('change', this.change.bind(this))
+    jotted.on('change', this.change.bind(this), priority)
 
     // public
     this.cache = cache
@@ -38,6 +39,10 @@ export default class PluginPlay {
     // replace the params with the latest cache
     if (this.cache[params.type]) {
       callback(null, this.cache[params.type])
+
+      // make sure we don't cache forceRender,
+      // and send it with each change.
+      this.cache[params.type].forceRender = null
     } else {
       // cache the first run
       this.cache[params.type] = util.extend(params)
@@ -50,7 +55,10 @@ export default class PluginPlay {
     // trigger change on each type with the latest code
     for (let type in this.code) {
       // update the cache with the latest code
-      this.cache[type] = util.extend(this.code[type])
+      this.cache[type] = util.extend(this.code[type], {
+        // force rendering on each Run press
+        forceRender: true
+      })
 
       // trigger the change
       this.jotted.trigger('change', this.cache[type])

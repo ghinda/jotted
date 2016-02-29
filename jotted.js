@@ -447,6 +447,7 @@
 
       options = extend(options, {});
 
+      var priority = 10;
       // cached code
       var cache = {};
       // latest version of the code.
@@ -462,7 +463,7 @@
       $button.addEventListener('click', this.run.bind(this));
 
       // capture the code on each change
-      jotted.on('change', this.change.bind(this));
+      jotted.on('change', this.change.bind(this), priority);
 
       // public
       this.cache = cache;
@@ -479,6 +480,10 @@
         // replace the params with the latest cache
         if (this.cache[params.type]) {
           callback(null, this.cache[params.type]);
+
+          // make sure we don't cache forceRender,
+          // and send it with each change.
+          this.cache[params.type].forceRender = null;
         } else {
           // cache the first run
           this.cache[params.type] = extend(params);
@@ -492,7 +497,10 @@
         // trigger change on each type with the latest code
         for (var type in this.code) {
           // update the cache with the latest code
-          this.cache[type] = extend(this.code[type]);
+          this.cache[type] = extend(this.code[type], {
+            // force rendering on each Run press
+            forceRender: true
+          });
 
           // trigger the change
           this.jotted.trigger('change', this.cache[type]);
@@ -513,6 +521,12 @@
       var priority = 30;
       var history = [];
       var historyIndex = 0;
+      var logCaptureSnippet = '(' + this.capture.toString() + ')();';
+      var contentCache = {
+        html: '',
+        css: '',
+        js: ''
+      };
 
       var $iframe = jotted.$container.querySelector('.jotted-pane-result iframe');
 
@@ -562,6 +576,8 @@
       this.$iframe = $iframe;
       this.history = history;
       this.historyIndex = historyIndex;
+      this.logCaptureSnippet = logCaptureSnippet;
+      this.contentCache = contentCache;
     }
 
     babelHelpers.createClass(PluginConsole, [{
@@ -580,7 +596,21 @@
     }, {
       key: 'autoClear',
       value: function autoClear(params, callback) {
-        this.clear();
+        var snippetlessContent = params.content;
+
+        // remove the snippet from cached js content
+        if (params.type === 'js') {
+          snippetlessContent = snippetlessContent.replace(this.logCaptureSnippet, '');
+        }
+
+        // for compatibility with the Play plugin,
+        // clear the console only if something has changed or force rendering.
+        if (params.forceRender === true || this.contentCache[params.type] !== snippetlessContent) {
+          this.clear();
+        }
+
+        // always cache the latest content
+        this.contentCache[params.type] = snippetlessContent;
 
         callback(null, params);
       }
@@ -594,7 +624,13 @@
           return callback(null, params);
         }
 
-        params.content = '(' + this.capture.toString() + ')();\n' + params.content;
+        // check if the snippet is already added.
+        // the Play plugin caches the changed params and triggers change
+        // with the cached response, causing the snippet to be inserted
+        // multiple times, on each trigger.
+        if (params.content.indexOf(this.logCaptureSnippet) === -1) {
+          params.content = '' + this.logCaptureSnippet + params.content;
+        }
 
         callback(null, params);
       }
@@ -1210,7 +1246,8 @@
         // don't render if previous and new frame content are the same.
         // mostly for the `play` plugin,
         // so we don't re-render the same content on each change.
-        if (this.frameContent === oldFrameContent) {
+        // unless we set forceRender.
+        if (params.forceRender !== true && this.frameContent === oldFrameContent) {
           callback(null, params);
           return;
         }

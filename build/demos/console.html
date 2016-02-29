@@ -139,15 +139,15 @@
     files: [
       {
         type: &#39;js&#39;,
-        content: &#39;var someVar = 1;\nconsole.log(&quot;log someVar&quot;, someVar);&#39;
+        content: &#39;var someVar = Date.now();\nconsole.log(&quot;log someVar&quot;, someVar);&#39;
       }
     ],
     pane: &#39;console&#39;,
     plugins: [{
       name: &#39;console&#39;,
       options: {
-        // to clear the console on each change
-        // autoClear: true
+        // clear the console on each change
+        autoClear: true
       }
     }]
   });

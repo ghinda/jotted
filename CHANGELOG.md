@@ -1,6 +1,9 @@
 
-## [1.3.1] - 2016-02-29
+## [1.4.0] - 2016-03-04
 
+* New `firstRun` option (default is `true`) to the `play` plugin. Causes the preview to start with blank content, and only run the initial content on the first Run button press.
+
+## [1.3.1] - 2016-02-29
 * Fix compatibility issues between the Console and Play plugins.
 * Make sure we don't insert the console.log capture snippet multiple times.
 * Always force rendering when pressing the Run button in the Play plugin, even if the content hasn't changed.

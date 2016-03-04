@@ -272,6 +272,11 @@ For a code editor plugin, see the [codemirror](src/plugins/codemirror.js) plugin
 * Thanks! :beers:
 
 
+## Who's using it
+
+* [educative.io](https://www.educative.io/)
+
+
 ## License
 
 Jotted is licensed under the [MIT license](LICENSE).

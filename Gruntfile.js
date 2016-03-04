@@ -1,14 +1,14 @@
 'use strict';
 var LIVERELOAD_PORT = 35729;
-var lrSnippet = require('connect-livereload')({ port: LIVERELOAD_PORT });
+var lrSnippet = require('connect-livereload')({ port: LIVERELOAD_PORT })
 var mountFolder = function (connect, dir) {
-  return connect.static(require('path').resolve(dir));
+  return connect.static(require('path').resolve(dir))
 };
-var babel = require('rollup-plugin-babel');
+var babel = require('rollup-plugin-babel')
 
 module.exports = function (grunt) {
   // load all grunt tasks
-  require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
+  require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks)
 
   grunt.initConfig({
     watch: {
@@ -237,7 +237,7 @@ module.exports = function (grunt) {
         }
       }
     }
-  });
+  })
 
   grunt.registerTask('server', function (target) {
     if (target === 'dist') {
@@ -245,21 +245,21 @@ module.exports = function (grunt) {
         'default',
         'copy',
         'connect:dist:keepalive'
-      ]);
+      ])
     }
 
     grunt.task.run([
       'default',
       'connect:livereload',
       'watch'
-    ]);
-  });
+    ])
+  })
 
   grunt.registerTask('test', [
     'default',
     'connect:test',
     'saucelabs-mocha'
-  ]);
+  ])
 
   grunt.registerTask('default', [
     'clean',
@@ -268,12 +268,11 @@ module.exports = function (grunt) {
     'uglify',
     'stylus',
     'assemble'
-  ]);
+  ])
 
   grunt.registerTask('deploy', [
     'test',
     'copy',
     'buildcontrol'
-  ]);
-
-};
+  ])
+}

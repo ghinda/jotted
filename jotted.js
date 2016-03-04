@@ -1,7 +1,7 @@
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
-  global.Jotted = factory();
+  (global.Jotted = factory());
 }(this, function () { 'use strict';
 
   var babelHelpers = {};
@@ -36,67 +36,6 @@
   }();
 
   babelHelpers;
-
-  /* template
-   */
-
-  function container() {
-    return '\n    <ul class="jotted-nav">\n      <li class="jotted-nav-item jotted-nav-item-result">\n        <a href="#" data-jotted-type="result">\n          Result\n        </a>\n      </li>\n      <li class="jotted-nav-item jotted-nav-item-html">\n        <a href="#" data-jotted-type="html">\n          HTML\n        </a>\n      </li>\n      <li class="jotted-nav-item jotted-nav-item-css">\n        <a href="#" data-jotted-type="css">\n          CSS\n        </a>\n      </li>\n      <li class="jotted-nav-item jotted-nav-item-js">\n        <a href="#" data-jotted-type="js">\n          JavaScript\n        </a>\n      </li>\n    </ul>\n    <div class="jotted-pane jotted-pane-result"><iframe></iframe></div>\n    <div class="jotted-pane jotted-pane-html"></div>\n    <div class="jotted-pane jotted-pane-css"></div>\n    <div class="jotted-pane jotted-pane-js"></div>\n  ';
-  }
-
-  function paneActiveClass(type) {
-    return 'jotted-pane-active-' + type;
-  }
-
-  function containerClass() {
-    return 'jotted';
-  }
-
-  function hasFileClass(type) {
-    return 'jotted-has-' + type;
-  }
-
-  function editorClass(type) {
-    return 'jotted-editor jotted-editor-' + type;
-  }
-
-  function editorContent(type) {
-    var fileUrl = arguments.length <= 1 || arguments[1] === undefined ? '' : arguments[1];
-
-    return '\n    <textarea data-jotted-type="' + type + '" data-jotted-file="' + fileUrl + '"></textarea>\n    <div class="jotted-status"></div>\n  ';
-  }
-
-  function statusMessage(err) {
-    return '\n    <p>' + err + '</p>\n  ';
-  }
-
-  function statusClass(type) {
-    return 'jotted-status-' + type;
-  }
-
-  function statusActiveClass(type) {
-    return 'jotted-status-active-' + type;
-  }
-
-  function pluginClass(name) {
-    return 'jotted-plugin-' + name;
-  }
-
-  function frameContent() {
-    var style = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
-    var body = arguments.length <= 1 || arguments[1] === undefined ? '' : arguments[1];
-    var script = arguments.length <= 2 || arguments[2] === undefined ? '' : arguments[2];
-
-    return '\n    <!doctype html>\n    <html>\n      <head>\n        <style>' + style + '</style>\n      </head>\n      <body>\n        ' + body + '\n\n        <script>\n          (function () {\n            window.addEventListener(\'DOMContentLoaded\', function () {\n              window.parent.postMessage(JSON.stringify({\n                type: \'jotted-dom-ready\'\n              }), \'*\')\n            })\n          }())\n        </script>\n        <script>' + script + '</script>\n      </body>\n    </html>\n  ';
-  }
-
-  function statusLoading(url) {
-    return 'Loading <strong>' + url + '</strong>..';
-  }
-
-  function statusFetchError(url) {
-    return 'There was an error loading <strong>' + url + '</strong>.';
-  }
 
   /* util
    */
@@ -284,6 +223,67 @@
     return type;
   }
 
+  /* template
+   */
+
+  function container() {
+    return '\n    <ul class="jotted-nav">\n      <li class="jotted-nav-item jotted-nav-item-result">\n        <a href="#" data-jotted-type="result">\n          Result\n        </a>\n      </li>\n      <li class="jotted-nav-item jotted-nav-item-html">\n        <a href="#" data-jotted-type="html">\n          HTML\n        </a>\n      </li>\n      <li class="jotted-nav-item jotted-nav-item-css">\n        <a href="#" data-jotted-type="css">\n          CSS\n        </a>\n      </li>\n      <li class="jotted-nav-item jotted-nav-item-js">\n        <a href="#" data-jotted-type="js">\n          JavaScript\n        </a>\n      </li>\n    </ul>\n    <div class="jotted-pane jotted-pane-result"><iframe></iframe></div>\n    <div class="jotted-pane jotted-pane-html"></div>\n    <div class="jotted-pane jotted-pane-css"></div>\n    <div class="jotted-pane jotted-pane-js"></div>\n  ';
+  }
+
+  function paneActiveClass(type) {
+    return 'jotted-pane-active-' + type;
+  }
+
+  function containerClass() {
+    return 'jotted';
+  }
+
+  function hasFileClass(type) {
+    return 'jotted-has-' + type;
+  }
+
+  function editorClass(type) {
+    return 'jotted-editor jotted-editor-' + type;
+  }
+
+  function editorContent(type) {
+    var fileUrl = arguments.length <= 1 || arguments[1] === undefined ? '' : arguments[1];
+
+    return '\n    <textarea data-jotted-type="' + type + '" data-jotted-file="' + fileUrl + '"></textarea>\n    <div class="jotted-status"></div>\n  ';
+  }
+
+  function statusMessage(err) {
+    return '\n    <p>' + err + '</p>\n  ';
+  }
+
+  function statusClass(type) {
+    return 'jotted-status-' + type;
+  }
+
+  function statusActiveClass(type) {
+    return 'jotted-status-active-' + type;
+  }
+
+  function pluginClass(name) {
+    return 'jotted-plugin-' + name;
+  }
+
+  function frameContent() {
+    var style = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
+    var body = arguments.length <= 1 || arguments[1] === undefined ? '' : arguments[1];
+    var script = arguments.length <= 2 || arguments[2] === undefined ? '' : arguments[2];
+
+    return '\n    <!doctype html>\n    <html>\n      <head>\n        <style>' + style + '</style>\n      </head>\n      <body>\n        ' + body + '\n\n        <script>\n          (function () {\n            window.addEventListener(\'DOMContentLoaded\', function () {\n              window.parent.postMessage(JSON.stringify({\n                type: \'jotted-dom-ready\'\n              }), \'*\')\n            })\n          }())\n        </script>\n        <script>' + script + '</script>\n      </body>\n    </html>\n  ';
+  }
+
+  function statusLoading(url) {
+    return 'Loading <strong>' + url + '</strong>..';
+  }
+
+  function statusFetchError(url) {
+    return 'There was an error loading <strong>' + url + '</strong>.';
+  }
+
   var plugins = [];
 
   function find(id) {
@@ -441,73 +441,540 @@
     return PubSoup;
   }();
 
-  var PluginPlay = function () {
-    function PluginPlay(jotted, options) {
-      babelHelpers.classCallCheck(this, PluginPlay);
+  var PluginRender = function () {
+    function PluginRender(jotted, options) {
+      babelHelpers.classCallCheck(this, PluginRender);
 
       options = extend(options, {});
 
-      var priority = 10;
-      // cached code
-      var cache = {};
-      // latest version of the code.
-      // replaces the cache when the run button is pressed.
-      var code = {};
+      // iframe srcdoc support
+      var supportSrcdoc = !!('srcdoc' in document.createElement('iframe'));
+      var $resultFrame = jotted.$container.querySelector('.jotted-pane-result iframe');
 
-      // run button
-      var $button = document.createElement('button');
-      $button.className = 'jotted-button jotted-button-play';
-      $button.innerHTML = 'Run';
+      var frameContent = '';
+      var latestCallback = function latestCallback() {};
 
-      jotted.$container.appendChild($button);
-      $button.addEventListener('click', this.run.bind(this));
+      // cached content
+      var content = {
+        html: '',
+        css: '',
+        js: ''
+      };
 
-      // capture the code on each change
-      jotted.on('change', this.change.bind(this), priority);
+      // catch domready events from the iframe
+      window.addEventListener('message', this.domready.bind(this));
+
+      // render on each change
+      jotted.on('change', this.change.bind(this), 100);
 
       // public
-      this.cache = cache;
-      this.code = code;
-      this.jotted = jotted;
+      this.supportSrcdoc = supportSrcdoc;
+      this.latestCallback = latestCallback;
+      this.content = content;
+      this.frameContent = frameContent;
+      this.$resultFrame = $resultFrame;
     }
 
-    babelHelpers.createClass(PluginPlay, [{
+    babelHelpers.createClass(PluginRender, [{
       key: 'change',
       value: function change(params, callback) {
-        // always cache the latest code
-        this.code[params.type] = extend(params);
+        // cache manipulated content
+        this.content[params.type] = params.content;
 
-        // replace the params with the latest cache
-        if (this.cache[params.type]) {
-          callback(null, this.cache[params.type]);
+        // check existing and to-be-rendered content
+        var oldFrameContent = this.frameContent;
+        this.frameContent = frameContent(this.content['css'], this.content['html'], this.content['js']);
 
-          // make sure we don't cache forceRender,
-          // and send it with each change.
-          this.cache[params.type].forceRender = null;
-        } else {
-          // cache the first run
-          this.cache[params.type] = extend(params);
-
+        // don't render if previous and new frame content are the same.
+        // mostly for the `play` plugin,
+        // so we don't re-render the same content on each change.
+        // unless we set forceRender.
+        if (params.forceRender !== true && this.frameContent === oldFrameContent) {
           callback(null, params);
+          return;
+        }
+
+        // cache the current callback as a global,
+        // so we can call it from the message callback.
+        this.latestCallback = function () {
+          callback(null, params);
+        };
+
+        this.$resultFrame.setAttribute('srcdoc', this.frameContent);
+
+        // older browsers without iframe srcset support (IE9)
+        if (!this.supportSrcdoc) {
+          // tips from https://github.com/jugglinmike/srcdoc-polyfill
+          // Copyright (c) 2012 Mike Pennisi
+          // Licensed under the MIT license.
+          var jsUrl = 'javascript:window.frameElement.getAttribute("srcdoc");';
+
+          this.$resultFrame.setAttribute('src', jsUrl);
+
+          // Explicitly set the iFrame's window.location for
+          // compatibility with IE9, which does not react to changes in
+          // the `src` attribute when it is a `javascript:` URL.
+          if (this.$resultFrame.contentWindow) {
+            this.$resultFrame.contentWindow.location = jsUrl;
+          }
         }
       }
     }, {
-      key: 'run',
-      value: function run() {
-        // trigger change on each type with the latest code
-        for (var type in this.code) {
-          // update the cache with the latest code
-          this.cache[type] = extend(this.code[type], {
-            // force rendering on each Run press
-            forceRender: true
-          });
+      key: 'domready',
+      value: function domready(e) {
+        // only catch messages from the iframe
+        if (e.source !== this.$resultFrame.contentWindow) {
+          return;
+        }
 
-          // trigger the change
-          this.jotted.trigger('change', this.cache[type]);
+        var data = JSON.parse(e.data);
+        if (data.type === 'jotted-dom-ready') {
+          this.latestCallback();
         }
       }
     }]);
-    return PluginPlay;
+    return PluginRender;
+  }();
+
+  var PluginScriptless = function () {
+    function PluginScriptless(jotted, options) {
+      babelHelpers.classCallCheck(this, PluginScriptless);
+
+      options = extend(options, {});
+
+      // https://html.spec.whatwg.org/multipage/scripting.html
+      var runScriptTypes = ['application/javascript', 'application/ecmascript', 'application/x-ecmascript', 'application/x-javascript', 'text/ecmascript', 'text/javascript', 'text/javascript1.0', 'text/javascript1.1', 'text/javascript1.2', 'text/javascript1.3', 'text/javascript1.4', 'text/javascript1.5', 'text/jscript', 'text/livescript', 'text/x-ecmascript', 'text/x-javascript'];
+
+      // remove script tags on each change
+      jotted.on('change', this.change.bind(this));
+
+      // public
+      this.runScriptTypes = runScriptTypes;
+    }
+
+    babelHelpers.createClass(PluginScriptless, [{
+      key: 'change',
+      value: function change(params, callback) {
+        if (params.type !== 'html') {
+          return callback(null, params);
+        }
+
+        // for IE9 support, remove the script tags from HTML content.
+        // when we stop supporting IE9, we can use the sandbox attribute.
+        var fragment = document.createElement('div');
+        fragment.innerHTML = params.content;
+
+        var typeAttr = null;
+
+        // remove all script tags
+        var $scripts = fragment.querySelectorAll('script');
+        for (var i = 0; i < $scripts.length; i++) {
+          typeAttr = $scripts[i].getAttribute('type');
+
+          // only remove script tags without the type attribute
+          // or with a javascript mime attribute value.
+          // the ones that are run by the browser.
+          if (!typeAttr || this.runScriptTypes.indexOf(typeAttr) !== -1) {
+            $scripts[i].parentNode.removeChild($scripts[i]);
+          }
+        }
+
+        params.content = fragment.innerHTML;
+
+        callback(null, params);
+      }
+    }]);
+    return PluginScriptless;
+  }();
+
+  var PluginAce = function () {
+    function PluginAce(jotted, options) {
+      babelHelpers.classCallCheck(this, PluginAce);
+
+      var priority = 1;
+      var i;
+
+      this.editor = {};
+      this.jotted = jotted;
+
+      options = extend(options, {});
+
+      // check if Ace is loaded
+      if (typeof window.ace === 'undefined') {
+        return;
+      }
+
+      var $editors = jotted.$container.querySelectorAll('.jotted-editor');
+
+      for (i = 0; i < $editors.length; i++) {
+        var $textarea = $editors[i].querySelector('textarea');
+        var type = data($textarea, 'jotted-type');
+        var file = data($textarea, 'jotted-file');
+
+        var $aceContainer = document.createElement('div');
+        $editors[i].appendChild($aceContainer);
+
+        this.editor[type] = window.ace.edit($aceContainer);
+        var editor = this.editor[type];
+
+        var editorOptions = extend(options);
+
+        editor.getSession().setMode('ace/mode/' + getMode(type, file));
+        editor.getSession().setOptions(editorOptions);
+
+        editor.$blockScrolling = Infinity;
+      }
+
+      jotted.on('change', this.change.bind(this), priority);
+    }
+
+    babelHelpers.createClass(PluginAce, [{
+      key: 'editorChange',
+      value: function editorChange(params) {
+        var _this = this;
+
+        return function () {
+          _this.jotted.trigger('change', params);
+        };
+      }
+    }, {
+      key: 'change',
+      value: function change(params, callback) {
+        var editor = this.editor[params.type];
+
+        // if the event is not started by the ace change.
+        // triggered only once per editor,
+        // when the textarea is populated/file is loaded.
+        if (!params.aceEditor) {
+          editor.getSession().setValue(params.content);
+
+          // attach the event only after the file is loaded
+          params.aceEditor = editor;
+          editor.on('change', this.editorChange(params));
+        }
+
+        // manipulate the params and pass them on
+        params.content = editor.getValue();
+        callback(null, params);
+      }
+    }]);
+    return PluginAce;
+  }();
+
+  var PluginCodeMirror = function () {
+    function PluginCodeMirror(jotted, options) {
+      babelHelpers.classCallCheck(this, PluginCodeMirror);
+
+      var priority = 1;
+      var i;
+
+      this.editor = {};
+      this.jotted = jotted;
+
+      // custom modemap for codemirror
+      var modemap = {
+        'html': 'htmlmixed'
+      };
+
+      options = extend(options, {
+        lineNumbers: true
+      });
+
+      // check if CodeMirror is loaded
+      if (typeof window.CodeMirror === 'undefined') {
+        return;
+      }
+
+      var $editors = jotted.$container.querySelectorAll('.jotted-editor');
+
+      for (i = 0; i < $editors.length; i++) {
+        var $textarea = $editors[i].querySelector('textarea');
+        var type = data($textarea, 'jotted-type');
+        var file = data($textarea, 'jotted-file');
+
+        this.editor[type] = window.CodeMirror.fromTextArea($textarea, options);
+        this.editor[type].setOption('mode', getMode(type, file, modemap));
+      }
+
+      jotted.on('change', this.change.bind(this), priority);
+    }
+
+    babelHelpers.createClass(PluginCodeMirror, [{
+      key: 'editorChange',
+      value: function editorChange(params) {
+        var _this = this;
+
+        return function () {
+          // trigger a change event
+          _this.jotted.trigger('change', params);
+        };
+      }
+    }, {
+      key: 'change',
+      value: function change(params, callback) {
+        var editor = this.editor[params.type];
+
+        // if the event is not started by the codemirror change.
+        // triggered only once per editor,
+        // when the textarea is populated/file is loaded.
+        if (!params.cmEditor) {
+          editor.setValue(params.content);
+
+          // attach the event only after the file is loaded
+          params.cmEditor = editor;
+          editor.on('change', this.editorChange(params));
+        }
+
+        // manipulate the params and pass them on
+        params.content = editor.getValue();
+        callback(null, params);
+      }
+    }]);
+    return PluginCodeMirror;
+  }();
+
+  var PluginLess = function () {
+    function PluginLess(jotted, options) {
+      babelHelpers.classCallCheck(this, PluginLess);
+
+      var priority = 20;
+
+      options = extend(options, {});
+
+      // check if less is loaded
+      if (typeof window.less === 'undefined') {
+        return;
+      }
+
+      // change CSS link label to Less
+      jotted.$container.querySelector('a[data-jotted-type="css"]').innerHTML = 'Less';
+
+      jotted.on('change', this.change.bind(this), priority);
+    }
+
+    babelHelpers.createClass(PluginLess, [{
+      key: 'isLess',
+      value: function isLess(params) {
+        if (params.type !== 'css') {
+          return false;
+        }
+
+        return params.file.indexOf('.less') !== -1 || params.file === '';
+      }
+    }, {
+      key: 'change',
+      value: function change(params, callback) {
+        // only parse .less and blank files
+        if (this.isLess(params)) {
+          window.less.render(params.content, this.options, function (err, res) {
+            if (err) {
+              return callback(err, params);
+            } else {
+              // replace the content with the parsed less
+              params.content = res.css;
+            }
+
+            callback(null, params);
+          });
+        } else {
+          // make sure we callback either way,
+          // to not break the pubsoup
+          callback(null, params);
+        }
+      }
+    }]);
+    return PluginLess;
+  }();
+
+  var PluginCoffeeScript = function () {
+    function PluginCoffeeScript(jotted, options) {
+      babelHelpers.classCallCheck(this, PluginCoffeeScript);
+
+      var priority = 20;
+
+      options = extend(options, {});
+
+      // check if coffeescript is loaded
+      if (typeof window.CoffeeScript === 'undefined') {
+        return;
+      }
+
+      // change JS link label to Less
+      jotted.$container.querySelector('a[data-jotted-type="js"]').innerHTML = 'CoffeeScript';
+
+      jotted.on('change', this.change.bind(this), priority);
+    }
+
+    babelHelpers.createClass(PluginCoffeeScript, [{
+      key: 'isCoffee',
+      value: function isCoffee(params) {
+        if (params.type !== 'js') {
+          return false;
+        }
+
+        return params.file.indexOf('.coffee') !== -1 || params.file === '';
+      }
+    }, {
+      key: 'change',
+      value: function change(params, callback) {
+        // only parse .less and blank files
+        if (this.isCoffee(params)) {
+          try {
+            params.content = window.CoffeeScript.compile(params.content);
+          } catch (err) {
+            return callback(err, params);
+          }
+        }
+
+        callback(null, params);
+      }
+    }]);
+    return PluginCoffeeScript;
+  }();
+
+  var PluginStylus = function () {
+    function PluginStylus(jotted, options) {
+      babelHelpers.classCallCheck(this, PluginStylus);
+
+      var priority = 20;
+
+      options = extend(options, {});
+
+      // check if stylus is loaded
+      if (typeof window.stylus === 'undefined') {
+        return;
+      }
+
+      // change CSS link label to Stylus
+      jotted.$container.querySelector('a[data-jotted-type="css"]').innerHTML = 'Stylus';
+
+      jotted.on('change', this.change.bind(this), priority);
+    }
+
+    babelHelpers.createClass(PluginStylus, [{
+      key: 'isStylus',
+      value: function isStylus(params) {
+        if (params.type !== 'css') {
+          return false;
+        }
+
+        return params.file.indexOf('.styl') !== -1 || params.file === '';
+      }
+    }, {
+      key: 'change',
+      value: function change(params, callback) {
+        // only parse .styl and blank files
+        if (this.isStylus(params)) {
+          window.stylus(params.content, this.options).render(function (err, res) {
+            if (err) {
+              return callback(err, params);
+            } else {
+              // replace the content with the parsed less
+              params.content = res;
+            }
+
+            callback(null, params);
+          });
+        } else {
+          // make sure we callback either way,
+          // to not break the pubsoup
+          callback(null, params);
+        }
+      }
+    }]);
+    return PluginStylus;
+  }();
+
+  var PluginBabel = function () {
+    function PluginBabel(jotted, options) {
+      babelHelpers.classCallCheck(this, PluginBabel);
+
+      var priority = 20;
+
+      this.options = extend(options, {});
+
+      // check if babel is loaded
+      if (typeof window.Babel !== 'undefined') {
+        // using babel-standalone
+        this.babel = window.Babel;
+      } else if (typeof window.babel !== 'undefined') {
+        // using browser.js from babel-core 5.x
+        this.babel = {
+          transform: window.babel
+        };
+      } else {
+        return;
+      }
+
+      // change js link label
+      jotted.$container.querySelector('a[data-jotted-type="js"]').innerHTML = 'ES2015';
+
+      jotted.on('change', this.change.bind(this), priority);
+    }
+
+    babelHelpers.createClass(PluginBabel, [{
+      key: 'change',
+      value: function change(params, callback) {
+        // only parse js content
+        if (params.type === 'js') {
+          try {
+            params.content = this.babel.transform(params.content, this.options).code;
+          } catch (err) {
+            return callback(err, params);
+          }
+
+          callback(null, params);
+        } else {
+          // make sure we callback either way,
+          // to not break the pubsoup
+          callback(null, params);
+        }
+      }
+    }]);
+    return PluginBabel;
+  }();
+
+  var PluginMarkdown = function () {
+    function PluginMarkdown(jotted, options) {
+      babelHelpers.classCallCheck(this, PluginMarkdown);
+
+      var priority = 20;
+
+      this.options = extend(options, {});
+
+      // check if marked is loaded
+      if (typeof window.marked === 'undefined') {
+        return;
+      }
+
+      window.marked.setOptions(options);
+
+      // change html link label
+      jotted.$container.querySelector('a[data-jotted-type="html"]').innerHTML = 'Markdown';
+
+      jotted.on('change', this.change.bind(this), priority);
+    }
+
+    babelHelpers.createClass(PluginMarkdown, [{
+      key: 'change',
+      value: function change(params, callback) {
+        // only parse html content
+        if (params.type === 'html') {
+          try {
+            params.content = window.marked(params.content);
+          } catch (err) {
+            return callback(err, params);
+          }
+
+          callback(null, params);
+        } else {
+          // make sure we callback either way,
+          // to not break the pubsoup
+          callback(null, params);
+        }
+      }
+    }]);
+    return PluginMarkdown;
   }();
 
   var PluginConsole = function () {
@@ -758,540 +1225,73 @@
     return PluginConsole;
   }();
 
-  var PluginMarkdown = function () {
-    function PluginMarkdown(jotted, options) {
-      babelHelpers.classCallCheck(this, PluginMarkdown);
-
-      var priority = 20;
-
-      this.options = extend(options, {});
-
-      // check if marked is loaded
-      if (typeof window.marked === 'undefined') {
-        return;
-      }
-
-      window.marked.setOptions(options);
-
-      // change html link label
-      jotted.$container.querySelector('a[data-jotted-type="html"]').innerHTML = 'Markdown';
-
-      jotted.on('change', this.change.bind(this), priority);
-    }
-
-    babelHelpers.createClass(PluginMarkdown, [{
-      key: 'change',
-      value: function change(params, callback) {
-        // only parse html content
-        if (params.type === 'html') {
-          try {
-            params.content = window.marked(params.content);
-          } catch (err) {
-            return callback(err, params);
-          }
-
-          callback(null, params);
-        } else {
-          // make sure we callback either way,
-          // to not break the pubsoup
-          callback(null, params);
-        }
-      }
-    }]);
-    return PluginMarkdown;
-  }();
-
-  var PluginBabel = function () {
-    function PluginBabel(jotted, options) {
-      babelHelpers.classCallCheck(this, PluginBabel);
-
-      var priority = 20;
-
-      this.options = extend(options, {});
-
-      // check if babel is loaded
-      if (typeof window.Babel !== 'undefined') {
-        // using babel-standalone
-        this.babel = window.Babel;
-      } else if (typeof window.babel !== 'undefined') {
-        // using browser.js from babel-core 5.x
-        this.babel = {
-          transform: window.babel
-        };
-      } else {
-        return;
-      }
-
-      // change js link label
-      jotted.$container.querySelector('a[data-jotted-type="js"]').innerHTML = 'ES2015';
-
-      jotted.on('change', this.change.bind(this), priority);
-    }
-
-    babelHelpers.createClass(PluginBabel, [{
-      key: 'change',
-      value: function change(params, callback) {
-        // only parse js content
-        if (params.type === 'js') {
-          try {
-            params.content = this.babel.transform(params.content, this.options).code;
-          } catch (err) {
-            return callback(err, params);
-          }
-
-          callback(null, params);
-        } else {
-          // make sure we callback either way,
-          // to not break the pubsoup
-          callback(null, params);
-        }
-      }
-    }]);
-    return PluginBabel;
-  }();
-
-  var PluginStylus = function () {
-    function PluginStylus(jotted, options) {
-      babelHelpers.classCallCheck(this, PluginStylus);
-
-      var priority = 20;
+  var PluginPlay = function () {
+    function PluginPlay(jotted, options) {
+      babelHelpers.classCallCheck(this, PluginPlay);
 
       options = extend(options, {});
 
-      // check if stylus is loaded
-      if (typeof window.stylus === 'undefined') {
-        return;
-      }
+      var priority = 10;
+      // cached code
+      var cache = {};
+      // latest version of the code.
+      // replaces the cache when the run button is pressed.
+      var code = {};
 
-      // change CSS link label to Stylus
-      jotted.$container.querySelector('a[data-jotted-type="css"]').innerHTML = 'Stylus';
+      // run button
+      var $button = document.createElement('button');
+      $button.className = 'jotted-button jotted-button-play';
+      $button.innerHTML = 'Run';
 
+      jotted.$container.appendChild($button);
+      $button.addEventListener('click', this.run.bind(this));
+
+      // capture the code on each change
       jotted.on('change', this.change.bind(this), priority);
-    }
-
-    babelHelpers.createClass(PluginStylus, [{
-      key: 'isStylus',
-      value: function isStylus(params) {
-        if (params.type !== 'css') {
-          return false;
-        }
-
-        return params.file.indexOf('.styl') !== -1 || params.file === '';
-      }
-    }, {
-      key: 'change',
-      value: function change(params, callback) {
-        // only parse .styl and blank files
-        if (this.isStylus(params)) {
-          window.stylus(params.content, this.options).render(function (err, res) {
-            if (err) {
-              return callback(err, params);
-            } else {
-              // replace the content with the parsed less
-              params.content = res;
-            }
-
-            callback(null, params);
-          });
-        } else {
-          // make sure we callback either way,
-          // to not break the pubsoup
-          callback(null, params);
-        }
-      }
-    }]);
-    return PluginStylus;
-  }();
-
-  var PluginCoffeeScript = function () {
-    function PluginCoffeeScript(jotted, options) {
-      babelHelpers.classCallCheck(this, PluginCoffeeScript);
-
-      var priority = 20;
-
-      options = extend(options, {});
-
-      // check if coffeescript is loaded
-      if (typeof window.CoffeeScript === 'undefined') {
-        return;
-      }
-
-      // change JS link label to Less
-      jotted.$container.querySelector('a[data-jotted-type="js"]').innerHTML = 'CoffeeScript';
-
-      jotted.on('change', this.change.bind(this), priority);
-    }
-
-    babelHelpers.createClass(PluginCoffeeScript, [{
-      key: 'isCoffee',
-      value: function isCoffee(params) {
-        if (params.type !== 'js') {
-          return false;
-        }
-
-        return params.file.indexOf('.coffee') !== -1 || params.file === '';
-      }
-    }, {
-      key: 'change',
-      value: function change(params, callback) {
-        // only parse .less and blank files
-        if (this.isCoffee(params)) {
-          try {
-            params.content = window.CoffeeScript.compile(params.content);
-          } catch (err) {
-            return callback(err, params);
-          }
-        }
-
-        callback(null, params);
-      }
-    }]);
-    return PluginCoffeeScript;
-  }();
-
-  var PluginLess = function () {
-    function PluginLess(jotted, options) {
-      babelHelpers.classCallCheck(this, PluginLess);
-
-      var priority = 20;
-
-      options = extend(options, {});
-
-      // check if less is loaded
-      if (typeof window.less === 'undefined') {
-        return;
-      }
-
-      // change CSS link label to Less
-      jotted.$container.querySelector('a[data-jotted-type="css"]').innerHTML = 'Less';
-
-      jotted.on('change', this.change.bind(this), priority);
-    }
-
-    babelHelpers.createClass(PluginLess, [{
-      key: 'isLess',
-      value: function isLess(params) {
-        if (params.type !== 'css') {
-          return false;
-        }
-
-        return params.file.indexOf('.less') !== -1 || params.file === '';
-      }
-    }, {
-      key: 'change',
-      value: function change(params, callback) {
-        // only parse .less and blank files
-        if (this.isLess(params)) {
-          window.less.render(params.content, this.options, function (err, res) {
-            if (err) {
-              return callback(err, params);
-            } else {
-              // replace the content with the parsed less
-              params.content = res.css;
-            }
-
-            callback(null, params);
-          });
-        } else {
-          // make sure we callback either way,
-          // to not break the pubsoup
-          callback(null, params);
-        }
-      }
-    }]);
-    return PluginLess;
-  }();
-
-  var PluginCodeMirror = function () {
-    function PluginCodeMirror(jotted, options) {
-      babelHelpers.classCallCheck(this, PluginCodeMirror);
-
-      var priority = 1;
-      var i;
-
-      this.editor = {};
-      this.jotted = jotted;
-
-      // custom modemap for codemirror
-      var modemap = {
-        'html': 'htmlmixed'
-      };
-
-      options = extend(options, {
-        lineNumbers: true
-      });
-
-      // check if CodeMirror is loaded
-      if (typeof window.CodeMirror === 'undefined') {
-        return;
-      }
-
-      var $editors = jotted.$container.querySelectorAll('.jotted-editor');
-
-      for (i = 0; i < $editors.length; i++) {
-        var $textarea = $editors[i].querySelector('textarea');
-        var type = data($textarea, 'jotted-type');
-        var file = data($textarea, 'jotted-file');
-
-        this.editor[type] = window.CodeMirror.fromTextArea($textarea, options);
-        this.editor[type].setOption('mode', getMode(type, file, modemap));
-      }
-
-      jotted.on('change', this.change.bind(this), priority);
-    }
-
-    babelHelpers.createClass(PluginCodeMirror, [{
-      key: 'editorChange',
-      value: function editorChange(params) {
-        var _this = this;
-
-        return function () {
-          // trigger a change event
-          _this.jotted.trigger('change', params);
-        };
-      }
-    }, {
-      key: 'change',
-      value: function change(params, callback) {
-        var editor = this.editor[params.type];
-
-        // if the event is not started by the codemirror change.
-        // triggered only once per editor,
-        // when the textarea is populated/file is loaded.
-        if (!params.cmEditor) {
-          editor.setValue(params.content);
-
-          // attach the event only after the file is loaded
-          params.cmEditor = editor;
-          editor.on('change', this.editorChange(params));
-        }
-
-        // manipulate the params and pass them on
-        params.content = editor.getValue();
-        callback(null, params);
-      }
-    }]);
-    return PluginCodeMirror;
-  }();
-
-  var PluginAce = function () {
-    function PluginAce(jotted, options) {
-      babelHelpers.classCallCheck(this, PluginAce);
-
-      var priority = 1;
-      var i;
-
-      this.editor = {};
-      this.jotted = jotted;
-
-      options = extend(options, {});
-
-      // check if Ace is loaded
-      if (typeof window.ace === 'undefined') {
-        return;
-      }
-
-      var $editors = jotted.$container.querySelectorAll('.jotted-editor');
-
-      for (i = 0; i < $editors.length; i++) {
-        var $textarea = $editors[i].querySelector('textarea');
-        var type = data($textarea, 'jotted-type');
-        var file = data($textarea, 'jotted-file');
-
-        var $aceContainer = document.createElement('div');
-        $editors[i].appendChild($aceContainer);
-
-        this.editor[type] = window.ace.edit($aceContainer);
-        var editor = this.editor[type];
-
-        var editorOptions = extend(options);
-
-        editor.getSession().setMode('ace/mode/' + getMode(type, file));
-        editor.getSession().setOptions(editorOptions);
-
-        editor.$blockScrolling = Infinity;
-      }
-
-      jotted.on('change', this.change.bind(this), priority);
-    }
-
-    babelHelpers.createClass(PluginAce, [{
-      key: 'editorChange',
-      value: function editorChange(params) {
-        var _this = this;
-
-        return function () {
-          _this.jotted.trigger('change', params);
-        };
-      }
-    }, {
-      key: 'change',
-      value: function change(params, callback) {
-        var editor = this.editor[params.type];
-
-        // if the event is not started by the ace change.
-        // triggered only once per editor,
-        // when the textarea is populated/file is loaded.
-        if (!params.aceEditor) {
-          editor.getSession().setValue(params.content);
-
-          // attach the event only after the file is loaded
-          params.aceEditor = editor;
-          editor.on('change', this.editorChange(params));
-        }
-
-        // manipulate the params and pass them on
-        params.content = editor.getValue();
-        callback(null, params);
-      }
-    }]);
-    return PluginAce;
-  }();
-
-  var PluginScriptless = function () {
-    function PluginScriptless(jotted, options) {
-      babelHelpers.classCallCheck(this, PluginScriptless);
-
-      options = extend(options, {});
-
-      // https://html.spec.whatwg.org/multipage/scripting.html
-      var runScriptTypes = ['application/javascript', 'application/ecmascript', 'application/x-ecmascript', 'application/x-javascript', 'text/ecmascript', 'text/javascript', 'text/javascript1.0', 'text/javascript1.1', 'text/javascript1.2', 'text/javascript1.3', 'text/javascript1.4', 'text/javascript1.5', 'text/jscript', 'text/livescript', 'text/x-ecmascript', 'text/x-javascript'];
-
-      // remove script tags on each change
-      jotted.on('change', this.change.bind(this));
 
       // public
-      this.runScriptTypes = runScriptTypes;
+      this.cache = cache;
+      this.code = code;
+      this.jotted = jotted;
     }
 
-    babelHelpers.createClass(PluginScriptless, [{
+    babelHelpers.createClass(PluginPlay, [{
       key: 'change',
       value: function change(params, callback) {
-        if (params.type !== 'html') {
-          return callback(null, params);
-        }
+        // always cache the latest code
+        this.code[params.type] = extend(params);
 
-        // for IE9 support, remove the script tags from HTML content.
-        // when we stop supporting IE9, we can use the sandbox attribute.
-        var fragment = document.createElement('div');
-        fragment.innerHTML = params.content;
+        // replace the params with the latest cache
+        if (this.cache[params.type]) {
+          callback(null, this.cache[params.type]);
 
-        var typeAttr = null;
+          // make sure we don't cache forceRender,
+          // and send it with each change.
+          this.cache[params.type].forceRender = null;
+        } else {
+          // cache the first run
+          this.cache[params.type] = extend(params);
 
-        // remove all script tags
-        var $scripts = fragment.querySelectorAll('script');
-        for (var i = 0; i < $scripts.length; i++) {
-          typeAttr = $scripts[i].getAttribute('type');
-
-          // only remove script tags without the type attribute
-          // or with a javascript mime attribute value.
-          // the ones that are run by the browser.
-          if (!typeAttr || this.runScriptTypes.indexOf(typeAttr) !== -1) {
-            $scripts[i].parentNode.removeChild($scripts[i]);
-          }
-        }
-
-        params.content = fragment.innerHTML;
-
-        callback(null, params);
-      }
-    }]);
-    return PluginScriptless;
-  }();
-
-  var PluginRender = function () {
-    function PluginRender(jotted, options) {
-      babelHelpers.classCallCheck(this, PluginRender);
-
-      options = extend(options, {});
-
-      // iframe srcdoc support
-      var supportSrcdoc = !!('srcdoc' in document.createElement('iframe'));
-      var $resultFrame = jotted.$container.querySelector('.jotted-pane-result iframe');
-
-      var frameContent = '';
-      var latestCallback = function latestCallback() {};
-
-      // cached content
-      var content = {
-        html: '',
-        css: '',
-        js: ''
-      };
-
-      // catch domready events from the iframe
-      window.addEventListener('message', this.domready.bind(this));
-
-      // render on each change
-      jotted.on('change', this.change.bind(this), 100);
-
-      // public
-      this.supportSrcdoc = supportSrcdoc;
-      this.latestCallback = latestCallback;
-      this.content = content;
-      this.frameContent = frameContent;
-      this.$resultFrame = $resultFrame;
-    }
-
-    babelHelpers.createClass(PluginRender, [{
-      key: 'change',
-      value: function change(params, callback) {
-        // cache manipulated content
-        this.content[params.type] = params.content;
-
-        // check existing and to-be-rendered content
-        var oldFrameContent = this.frameContent;
-        this.frameContent = frameContent(this.content['css'], this.content['html'], this.content['js']);
-
-        // don't render if previous and new frame content are the same.
-        // mostly for the `play` plugin,
-        // so we don't re-render the same content on each change.
-        // unless we set forceRender.
-        if (params.forceRender !== true && this.frameContent === oldFrameContent) {
           callback(null, params);
-          return;
-        }
-
-        // cache the current callback as a global,
-        // so we can call it from the message callback.
-        this.latestCallback = function () {
-          callback(null, params);
-        };
-
-        this.$resultFrame.setAttribute('srcdoc', this.frameContent);
-
-        // older browsers without iframe srcset support (IE9)
-        if (!this.supportSrcdoc) {
-          // tips from https://github.com/jugglinmike/srcdoc-polyfill
-          // Copyright (c) 2012 Mike Pennisi
-          // Licensed under the MIT license.
-          var jsUrl = 'javascript:window.frameElement.getAttribute("srcdoc");';
-
-          this.$resultFrame.setAttribute('src', jsUrl);
-
-          // Explicitly set the iFrame's window.location for
-          // compatibility with IE9, which does not react to changes in
-          // the `src` attribute when it is a `javascript:` URL.
-          if (this.$resultFrame.contentWindow) {
-            this.$resultFrame.contentWindow.location = jsUrl;
-          }
         }
       }
     }, {
-      key: 'domready',
-      value: function domready(e) {
-        // only catch messages from the iframe
-        if (e.source !== this.$resultFrame.contentWindow) {
-          return;
-        }
+      key: 'run',
+      value: function run() {
+        // trigger change on each type with the latest code
+        for (var type in this.code) {
+          // update the cache with the latest code
+          this.cache[type] = extend(this.code[type], {
+            // force rendering on each Run press
+            forceRender: true
+          });
 
-        var data = JSON.parse(e.data);
-        if (data.type === 'jotted-dom-ready') {
-          this.latestCallback();
+          // trigger the change
+          this.jotted.trigger('change', this.cache[type]);
         }
       }
     }]);
-    return PluginRender;
+    return PluginPlay;
   }();
 
   function BundlePlugins(jotted) {
@@ -1658,6 +1658,7 @@
   }();
 
   // register plugins
+
 
   Jotted.plugin = function () {
     return register.apply(this, arguments);

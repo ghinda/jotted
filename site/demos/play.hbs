@@ -32,7 +32,14 @@ demo: true
       }
     ],
     plugins: [
-      'play',
+      {
+        name: 'play',
+        options: {
+          // to start with a blank preview when initializing the plugin,
+          // and only run the initial content after the first Run press.
+          // firstRun: false
+        }
+      },
       'codemirror'
     ]
   });

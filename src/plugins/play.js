@@ -6,7 +6,9 @@ import * as util from '../util.js'
 
 export default class PluginPlay {
   constructor (jotted, options) {
-    options = util.extend(options, {})
+    options = util.extend(options, {
+      firstRun: true
+    })
 
     var priority = 10
     // cached code
@@ -14,6 +16,25 @@ export default class PluginPlay {
     // latest version of the code.
     // replaces the cache when the run button is pressed.
     var code = {}
+
+    // set firstRun=false to start with a blank preview.
+    // run the real content only after the first Run button press.
+    if (options.firstRun === false) {
+      cache = {
+        html: {
+          type: 'html',
+          content: ''
+        },
+        css: {
+          type: 'css',
+          content: ''
+        },
+        js: {
+          type: 'js',
+          content: ''
+        }
+      }
+    }
 
     // run button
     var $button = document.createElement('button')
@@ -37,7 +58,7 @@ export default class PluginPlay {
     this.code[params.type] = util.extend(params)
 
     // replace the params with the latest cache
-    if (this.cache[params.type]) {
+    if (typeof this.cache[params.type] !== 'undefined') {
       callback(null, this.cache[params.type])
 
       // make sure we don't cache forceRender,

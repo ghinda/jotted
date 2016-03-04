@@ -101,4 +101,74 @@ describe('Play Plugin', function () {
 
     jotted.play.done('change', change1)
   })
+
+  it('should start with blank content when setting firstRun', function (done) {
+    jotted.play = new Jotted(dom.$play, {
+      files: [{
+        type: 'html',
+        content: '<h1>Initial</h1>'
+      }],
+      plugins: [{
+        name: 'play',
+        options: {
+          firstRun: false
+        }
+      }],
+      debounce: false
+    })
+
+    var checkContent = function (errs, params) {
+      // only after the html is rendered
+      if (params.type === 'html') {
+        try {
+          expect(dom.$play.querySelector('.jotted-pane-result   iframe').contentWindow.document.querySelector('h1')).to.be.null
+          done()
+        } catch (err) {
+          done(err)
+        }
+      }
+    }
+
+    jotted.play.done('change', checkContent)
+  })
+
+  it('should show initial content on Run button press, when using firstRun', function (done) {
+    jotted.play = new Jotted(dom.$play, {
+      files: [{
+        type: 'html',
+        content: '<h1>Initial</h1>'
+      }],
+      plugins: [{
+        name: 'play',
+        options: {
+          firstRun: false
+        }
+      }],
+      debounce: false
+    })
+
+    var clickEvent = document.createEvent('Event')
+    clickEvent.initEvent('click', true, true)
+
+    var change1 = function () {
+      jotted.play.off('change', change1)
+      jotted.play.done('change', checkContent)
+
+      dom.$play.querySelector('.jotted-button-play').dispatchEvent(clickEvent)
+    }
+
+    var checkContent = function (errs, params) {
+      // only after the html is rendered
+      if (params.type === 'html') {
+        try {
+          expect(dom.$play.querySelector('.jotted-pane-result   iframe').contentWindow.document.querySelector('h1').innerHTML).to.equal('Initial')
+          done()
+        } catch (err) {
+          done(err)
+        }
+      }
+    }
+
+    jotted.play.done('change', change1)
+  })
 })

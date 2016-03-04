@@ -151,7 +151,14 @@
       }
     ],
     plugins: [
-      &#39;play&#39;,
+      {
+        name: &#39;play&#39;,
+        options: {
+          // to start with a blank preview when initializing the plugin,
+          // and only run the initial content after the first Run press.
+          // firstRun: false
+        }
+      },
       &#39;codemirror&#39;
     ]
   });

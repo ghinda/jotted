@@ -1301,14 +1301,16 @@
       value: function run() {
         // trigger change on each type with the latest code
         for (var type in this.code) {
-          // update the cache with the latest code
-          this.cache[type] = extend(this.code[type], {
-            // force rendering on each Run press
-            forceRender: true
-          });
+          // check if code of type has changed
+          if (this.cache[type].content !== this.code[type].content) {
+            this.cache[type] = extend(this.code[type], {
+              // force rendering on each Run press
+              forceRender: true
+            });
 
-          // trigger the change
-          this.jotted.trigger('change', this.cache[type]);
+            // trigger the change
+            this.jotted.trigger('change', this.cache[type]);
+          }
         }
       }
     }]);
@@ -1366,11 +1368,11 @@
         options.plugins.push('scriptless');
       }
 
-      // cached content for the change method
+      // cached content for the change method.
       this._set('cachedContent', {
-        html: '',
-        css: '',
-        js: ''
+        html: null,
+        css: null,
+        js: null
       });
 
       // PubSoup

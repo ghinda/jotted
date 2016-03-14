@@ -146,4 +146,27 @@ describe('Core', function () {
       expect($navs[i].offsetParent).to.not.be.null
     }
   })
+
+  it('should trigger change events when using empty content', function (done) {
+    jotted.core = new Jotted(dom.$editor, {
+      files: [{
+        type: 'html',
+        content: ''
+      }]
+    })
+
+    var changeEvent = document.createEvent('Event')
+    changeEvent.initEvent('change', true, true)
+
+    var $textareaHtml = dom.$editor.querySelector('.jotted-pane-html textarea')
+    jotted.core.done('change', function () {
+      $textareaHtml.value = 'newvalue'
+      $textareaHtml.dispatchEvent(changeEvent)
+    })
+
+    jotted.core.on('change', function (params, callback) {
+      expect(params.type).to.equal('html')
+      done()
+    })
+  })
 })

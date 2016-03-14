@@ -40,11 +40,11 @@ class Jotted {
       options.plugins.push('scriptless')
     }
 
-    // cached content for the change method
+    // cached content for the change method.
     this._set('cachedContent', {
-      html: '',
-      css: '',
-      js: ''
+      html: null,
+      css: null,
+      js: null
     })
 
     // PubSoup

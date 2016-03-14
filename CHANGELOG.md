@@ -1,4 +1,8 @@
 
+## [1.4.1] - 2016-03-14
+
+* Fix issues with not triggering the initial change event when loading file content, when using content: ''.
+
 ## [1.4.0] - 2016-03-04
 
 * New `firstRun` option (default is `true`) to the `play` plugin. Causes the preview to start with blank content, and only run the initial content on the first Run button press.

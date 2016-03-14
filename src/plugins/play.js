@@ -75,16 +75,13 @@ export default class PluginPlay {
   run () {
     // trigger change on each type with the latest code
     for (let type in this.code) {
-      // check if code of type has changed
-      if (this.cache[type].content !== this.code[type].content) {
-        this.cache[type] = util.extend(this.code[type], {
-          // force rendering on each Run press
-          forceRender: true
-        })
+      this.cache[type] = util.extend(this.code[type], {
+        // force rendering on each Run press
+        forceRender: true
+      })
 
-        // trigger the change
-        this.jotted.trigger('change', this.cache[type])
-      }
+      // trigger the change
+      this.jotted.trigger('change', this.cache[type])
     }
   }
 }

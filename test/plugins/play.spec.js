@@ -88,14 +88,11 @@ describe('Play Plugin', function () {
     }
 
     var checkContent = function (errs, params) {
-      // only after the html is rendered
-      if (params.type === 'html') {
-        try {
-          expect(dom.$play.querySelector('.jotted-pane-result   iframe').contentWindow.document.querySelector('h1').innerHTML).to.equal('Changed Text')
-          done()
-        } catch (err) {
-          done(err)
-        }
+      try {
+        expect(dom.$play.querySelector('.jotted-pane-result   iframe').contentWindow.document.querySelector('h1').innerHTML).to.equal('Changed Text')
+        done()
+      } catch (err) {
+        done(err)
       }
     }
 
@@ -118,14 +115,11 @@ describe('Play Plugin', function () {
     })
 
     var checkContent = function (errs, params) {
-      // only after the html is rendered
-      if (params.type === 'html') {
-        try {
-          expect(dom.$play.querySelector('.jotted-pane-result   iframe').contentWindow.document.querySelector('h1')).to.be.null
-          done()
-        } catch (err) {
-          done(err)
-        }
+      try {
+        expect(dom.$play.querySelector('.jotted-pane-result   iframe').contentWindow.document.querySelector('h1')).to.be.null
+        done()
+      } catch (err) {
+        done(err)
       }
     }
 
@@ -158,14 +152,11 @@ describe('Play Plugin', function () {
     }
 
     var checkContent = function (errs, params) {
-      // only after the html is rendered
-      if (params.type === 'html') {
-        try {
-          expect(dom.$play.querySelector('.jotted-pane-result   iframe').contentWindow.document.querySelector('h1').innerHTML).to.equal('Initial')
-          done()
-        } catch (err) {
-          done(err)
-        }
+      try {
+        expect(dom.$play.querySelector('.jotted-pane-result   iframe').contentWindow.document.querySelector('h1').innerHTML).to.equal('Initial')
+        done()
+      } catch (err) {
+        done(err)
       }
     }
 

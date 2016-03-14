@@ -24,67 +24,22 @@
 
   
 
-<div id="j-ace"></div>
 <div id="j-cm"></div>
 
 <link rel="stylesheet" href="bower_components/codemirror/lib/codemirror.css">
 <script src="bower_components/codemirror/lib/codemirror.js"></script>
 
-<script src="bower_components/ace-builds/src/ace.js"></script>
-
-<script src="bower_components/less/dist/less.js"></script>
-
-<script src="bower_components/coffee-script/extras/coffee-script.js"></script>
-
-<script src="lib/stylus.min.js"></script>
-
-<script src="lib/babel.min.js"></script>
-
-<script src="lib/marked.js"></script>
-
 <script src="jotted.js"></script>
 
 <script>
-  Jotted.plugin('test', function (jotted, options) {
-    console.log('test', options)
-  });
-
-  var jot = new Jotted(document.getElementById('j-ace'), {
-    files: [{
-      type: 'html',
-      url: 'demos/ace.html'
-    }],
-    plugins: [
-      'ace',
-      'less',
-      'coffeescript',
-      {
-        name: 'test',
-        options: {
-          testOption: 'test-option'
-        }
-      }
-    ]
-  });
-
   var jot = new Jotted(document.getElementById('j-cm'), {
     pane: 'html',
     files: [{
-      type: 'css',
-      url: 'jotted.styl'
-    }, {
       type: 'html',
-      content: '# heading 1'
+      content: ''
     }],
-    showBlank: true,
     plugins: [
-      {
-        name: 'codemirror',
-        options: {}
-      },
-      'stylus',
-      'babel',
-      'markdown'
+      'codemirror'
     ]
   });
 </script>

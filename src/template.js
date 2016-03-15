@@ -73,31 +73,6 @@ export function pluginClass (name) {
   return `jotted-plugin-${name}`
 }
 
-export function frameContent (style = '', body = '', script = '') {
-  return `
-    <!doctype html>
-    <html>
-      <head>
-        <style>${style}</style>
-      </head>
-      <body>
-        ${body}
-
-        <script>
-          (function () {
-            window.addEventListener('DOMContentLoaded', function () {
-              window.parent.postMessage(JSON.stringify({
-                type: 'jotted-dom-ready'
-              }), '*')
-            })
-          }())
-        </script>
-        <script>${script}</script>
-      </body>
-    </html>
-  `
-}
-
 export function statusLoading (url) {
   return `Loading <strong>${url}</strong>..`
 }

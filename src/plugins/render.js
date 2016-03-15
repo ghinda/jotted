@@ -3,7 +3,6 @@
  */
 
 import * as util from '../util.js'
-import * as template from '../template.js'
 
 export default class PluginRender {
   constructor (jotted, options) {
@@ -37,13 +36,44 @@ export default class PluginRender {
     this.$resultFrame = $resultFrame
   }
 
+  template (style = '', body = '', script = '') {
+    return `
+      <!doctype html>
+      <html>
+        <head>
+          <script>
+            (function () {
+              window.addEventListener('DOMContentLoaded', function () {
+                window.parent.postMessage(JSON.stringify({
+                  type: 'jotted-dom-ready'
+                }), '*')
+              })
+            }())
+          </script>
+
+          <style>${style}</style>
+        </head>
+        <body>
+          ${body}
+
+          <!--
+            Jotted:
+            Empty script tag prevents malformed HTML from breaking the next script.
+          -->
+          <script></script>
+          <script>${script}</script>
+        </body>
+      </html>
+    `
+  }
+
   change (params, callback) {
     // cache manipulated content
     this.content[params.type] = params.content
 
     // check existing and to-be-rendered content
     var oldFrameContent = this.frameContent
-    this.frameContent = template.frameContent(this.content['css'], this.content['html'], this.content['js'])
+    this.frameContent = this.template(this.content['css'], this.content['html'], this.content['js'])
 
     // don't render if previous and new frame content are the same.
     // mostly for the `play` plugin,

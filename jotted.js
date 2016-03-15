@@ -268,14 +268,6 @@
     return 'jotted-plugin-' + name;
   }
 
-  function frameContent() {
-    var style = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
-    var body = arguments.length <= 1 || arguments[1] === undefined ? '' : arguments[1];
-    var script = arguments.length <= 2 || arguments[2] === undefined ? '' : arguments[2];
-
-    return '\n    <!doctype html>\n    <html>\n      <head>\n        <style>' + style + '</style>\n      </head>\n      <body>\n        ' + body + '\n\n        <script>\n          (function () {\n            window.addEventListener(\'DOMContentLoaded\', function () {\n              window.parent.postMessage(JSON.stringify({\n                type: \'jotted-dom-ready\'\n              }), \'*\')\n            })\n          }())\n        </script>\n        <script>' + script + '</script>\n      </body>\n    </html>\n  ';
-  }
-
   function statusLoading(url) {
     return 'Loading <strong>' + url + '</strong>..';
   }
@@ -476,6 +468,15 @@
     }
 
     babelHelpers.createClass(PluginRender, [{
+      key: 'template',
+      value: function template() {
+        var style = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
+        var body = arguments.length <= 1 || arguments[1] === undefined ? '' : arguments[1];
+        var script = arguments.length <= 2 || arguments[2] === undefined ? '' : arguments[2];
+
+        return '\n      <!doctype html>\n      <html>\n        <head>\n          <script>\n            (function () {\n              window.addEventListener(\'DOMContentLoaded\', function () {\n                window.parent.postMessage(JSON.stringify({\n                  type: \'jotted-dom-ready\'\n                }), \'*\')\n              })\n            }())\n          </script>\n\n          <style>' + style + '</style>\n        </head>\n        <body>\n          ' + body + '\n\n          <!--\n            Jotted:\n            Empty script tag prevents malformed HTML from breaking the next script.\n          -->\n          <script></script>\n          <script>' + script + '</script>\n        </body>\n      </html>\n    ';
+      }
+    }, {
       key: 'change',
       value: function change(params, callback) {
         // cache manipulated content
@@ -483,7 +484,7 @@
 
         // check existing and to-be-rendered content
         var oldFrameContent = this.frameContent;
-        this.frameContent = frameContent(this.content['css'], this.content['html'], this.content['js']);
+        this.frameContent = this.template(this.content['css'], this.content['html'], this.content['js']);
 
         // don't render if previous and new frame content are the same.
         // mostly for the `play` plugin,

@@ -1,4 +1,8 @@
 
+## [1.4.2] - 2016-03-15
+
+* Prevent malformed HTML from breaking JavaScript execution, and displaying the script content as text.
+
 ## [1.4.1] - 2016-03-14
 
 * Fix issues with not triggering the initial change event when loading file content, when using content: ''.

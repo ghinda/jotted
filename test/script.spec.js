@@ -33,9 +33,12 @@ describe('Script', function () {
     })
 
     var $iframe = jotted.script.$container.querySelector('.jotted-pane-result iframe')
-    jotted.script.done('change', window.util.check(done, function () {
-      expect($iframe.contentWindow.globalThatShouldntExist).to.be.undefined
-    }))
+    jotted.script.done('change', function (e, params) {
+      if (params.type === 'html') {
+        expect($iframe.contentWindow.globalThatShouldntExist).to.be.undefined
+        done()
+      }
+    })
   })
 
   it('should run script tags with no type attribute', function (done) {
@@ -52,9 +55,12 @@ describe('Script', function () {
     })
 
     var $iframe = jotted.script.$container.querySelector('.jotted-pane-result iframe')
-    jotted.script.done('change', window.util.check(done, function () {
-      expect($iframe.contentWindow.globalThatShouldExist).to.be.true
-    }))
+    jotted.script.done('change', function (e, params) {
+      if (params.type === 'html') {
+        expect($iframe.contentWindow.globalThatShouldExist).to.be.true
+        done()
+      }
+    })
   })
 
   it('should run script tags with text/javascript type attribute', function (done) {
@@ -70,9 +76,12 @@ describe('Script', function () {
       }]
     })
 
-    jotted.script.done('change', window.util.check(done, function () {
-      expect(dom.$script.querySelector('iframe').contentWindow.globalThatShouldExist).to.be.true
-    }))
+    jotted.script.done('change', function (e, params) {
+      if (params.type === 'html') {
+        expect(dom.$script.querySelector('iframe').contentWindow.globalThatShouldExist).to.be.true
+        done()
+      }
+    })
   })
 
   it('should not run script tags with type attribute other than text/javascript', function (done) {
@@ -88,9 +97,12 @@ describe('Script', function () {
       }]
     })
 
-    jotted.script.done('change', window.util.check(done, function () {
-      expect(dom.$script.querySelector('iframe').contentWindow.globalThatShouldntExist).to.be.undefined
-    }))
+    jotted.script.done('change', function (e, params) {
+      if (params.type === 'html') {
+        expect(dom.$script.querySelector('iframe').contentWindow.globalThatShouldntExist).to.be.undefined
+        done()
+      }
+    })
   })
 
   it('should render inline text/babel jsx with react', function (done) {
@@ -104,9 +116,13 @@ describe('Script', function () {
     })
 
     var $iframe = jotted.script.$container.querySelector('.jotted-pane-result iframe')
-    jotted.script.done('change', window.util.check(done, function () {
+    jotted.script.done('change', function (e, params) {
+      // will only trigger once.
+      // because it has to load the scripts,
+      // consecutive renders don't have enough time to trigger DOMContentLoaded.
       expect($iframe.contentWindow.document.querySelector('#content').textContent).to.contain('Hello, world!')
-    }))
+      done()
+    })
   })
 
   it('should run js only after all inline scripts are loaded', function (done) {

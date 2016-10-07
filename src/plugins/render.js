@@ -13,7 +13,6 @@ export default class PluginRender {
     var $resultFrame = jotted.$container.querySelector('.jotted-pane-result iframe')
 
     var frameContent = ''
-    var latestCallback = function () {}
 
     // cached content
     var content = {
@@ -30,13 +29,15 @@ export default class PluginRender {
 
     // public
     this.supportSrcdoc = supportSrcdoc
-    this.latestCallback = latestCallback
     this.content = content
     this.frameContent = frameContent
     this.$resultFrame = $resultFrame
+
+    this.callbacks = []
+    this.index = 0
   }
 
-  template (style = '', body = '', script = '') {
+  template (style = '', body = '', script = '', uid) {
     return `
       <!doctype html>
       <html>
@@ -45,7 +46,8 @@ export default class PluginRender {
             (function () {
               window.addEventListener('DOMContentLoaded', function () {
                 window.parent.postMessage(JSON.stringify({
-                  type: 'jotted-dom-ready'
+                  type: 'jotted-dom-ready',
+                  uid: ${uid}
                 }), '*')
               })
             }())
@@ -68,12 +70,15 @@ export default class PluginRender {
   }
 
   change (params, callback) {
+    // uid for callbacks
+    var uid = this.index++
+
     // cache manipulated content
     this.content[params.type] = params.content
 
     // check existing and to-be-rendered content
     var oldFrameContent = this.frameContent
-    this.frameContent = this.template(this.content['css'], this.content['html'], this.content['js'])
+    this.frameContent = this.template(this.content['css'], this.content['html'], this.content['js'], uid)
 
     // don't render if previous and new frame content are the same.
     // mostly for the `play` plugin,
@@ -86,18 +91,30 @@ export default class PluginRender {
 
     // cache the current callback as a global,
     // so we can call it from the message callback.
-    this.latestCallback = function () {
+    this.callbacks[uid] = function () {
       callback(null, params)
     }
 
-    this.$resultFrame.setAttribute('srcdoc', this.frameContent)
+    // the iframe was removed from the dom,
+    // while we were rendering.
+    if (!this.$resultFrame.contentWindow) {
+      return
+    }
 
-    // older browsers without iframe srcset support (IE9)
-    if (!this.supportSrcdoc) {
+    if (this.supportSrcdoc) {
+      // srcdoc in unreliable in Chrome.
+      // https://github.com/ghinda/jotted/issues/23
+      this.$resultFrame.contentWindow.document.open()
+      this.$resultFrame.contentWindow.document.write(this.frameContent)
+      this.$resultFrame.contentWindow.document.close()
+    } else {
+      // older browsers without iframe srcset support (IE9).
+      this.$resultFrame.setAttribute('data-srcdoc', this.frameContent)
+
       // tips from https://github.com/jugglinmike/srcdoc-polyfill
       // Copyright (c) 2012 Mike Pennisi
       // Licensed under the MIT license.
-      var jsUrl = 'javascript:window.frameElement.getAttribute("srcdoc");'
+      var jsUrl = 'javascript:window.frameElement.getAttribute("data-srcdoc");'
 
       this.$resultFrame.setAttribute('src', jsUrl)
 
@@ -116,9 +133,14 @@ export default class PluginRender {
       return
     }
 
-    var data = JSON.parse(e.data)
+    var data = {}
+    try {
+      data = JSON.parse(e.data)
+    } catch (e) {}
+
     if (data.type === 'jotted-dom-ready') {
-      this.latestCallback()
+      this.callbacks[data.uid]()
+      this.callbacks[data.uid] = null
     }
   }
 }

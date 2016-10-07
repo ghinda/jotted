@@ -12,13 +12,14 @@ title: ''
 
 <script>
   var jot = new Jotted(document.getElementById('j-cm'), {
-    pane: 'html',
     files: [{
-      type: 'html',
+      type: 'js',
       content: ''
     }],
-    plugins: [
-      'codemirror'
-    ]
+    plugins: ['console']
   });
+
+  jot.done('change', function () {
+    console.log('done')
+  })
 </script>

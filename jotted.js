@@ -2,47 +2,14 @@
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
   (global.Jotted = factory());
-}(this, function () { 'use strict';
-
-  var babelHelpers = {};
-  babelHelpers.typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
-    return typeof obj;
-  } : function (obj) {
-    return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj;
-  };
-
-  babelHelpers.classCallCheck = function (instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
-  };
-
-  babelHelpers.createClass = function () {
-    function defineProperties(target, props) {
-      for (var i = 0; i < props.length; i++) {
-        var descriptor = props[i];
-        descriptor.enumerable = descriptor.enumerable || false;
-        descriptor.configurable = true;
-        if ("value" in descriptor) descriptor.writable = true;
-        Object.defineProperty(target, descriptor.key, descriptor);
-      }
-    }
-
-    return function (Constructor, protoProps, staticProps) {
-      if (protoProps) defineProperties(Constructor.prototype, protoProps);
-      if (staticProps) defineProperties(Constructor, staticProps);
-      return Constructor;
-    };
-  }();
-
-  babelHelpers;
+}(this, (function () { 'use strict';
 
   /* util
    */
 
   function extend() {
-    var obj = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-    var defaults = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+    var obj = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+    var defaults = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
     var extended = {};
     // clone object
@@ -89,10 +56,10 @@
       }
 
       index++;
-      if (index === arr.length) {
-        callback(errors, res);
-      } else {
+      if (index < arr.length) {
         seqRunner(index, res, arr, errors, callback);
+      } else {
+        callback(errors, res);
       }
     };
   }
@@ -103,7 +70,7 @@
   }
 
   function seq(arr, params) {
-    var callback = arguments.length <= 2 || arguments[2] === undefined ? function () {} : arguments[2];
+    var callback = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : function () {};
 
     var errors = [];
 
@@ -199,24 +166,24 @@
   };
 
   function getMode() {
-    var type = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
-    var file = arguments.length <= 1 || arguments[1] === undefined ? '' : arguments[1];
-    var customModemap = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+    var type = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+    var file = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+    var customModemap = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
     var modemap = extend(customModemap, defaultModemap);
 
     // try the file extension
     for (var key in modemap) {
       var keyLength = key.length;
-      if (file.slice(- keyLength++) === '.' + key) {
+      if (file.slice(-keyLength++) === '.' + key) {
         return modemap[key];
       }
     }
 
     // try the file type (html/css/js)
-    for (var key in modemap) {
-      if (type === key) {
-        return modemap[key];
+    for (var _key in modemap) {
+      if (type === _key) {
+        return modemap[_key];
       }
     }
 
@@ -247,7 +214,7 @@
   }
 
   function editorContent(type) {
-    var fileUrl = arguments.length <= 1 || arguments[1] === undefined ? '' : arguments[1];
+    var fileUrl = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
 
     return '\n    <textarea data-jotted-type="' + type + '" data-jotted-file="' + fileUrl + '"></textarea>\n    <div class="jotted-status"></div>\n  ';
   }
@@ -276,9 +243,232 @@
     return 'There was an error loading <strong>' + url + '</strong>.';
   }
 
+  var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+    return typeof obj;
+  } : function (obj) {
+    return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+  };
+
+
+
+
+
+  var asyncGenerator = function () {
+    function AwaitValue(value) {
+      this.value = value;
+    }
+
+    function AsyncGenerator(gen) {
+      var front, back;
+
+      function send(key, arg) {
+        return new Promise(function (resolve, reject) {
+          var request = {
+            key: key,
+            arg: arg,
+            resolve: resolve,
+            reject: reject,
+            next: null
+          };
+
+          if (back) {
+            back = back.next = request;
+          } else {
+            front = back = request;
+            resume(key, arg);
+          }
+        });
+      }
+
+      function resume(key, arg) {
+        try {
+          var result = gen[key](arg);
+          var value = result.value;
+
+          if (value instanceof AwaitValue) {
+            Promise.resolve(value.value).then(function (arg) {
+              resume("next", arg);
+            }, function (arg) {
+              resume("throw", arg);
+            });
+          } else {
+            settle(result.done ? "return" : "normal", result.value);
+          }
+        } catch (err) {
+          settle("throw", err);
+        }
+      }
+
+      function settle(type, value) {
+        switch (type) {
+          case "return":
+            front.resolve({
+              value: value,
+              done: true
+            });
+            break;
+
+          case "throw":
+            front.reject(value);
+            break;
+
+          default:
+            front.resolve({
+              value: value,
+              done: false
+            });
+            break;
+        }
+
+        front = front.next;
+
+        if (front) {
+          resume(front.key, front.arg);
+        } else {
+          back = null;
+        }
+      }
+
+      this._invoke = send;
+
+      if (typeof gen.return !== "function") {
+        this.return = undefined;
+      }
+    }
+
+    if (typeof Symbol === "function" && Symbol.asyncIterator) {
+      AsyncGenerator.prototype[Symbol.asyncIterator] = function () {
+        return this;
+      };
+    }
+
+    AsyncGenerator.prototype.next = function (arg) {
+      return this._invoke("next", arg);
+    };
+
+    AsyncGenerator.prototype.throw = function (arg) {
+      return this._invoke("throw", arg);
+    };
+
+    AsyncGenerator.prototype.return = function (arg) {
+      return this._invoke("return", arg);
+    };
+
+    return {
+      wrap: function (fn) {
+        return function () {
+          return new AsyncGenerator(fn.apply(this, arguments));
+        };
+      },
+      await: function (value) {
+        return new AwaitValue(value);
+      }
+    };
+  }();
+
+
+
+
+
+  var classCallCheck = function (instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  };
+
+  var createClass = function () {
+    function defineProperties(target, props) {
+      for (var i = 0; i < props.length; i++) {
+        var descriptor = props[i];
+        descriptor.enumerable = descriptor.enumerable || false;
+        descriptor.configurable = true;
+        if ("value" in descriptor) descriptor.writable = true;
+        Object.defineProperty(target, descriptor.key, descriptor);
+      }
+    }
+
+    return function (Constructor, protoProps, staticProps) {
+      if (protoProps) defineProperties(Constructor.prototype, protoProps);
+      if (staticProps) defineProperties(Constructor, staticProps);
+      return Constructor;
+    };
+  }();
+
+
+
+
+
+
+
+  var get = function get(object, property, receiver) {
+    if (object === null) object = Function.prototype;
+    var desc = Object.getOwnPropertyDescriptor(object, property);
+
+    if (desc === undefined) {
+      var parent = Object.getPrototypeOf(object);
+
+      if (parent === null) {
+        return undefined;
+      } else {
+        return get(parent, property, receiver);
+      }
+    } else if ("value" in desc) {
+      return desc.value;
+    } else {
+      var getter = desc.get;
+
+      if (getter === undefined) {
+        return undefined;
+      }
+
+      return getter.call(receiver);
+    }
+  };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  var set = function set(object, property, value, receiver) {
+    var desc = Object.getOwnPropertyDescriptor(object, property);
+
+    if (desc === undefined) {
+      var parent = Object.getPrototypeOf(object);
+
+      if (parent !== null) {
+        set(parent, property, value, receiver);
+      }
+    } else if ("value" in desc && desc.writable) {
+      desc.value = value;
+    } else {
+      var setter = desc.set;
+
+      if (setter !== undefined) {
+        setter.call(receiver, value);
+      }
+    }
+
+    return value;
+  };
+
+  /* plugin
+   */
+
   var plugins = [];
 
-  function find(id) {
+  function find$1(id) {
     for (var pluginIndex in plugins) {
       var plugin = plugins[pluginIndex];
       if (plugin._id === id) {
@@ -302,32 +492,35 @@
 
     this._get('options').plugins.forEach(function (plugin) {
       // check if plugin definition is string or object
-      var Plugin = undefined;
-      var pluginName = undefined;
+      var Plugin = void 0;
+      var pluginName = void 0;
       var pluginOptions = {};
       if (typeof plugin === 'string') {
         pluginName = plugin;
-      } else if ((typeof plugin === 'undefined' ? 'undefined' : babelHelpers.typeof(plugin)) === 'object') {
+      } else if ((typeof plugin === 'undefined' ? 'undefined' : _typeof(plugin)) === 'object') {
         pluginName = plugin.name;
         pluginOptions = plugin.options || {};
       }
 
-      Plugin = find(pluginName);
+      Plugin = find$1(pluginName);
       _this._get('plugins')[plugin] = new Plugin(_this, pluginOptions);
 
       addClass(_this._get('$container'), pluginClass(pluginName));
     });
   }
 
+  /* pubsoup
+   */
+
   var PubSoup = function () {
     function PubSoup() {
-      babelHelpers.classCallCheck(this, PubSoup);
+      classCallCheck(this, PubSoup);
 
       this.topics = {};
       this.callbacks = {};
     }
 
-    babelHelpers.createClass(PubSoup, [{
+    createClass(PubSoup, [{
       key: 'find',
       value: function find(query) {
         this.topics[query] = this.topics[query] || [];
@@ -336,7 +529,7 @@
     }, {
       key: 'subscribe',
       value: function subscribe(topic, subscriber) {
-        var priority = arguments.length <= 2 || arguments[2] === undefined ? 90 : arguments[2];
+        var priority = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 90;
 
         var foundTopic = this.find(topic);
         subscriber._priority = priority;
@@ -389,7 +582,7 @@
     }, {
       key: 'publish',
       value: function publish(topic) {
-        var params = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+        var params = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
         var foundTopic = this.find(topic);
         var runList = [];
@@ -406,15 +599,13 @@
     }, {
       key: 'runCallbacks',
       value: function runCallbacks(topic) {
-        var pub = this;
-        return function () {
-          var _this = this,
-              _arguments = arguments;
+        var _this = this;
 
-          pub.callbacks[topic] = pub.callbacks[topic] || [];
+        return function (err, params) {
+          _this.callbacks[topic] = _this.callbacks[topic] || [];
 
-          pub.callbacks[topic].forEach(function (c) {
-            c.apply(_this, _arguments);
+          _this.callbacks[topic].forEach(function (c) {
+            c(err, params);
           });
         };
       }
@@ -424,7 +615,7 @@
     }, {
       key: 'done',
       value: function done(topic) {
-        var callback = arguments.length <= 1 || arguments[1] === undefined ? function () {} : arguments[1];
+        var callback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : function () {};
 
         this.callbacks[topic] = this.callbacks[topic] || [];
         this.callbacks[topic].push(callback);
@@ -433,9 +624,13 @@
     return PubSoup;
   }();
 
+  /* render plugin
+   * renders the iframe
+   */
+
   var PluginRender = function () {
     function PluginRender(jotted, options) {
-      babelHelpers.classCallCheck(this, PluginRender);
+      classCallCheck(this, PluginRender);
 
       options = extend(options, {});
 
@@ -444,7 +639,6 @@
       var $resultFrame = jotted.$container.querySelector('.jotted-pane-result iframe');
 
       var frameContent = '';
-      var latestCallback = function latestCallback() {};
 
       // cached content
       var content = {
@@ -461,30 +655,44 @@
 
       // public
       this.supportSrcdoc = supportSrcdoc;
-      this.latestCallback = latestCallback;
       this.content = content;
       this.frameContent = frameContent;
       this.$resultFrame = $resultFrame;
+
+      this.callbacks = [];
+      this.index = 0;
+
+      this.lastCallback = function () {};
     }
 
-    babelHelpers.createClass(PluginRender, [{
+    createClass(PluginRender, [{
       key: 'template',
       value: function template() {
-        var style = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
-        var body = arguments.length <= 1 || arguments[1] === undefined ? '' : arguments[1];
-        var script = arguments.length <= 2 || arguments[2] === undefined ? '' : arguments[2];
+        var style = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+        var body = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+        var script = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
 
         return '\n      <!doctype html>\n      <html>\n        <head>\n          <script>\n            (function () {\n              window.addEventListener(\'DOMContentLoaded\', function () {\n                window.parent.postMessage(JSON.stringify({\n                  type: \'jotted-dom-ready\'\n                }), \'*\')\n              })\n            }())\n          </script>\n\n          <style>' + style + '</style>\n        </head>\n        <body>\n          ' + body + '\n\n          <!--\n            Jotted:\n            Empty script tag prevents malformed HTML from breaking the next script.\n          -->\n          <script></script>\n          <script>' + script + '</script>\n        </body>\n      </html>\n    ';
       }
     }, {
       key: 'change',
       value: function change(params, callback) {
+        var _this = this;
+
         // cache manipulated content
         this.content[params.type] = params.content;
 
         // check existing and to-be-rendered content
         var oldFrameContent = this.frameContent;
         this.frameContent = this.template(this.content['css'], this.content['html'], this.content['js']);
+
+        // cache the current callback as global,
+        // so we can call it from the message callback.
+        this.lastCallback = function () {
+          _this.lastCallback = function () {};
+
+          callback(null, params);
+        };
 
         // don't render if previous and new frame content are the same.
         // mostly for the `play` plugin,
@@ -495,20 +703,20 @@
           return;
         }
 
-        // cache the current callback as a global,
-        // so we can call it from the message callback.
-        this.latestCallback = function () {
-          callback(null, params);
-        };
+        if (this.supportSrcdoc) {
+          // srcdoc in unreliable in Chrome.
+          // https://github.com/ghinda/jotted/issues/23
+          this.$resultFrame.contentWindow.document.open();
+          this.$resultFrame.contentWindow.document.write(this.frameContent);
+          this.$resultFrame.contentWindow.document.close();
+        } else {
+          // older browsers without iframe srcset support (IE9).
+          this.$resultFrame.setAttribute('data-srcdoc', this.frameContent);
 
-        this.$resultFrame.setAttribute('srcdoc', this.frameContent);
-
-        // older browsers without iframe srcset support (IE9)
-        if (!this.supportSrcdoc) {
           // tips from https://github.com/jugglinmike/srcdoc-polyfill
           // Copyright (c) 2012 Mike Pennisi
           // Licensed under the MIT license.
-          var jsUrl = 'javascript:window.frameElement.getAttribute("srcdoc");';
+          var jsUrl = 'javascript:window.frameElement.getAttribute("data-srcdoc");';
 
           this.$resultFrame.setAttribute('src', jsUrl);
 
@@ -528,18 +736,26 @@
           return;
         }
 
-        var data = JSON.parse(e.data);
-        if (data.type === 'jotted-dom-ready') {
-          this.latestCallback();
+        var data$$1 = {};
+        try {
+          data$$1 = JSON.parse(e.data);
+        } catch (e) {}
+
+        if (data$$1.type === 'jotted-dom-ready') {
+          this.lastCallback();
         }
       }
     }]);
     return PluginRender;
   }();
 
+  /* scriptless plugin
+   * removes script tags from html content
+   */
+
   var PluginScriptless = function () {
     function PluginScriptless(jotted, options) {
-      babelHelpers.classCallCheck(this, PluginScriptless);
+      classCallCheck(this, PluginScriptless);
 
       options = extend(options, {});
 
@@ -553,7 +769,7 @@
       this.runScriptTypes = runScriptTypes;
     }
 
-    babelHelpers.createClass(PluginScriptless, [{
+    createClass(PluginScriptless, [{
       key: 'change',
       value: function change(params, callback) {
         if (params.type !== 'html') {
@@ -588,9 +804,12 @@
     return PluginScriptless;
   }();
 
+  /* ace plugin
+   */
+
   var PluginAce = function () {
     function PluginAce(jotted, options) {
-      babelHelpers.classCallCheck(this, PluginAce);
+      classCallCheck(this, PluginAce);
 
       var priority = 1;
       var i;
@@ -629,7 +848,7 @@
       jotted.on('change', this.change.bind(this), priority);
     }
 
-    babelHelpers.createClass(PluginAce, [{
+    createClass(PluginAce, [{
       key: 'editorChange',
       value: function editorChange(params) {
         var _this = this;
@@ -662,9 +881,12 @@
     return PluginAce;
   }();
 
+  /* coremirror plugin
+   */
+
   var PluginCodeMirror = function () {
     function PluginCodeMirror(jotted, options) {
-      babelHelpers.classCallCheck(this, PluginCodeMirror);
+      classCallCheck(this, PluginCodeMirror);
 
       var priority = 1;
       var i;
@@ -700,7 +922,7 @@
       jotted.on('change', this.change.bind(this), priority);
     }
 
-    babelHelpers.createClass(PluginCodeMirror, [{
+    createClass(PluginCodeMirror, [{
       key: 'editorChange',
       value: function editorChange(params) {
         var _this = this;
@@ -734,9 +956,12 @@
     return PluginCodeMirror;
   }();
 
+  /* less plugin
+   */
+
   var PluginLess = function () {
     function PluginLess(jotted, options) {
-      babelHelpers.classCallCheck(this, PluginLess);
+      classCallCheck(this, PluginLess);
 
       var priority = 20;
 
@@ -753,7 +978,7 @@
       jotted.on('change', this.change.bind(this), priority);
     }
 
-    babelHelpers.createClass(PluginLess, [{
+    createClass(PluginLess, [{
       key: 'isLess',
       value: function isLess(params) {
         if (params.type !== 'css') {
@@ -787,9 +1012,12 @@
     return PluginLess;
   }();
 
+  /* coffeescript plugin
+   */
+
   var PluginCoffeeScript = function () {
     function PluginCoffeeScript(jotted, options) {
-      babelHelpers.classCallCheck(this, PluginCoffeeScript);
+      classCallCheck(this, PluginCoffeeScript);
 
       var priority = 20;
 
@@ -806,7 +1034,7 @@
       jotted.on('change', this.change.bind(this), priority);
     }
 
-    babelHelpers.createClass(PluginCoffeeScript, [{
+    createClass(PluginCoffeeScript, [{
       key: 'isCoffee',
       value: function isCoffee(params) {
         if (params.type !== 'js') {
@@ -833,9 +1061,12 @@
     return PluginCoffeeScript;
   }();
 
+  /* stylus plugin
+   */
+
   var PluginStylus = function () {
     function PluginStylus(jotted, options) {
-      babelHelpers.classCallCheck(this, PluginStylus);
+      classCallCheck(this, PluginStylus);
 
       var priority = 20;
 
@@ -852,7 +1083,7 @@
       jotted.on('change', this.change.bind(this), priority);
     }
 
-    babelHelpers.createClass(PluginStylus, [{
+    createClass(PluginStylus, [{
       key: 'isStylus',
       value: function isStylus(params) {
         if (params.type !== 'css') {
@@ -886,9 +1117,12 @@
     return PluginStylus;
   }();
 
+  /* babel plugin
+   */
+
   var PluginBabel = function () {
     function PluginBabel(jotted, options) {
-      babelHelpers.classCallCheck(this, PluginBabel);
+      classCallCheck(this, PluginBabel);
 
       var priority = 20;
 
@@ -913,7 +1147,7 @@
       jotted.on('change', this.change.bind(this), priority);
     }
 
-    babelHelpers.createClass(PluginBabel, [{
+    createClass(PluginBabel, [{
       key: 'change',
       value: function change(params, callback) {
         // only parse js content
@@ -935,9 +1169,12 @@
     return PluginBabel;
   }();
 
+  /* markdown plugin
+   */
+
   var PluginMarkdown = function () {
     function PluginMarkdown(jotted, options) {
-      babelHelpers.classCallCheck(this, PluginMarkdown);
+      classCallCheck(this, PluginMarkdown);
 
       var priority = 20;
 
@@ -956,7 +1193,7 @@
       jotted.on('change', this.change.bind(this), priority);
     }
 
-    babelHelpers.createClass(PluginMarkdown, [{
+    createClass(PluginMarkdown, [{
       key: 'change',
       value: function change(params, callback) {
         // only parse html content
@@ -978,9 +1215,12 @@
     return PluginMarkdown;
   }();
 
+  /* console plugin
+   */
+
   var PluginConsole = function () {
     function PluginConsole(jotted, options) {
-      babelHelpers.classCallCheck(this, PluginConsole);
+      classCallCheck(this, PluginConsole);
 
       options = extend(options, {
         autoClear: false
@@ -1048,7 +1288,7 @@
       this.contentCache = contentCache;
     }
 
-    babelHelpers.createClass(PluginConsole, [{
+    createClass(PluginConsole, [{
       key: 'getMessage',
       value: function getMessage(e) {
         // only catch messages from the iframe
@@ -1056,9 +1296,9 @@
           return;
         }
 
-        var data = JSON.parse(e.data);
-        if (data.type === 'jotted-console-log') {
-          this.log(data.message);
+        var data$$1 = JSON.parse(e.data);
+        if (data$$1.type === 'jotted-console-log') {
+          this.log(data$$1.message);
         }
       }
     }, {
@@ -1135,7 +1375,7 @@
     }, {
       key: 'log',
       value: function log() {
-        var message = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
+        var message = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
         var type = arguments[1];
 
         var $log = document.createElement('li');
@@ -1226,9 +1466,13 @@
     return PluginConsole;
   }();
 
+  /* play plugin
+   * adds a Run button
+   */
+
   var PluginPlay = function () {
     function PluginPlay(jotted, options) {
-      babelHelpers.classCallCheck(this, PluginPlay);
+      classCallCheck(this, PluginPlay);
 
       options = extend(options, {
         firstRun: true
@@ -1277,7 +1521,7 @@
       this.jotted = jotted;
     }
 
-    babelHelpers.createClass(PluginPlay, [{
+    createClass(PluginPlay, [{
       key: 'change',
       value: function change(params, callback) {
         // always cache the latest code
@@ -1315,6 +1559,10 @@
     return PluginPlay;
   }();
 
+  /* bundle plugins
+   */
+
+  // register bundled plugins
   function BundlePlugins(jotted) {
     jotted.plugin('render', PluginRender);
     jotted.plugin('scriptless', PluginScriptless);
@@ -1330,9 +1578,12 @@
     jotted.plugin('play', PluginPlay);
   }
 
+  /* jotted
+   */
+
   var Jotted = function () {
     function Jotted($jottedContainer, opts) {
-      babelHelpers.classCallCheck(this, Jotted);
+      classCallCheck(this, Jotted);
 
       if (!$jottedContainer) {
         throw new Error('Can\'t find Jotted container.');
@@ -1405,8 +1656,8 @@
 
       var _arr = ['html', 'css', 'js'];
       for (var _i = 0; _i < _arr.length; _i++) {
-        var type = _arr[_i];
-        this.markup(type);
+        var _type = _arr[_i];
+        this.markup(_type);
       }
 
       // textarea change events.
@@ -1431,8 +1682,8 @@
       // load files
       var _arr2 = ['html', 'css', 'js'];
       for (var _i2 = 0; _i2 < _arr2.length; _i2++) {
-        var type = _arr2[_i2];
-        this.load(type);
+        var _type2 = _arr2[_i2];
+        this.load(_type2);
       }
 
       // show all tabs, even if empty
@@ -1446,7 +1697,7 @@
       }
     }
 
-    babelHelpers.createClass(Jotted, [{
+    createClass(Jotted, [{
       key: 'findFile',
       value: function findFile(type) {
         var file = {};
@@ -1588,9 +1839,9 @@
     }, {
       key: 'status',
       value: function status() {
-        var statusType = arguments.length <= 0 || arguments[0] === undefined ? 'error' : arguments[0];
-        var messages = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
-        var params = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+        var statusType = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'error';
+        var messages = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+        var params = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
         if (!messages.length) {
           return this.clearStatus(statusType, params);
@@ -1646,7 +1897,7 @@
         return function (topic) {
           var _arguments = arguments;
 
-          var _ref = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+          var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
           var _ref$type = _ref.type;
           var type = _ref$type === undefined ? 'default' : _ref$type;
@@ -1685,9 +1936,11 @@
     return register.apply(this, arguments);
   };
 
+  // register bundled plugins
   BundlePlugins(Jotted);
 
   return Jotted;
 
-}));
+})));
+
 //# sourceMappingURL=jotted.js.map

@@ -33,15 +33,15 @@
 
 <script>
   var jot = new Jotted(document.getElementById('j-cm'), {
-    pane: 'html',
     files: [{
       type: 'html',
-      content: ''
-    }],
-    plugins: [
-      'codemirror'
-    ]
+      content: '<script src="https://fb.me/react-0.14.6.js"><\/script><script src="https://fb.me/react-dom-0.14.6.js"><\/script><script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.23/browser.js"><\/script><div id="content"><\/div><script language="javascript" type="text/babel">ReactDOM.render(<span>Hello, world!</span>, document.getElementById("content"));<\/script>'
+    }]
   });
+
+  jot.done('change', function (err, params) {
+    console.log(params.type.toUpperCase())
+  })
 </script>
 
 

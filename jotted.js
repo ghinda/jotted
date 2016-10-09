@@ -482,15 +482,13 @@
     }, {
       key: 'runCallbacks',
       value: function runCallbacks(topic) {
-        var pub = this;
-        return function () {
-          var _this = this,
-              _arguments = arguments;
+        var _this = this;
 
-          pub.callbacks[topic] = pub.callbacks[topic] || [];
+        return function (err, params) {
+          _this.callbacks[topic] = _this.callbacks[topic] || [];
 
-          pub.callbacks[topic].forEach(function (c) {
-            c.apply(_this, _arguments);
+          _this.callbacks[topic].forEach(function (c) {
+            c(err, params);
           });
         };
       }
@@ -546,6 +544,8 @@
 
       this.callbacks = [];
       this.index = 0;
+
+      this.lastCallback = function () {};
     }
 
     createClass(PluginRender, [{
@@ -554,22 +554,28 @@
         var style = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
         var body = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
         var script = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
-        var uid = arguments[3];
 
-        return '\n      <!doctype html>\n      <html>\n        <head>\n          <script>\n            (function () {\n              window.addEventListener(\'DOMContentLoaded\', function () {\n                window.parent.postMessage(JSON.stringify({\n                  type: \'jotted-dom-ready\',\n                  uid: ' + uid + '\n                }), \'*\')\n              })\n            }())\n          </script>\n\n          <style>' + style + '</style>\n        </head>\n        <body>\n          ' + body + '\n\n          <!--\n            Jotted:\n            Empty script tag prevents malformed HTML from breaking the next script.\n          -->\n          <script></script>\n          <script>' + script + '</script>\n        </body>\n      </html>\n    ';
+        return '\n      <!doctype html>\n      <html>\n        <head>\n          <script>\n            (function () {\n              window.addEventListener(\'DOMContentLoaded\', function () {\n                window.parent.postMessage(JSON.stringify({\n                  type: \'jotted-dom-ready\'\n                }), \'*\')\n              })\n            }())\n          </script>\n\n          <style>' + style + '</style>\n        </head>\n        <body>\n          ' + body + '\n\n          <!--\n            Jotted:\n            Empty script tag prevents malformed HTML from breaking the next script.\n          -->\n          <script></script>\n          <script>' + script + '</script>\n        </body>\n      </html>\n    ';
       }
     }, {
       key: 'change',
       value: function change(params, callback) {
-        // uid for callbacks
-        var uid = this.index++;
+        var _this = this;
 
         // cache manipulated content
         this.content[params.type] = params.content;
 
         // check existing and to-be-rendered content
         var oldFrameContent = this.frameContent;
-        this.frameContent = this.template(this.content['css'], this.content['html'], this.content['js'], uid);
+        this.frameContent = this.template(this.content['css'], this.content['html'], this.content['js']);
+
+        // cache the current callback as global,
+        // so we can call it from the message callback.
+        this.lastCallback = function () {
+          _this.lastCallback = function () {};
+
+          callback(null, params);
+        };
 
         // don't render if previous and new frame content are the same.
         // mostly for the `play` plugin,
@@ -577,18 +583,6 @@
         // unless we set forceRender.
         if (params.forceRender !== true && this.frameContent === oldFrameContent) {
           callback(null, params);
-          return;
-        }
-
-        // cache the current callback as a global,
-        // so we can call it from the message callback.
-        this.callbacks[uid] = function () {
-          callback(null, params);
-        };
-
-        // the iframe was removed from the dom,
-        // while we were rendering.
-        if (!this.$resultFrame.contentWindow) {
           return;
         }
 
@@ -631,8 +625,7 @@
         } catch (e) {}
 
         if (data$$1.type === 'jotted-dom-ready') {
-          this.callbacks[data$$1.uid]();
-          this.callbacks[data$$1.uid] = null;
+          this.lastCallback();
         }
       }
     }]);

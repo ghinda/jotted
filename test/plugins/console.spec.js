@@ -76,10 +76,10 @@ describe('Console Plugin', function () {
     })
 
     jotted.console.done('change', function (e, params) {
-      if (params.type === 'js') {
+      setTimeout(function () {
         expect(dom.$console.querySelector('.jotted-console-output').innerHTML).to.contain('someString')
         done()
-      }
+      }, 100)
     })
   })
 })

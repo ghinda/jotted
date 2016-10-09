@@ -34,10 +34,8 @@ describe('Script', function () {
 
     var $iframe = jotted.script.$container.querySelector('.jotted-pane-result iframe')
     jotted.script.done('change', function (e, params) {
-      if (params.type === 'html') {
-        expect($iframe.contentWindow.globalThatShouldntExist).to.be.undefined
-        done()
-      }
+      expect($iframe.contentWindow.globalThatShouldntExist).to.be.undefined
+      done()
     })
   })
 
@@ -56,10 +54,8 @@ describe('Script', function () {
 
     var $iframe = jotted.script.$container.querySelector('.jotted-pane-result iframe')
     jotted.script.done('change', function (e, params) {
-      if (params.type === 'html') {
-        expect($iframe.contentWindow.globalThatShouldExist).to.be.true
-        done()
-      }
+      expect($iframe.contentWindow.globalThatShouldExist).to.be.true
+      done()
     })
   })
 
@@ -77,10 +73,8 @@ describe('Script', function () {
     })
 
     jotted.script.done('change', function (e, params) {
-      if (params.type === 'html') {
-        expect(dom.$script.querySelector('iframe').contentWindow.globalThatShouldExist).to.be.true
-        done()
-      }
+      expect(dom.$script.querySelector('iframe').contentWindow.globalThatShouldExist).to.be.true
+      done()
     })
   })
 
@@ -98,10 +92,8 @@ describe('Script', function () {
     })
 
     jotted.script.done('change', function (e, params) {
-      if (params.type === 'html') {
-        expect(dom.$script.querySelector('iframe').contentWindow.globalThatShouldntExist).to.be.undefined
-        done()
-      }
+      expect(dom.$script.querySelector('iframe').contentWindow.globalThatShouldntExist).to.be.undefined
+      done()
     })
   })
 

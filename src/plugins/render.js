@@ -35,9 +35,11 @@ export default class PluginRender {
 
     this.callbacks = []
     this.index = 0
+
+    this.lastCallback = () => {}
   }
 
-  template (style = '', body = '', script = '', uid) {
+  template (style = '', body = '', script = '') {
     return `
       <!doctype html>
       <html>
@@ -46,8 +48,7 @@ export default class PluginRender {
             (function () {
               window.addEventListener('DOMContentLoaded', function () {
                 window.parent.postMessage(JSON.stringify({
-                  type: 'jotted-dom-ready',
-                  uid: ${uid}
+                  type: 'jotted-dom-ready'
                 }), '*')
               })
             }())
@@ -70,15 +71,20 @@ export default class PluginRender {
   }
 
   change (params, callback) {
-    // uid for callbacks
-    var uid = this.index++
-
     // cache manipulated content
     this.content[params.type] = params.content
 
     // check existing and to-be-rendered content
     var oldFrameContent = this.frameContent
-    this.frameContent = this.template(this.content['css'], this.content['html'], this.content['js'], uid)
+    this.frameContent = this.template(this.content['css'], this.content['html'], this.content['js'])
+
+    // cache the current callback as global,
+    // so we can call it from the message callback.
+    this.lastCallback = () => {
+      this.lastCallback = () => {}
+
+      callback(null, params)
+    }
 
     // don't render if previous and new frame content are the same.
     // mostly for the `play` plugin,
@@ -86,18 +92,6 @@ export default class PluginRender {
     // unless we set forceRender.
     if (params.forceRender !== true && this.frameContent === oldFrameContent) {
       callback(null, params)
-      return
-    }
-
-    // cache the current callback as a global,
-    // so we can call it from the message callback.
-    this.callbacks[uid] = function () {
-      callback(null, params)
-    }
-
-    // the iframe was removed from the dom,
-    // while we were rendering.
-    if (!this.$resultFrame.contentWindow) {
       return
     }
 
@@ -139,8 +133,7 @@ export default class PluginRender {
     } catch (e) {}
 
     if (data.type === 'jotted-dom-ready') {
-      this.callbacks[data.uid]()
-      this.callbacks[data.uid] = null
+      this.lastCallback()
     }
   }
 }

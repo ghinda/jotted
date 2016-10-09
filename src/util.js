@@ -47,10 +47,10 @@ function runCallback (index, params, arr, errors, callback) {
     }
 
     index++
-    if (index === arr.length) {
-      callback(errors, res)
-    } else {
+    if (index < arr.length) {
       seqRunner(index, res, arr, errors, callback)
+    } else {
+      callback(errors, res)
     }
   }
 }

@@ -71,12 +71,11 @@ export default class PubSoup {
 
   // parallel run all .done callbacks
   runCallbacks (topic) {
-    var pub = this
-    return function () {
-      pub.callbacks[topic] = pub.callbacks[topic] || []
+    return (err, params) => {
+      this.callbacks[topic] = this.callbacks[topic] || []
 
-      pub.callbacks[topic].forEach((c) => {
-        c.apply(this, arguments)
+      this.callbacks[topic].forEach((c) => {
+        c(err, params)
       })
     }
   }

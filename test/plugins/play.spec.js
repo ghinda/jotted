@@ -47,9 +47,12 @@ describe('Play Plugin', function () {
       $textareaHTML.dispatchEvent(changeEvent)
     }
 
-    var checkContent = window.util.check(done, function () {
+    var checkContent = function () {
+      jotted.play.off('change', checkContent)
+
       expect(dom.$play.querySelector('.jotted-pane-result   iframe').contentWindow.document.querySelector('h1').innerHTML).to.equal('Original')
-    })
+      done()
+    }
 
     jotted.play.done('change', changeText)
   })
@@ -88,12 +91,10 @@ describe('Play Plugin', function () {
     }
 
     var checkContent = function (errs, params) {
-      try {
-        expect(dom.$play.querySelector('.jotted-pane-result   iframe').contentWindow.document.querySelector('h1').innerHTML).to.equal('Changed Text')
-        done()
-      } catch (err) {
-        done(err)
-      }
+      jotted.play.off('change', checkContent)
+
+      expect(dom.$play.querySelector('.jotted-pane-result   iframe').contentWindow.document.querySelector('h1').innerHTML).to.equal('Changed Text')
+      done()
     }
 
     jotted.play.done('change', change1)
@@ -115,12 +116,10 @@ describe('Play Plugin', function () {
     })
 
     var checkContent = function (errs, params) {
-      try {
-        expect(dom.$play.querySelector('.jotted-pane-result   iframe').contentWindow.document.querySelector('h1')).to.be.null
-        done()
-      } catch (err) {
-        done(err)
-      }
+      jotted.play.off('change', checkContent)
+
+      expect(dom.$play.querySelector('.jotted-pane-result   iframe').contentWindow.document.querySelector('h1')).to.be.null
+      done()
     }
 
     jotted.play.done('change', checkContent)
@@ -152,12 +151,10 @@ describe('Play Plugin', function () {
     }
 
     var checkContent = function (errs, params) {
-      try {
-        expect(dom.$play.querySelector('.jotted-pane-result   iframe').contentWindow.document.querySelector('h1').innerHTML).to.equal('Initial')
-        done()
-      } catch (err) {
-        done(err)
-      }
+      jotted.play.off('change', checkContent)
+
+      expect(dom.$play.querySelector('.jotted-pane-result   iframe').contentWindow.document.querySelector('h1').innerHTML).to.equal('Initial')
+      done()
     }
 
     jotted.play.done('change', change1)

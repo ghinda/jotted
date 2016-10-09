@@ -75,8 +75,11 @@ describe('Console Plugin', function () {
       plugins: ['console']
     })
 
-    jotted.console.done('change', window.util.check(done, function () {
-      expect(dom.$console.querySelector('.jotted-console-output').innerHTML).to.contain('someString')
-    }))
+    jotted.console.done('change', function (e, params) {
+      setTimeout(function () {
+        expect(dom.$console.querySelector('.jotted-console-output').innerHTML).to.contain('someString')
+        done()
+      }, 100)
+    })
   })
 })

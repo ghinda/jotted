@@ -1,4 +1,8 @@
 
+## [1.4.3] - 2016-10-09
+
+* Fix issues with randomly rendering the Result iframe blank in Chrome, caused by inconsistent `srcdoc` behavior. Use `document.write` instead, in all modern browsers.
+
 ## [1.4.2] - 2016-03-15
 
 * Prevent malformed HTML from breaking JavaScript execution, and displaying the script content as text.

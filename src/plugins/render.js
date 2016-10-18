@@ -98,6 +98,13 @@ export default class PluginRender {
     if (this.supportSrcdoc) {
       // srcdoc in unreliable in Chrome.
       // https://github.com/ghinda/jotted/issues/23
+
+      // re-create the iframe on each change,
+      // to discard the previously loaded scripts.
+      var $newResultFrame = document.createElement('iframe')
+      this.$resultFrame.parentNode.replaceChild($newResultFrame, this.$resultFrame)
+      this.$resultFrame = $newResultFrame
+
       this.$resultFrame.contentWindow.document.open()
       this.$resultFrame.contentWindow.document.write(this.frameContent)
       this.$resultFrame.contentWindow.document.close()

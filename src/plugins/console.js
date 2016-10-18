@@ -19,8 +19,6 @@ export default class PluginConsole {
       js: ''
     }
 
-    var $iframe = jotted.$container.querySelector('.jotted-pane-result iframe')
-
     // new tab and pane markup
     var $nav = document.createElement('li')
     util.addClass($nav, 'jotted-nav-item jotted-nav-item-console')
@@ -69,23 +67,32 @@ export default class PluginConsole {
     window.addEventListener('message', this.getMessage.bind(this))
 
     // plugin public properties
+    this.$jottedContainer = jotted.$container
     this.$container = $container
     this.$input = $input
     this.$output = $output
-    this.$iframe = $iframe
     this.history = history
     this.historyIndex = historyIndex
     this.logCaptureSnippet = logCaptureSnippet
     this.contentCache = contentCache
+    this.getIframe = this.getIframe.bind(this)
+  }
+
+  getIframe () {
+    return this.$jottedContainer.querySelector('.jotted-pane-result iframe')
   }
 
   getMessage (e) {
     // only catch messages from the iframe
-    if (e.source !== this.$iframe.contentWindow) {
+    if (e.source !== this.getIframe().contentWindow) {
       return
     }
 
-    var data = JSON.parse(e.data)
+    var data = {}
+    try {
+      data = JSON.parse(e.data)
+    } catch (err) {}
+
     if (data.type === 'jotted-console-log') {
       this.log(data.message)
     }
@@ -193,7 +200,7 @@ export default class PluginConsole {
     // show output or errors
     try {
       // run the console input in the iframe context
-      var scriptOutput = this.$iframe.contentWindow.eval(`(function() {${inputValue}})()`)
+      var scriptOutput = this.getIframe().contentWindow.eval(`(function() {${inputValue}})()`)
 
       this.log(scriptOutput)
     } catch (err) {

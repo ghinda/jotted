@@ -706,6 +706,13 @@
         if (this.supportSrcdoc) {
           // srcdoc in unreliable in Chrome.
           // https://github.com/ghinda/jotted/issues/23
+
+          // re-create the iframe on each change,
+          // to discard the previously loaded scripts.
+          var $newResultFrame = document.createElement('iframe');
+          this.$resultFrame.parentNode.replaceChild($newResultFrame, this.$resultFrame);
+          this.$resultFrame = $newResultFrame;
+
           this.$resultFrame.contentWindow.document.open();
           this.$resultFrame.contentWindow.document.write(this.frameContent);
           this.$resultFrame.contentWindow.document.close();
@@ -1236,8 +1243,6 @@
         js: ''
       };
 
-      var $iframe = jotted.$container.querySelector('.jotted-pane-result iframe');
-
       // new tab and pane markup
       var $nav = document.createElement('li');
       addClass($nav, 'jotted-nav-item jotted-nav-item-console');
@@ -1278,25 +1283,35 @@
       window.addEventListener('message', this.getMessage.bind(this));
 
       // plugin public properties
+      this.$jottedContainer = jotted.$container;
       this.$container = $container;
       this.$input = $input;
       this.$output = $output;
-      this.$iframe = $iframe;
       this.history = history;
       this.historyIndex = historyIndex;
       this.logCaptureSnippet = logCaptureSnippet;
       this.contentCache = contentCache;
+      this.getIframe = this.getIframe.bind(this);
     }
 
     createClass(PluginConsole, [{
+      key: 'getIframe',
+      value: function getIframe() {
+        return this.$jottedContainer.querySelector('.jotted-pane-result iframe');
+      }
+    }, {
       key: 'getMessage',
       value: function getMessage(e) {
         // only catch messages from the iframe
-        if (e.source !== this.$iframe.contentWindow) {
+        if (e.source !== this.getIframe().contentWindow) {
           return;
         }
 
-        var data$$1 = JSON.parse(e.data);
+        var data$$1 = {};
+        try {
+          data$$1 = JSON.parse(e.data);
+        } catch (err) {}
+
         if (data$$1.type === 'jotted-console-log') {
           this.log(data$$1.message);
         }
@@ -1414,7 +1429,7 @@
         // show output or errors
         try {
           // run the console input in the iframe context
-          var scriptOutput = this.$iframe.contentWindow.eval('(function() {' + inputValue + '})()');
+          var scriptOutput = this.getIframe().contentWindow.eval('(function() {' + inputValue + '})()');
 
           this.log(scriptOutput);
         } catch (err) {

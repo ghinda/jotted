@@ -1,4 +1,8 @@
 
+## [1.4.4] - 2016-10-18
+
+* Fix issues with loading scripts multiple times on changes. Caused by the iframe not removing them from memory when using document.write. Fixed by re-creating the iframe on each change.
+
 ## [1.4.3] - 2016-10-09
 
 * Fix issues with randomly rendering the Result iframe blank in Chrome, caused by inconsistent `srcdoc` behavior. Use `document.write` instead, in all modern browsers.

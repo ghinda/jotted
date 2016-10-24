@@ -169,4 +169,31 @@ describe('Core', function () {
       done()
     })
   })
+
+  it('should sort and run change events in order of priority', function (done) {
+    var pluginContent = ''
+    Jotted.plugin('test', function (j) {
+      j.on('change', function (params, callback) {
+        if (params.type === 'html') {
+          pluginContent = params.content
+        }
+
+        callback(null, params)
+      }, 1)
+    })
+
+    jotted.core = new Jotted(dom.$editor, {
+      files: [{
+        type: 'html',
+        content: '# h1'
+      }],
+      plugins: [
+        'markdown',
+        'test'
+      ]
+    })
+
+    expect(pluginContent).to.equal('# h1')
+    done()
+  })
 })

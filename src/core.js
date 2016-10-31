@@ -29,6 +29,7 @@ class Jotted {
       runScripts: true,
       pane: 'result',
       debounce: 250,
+      container: 'default',
       plugins: []
     }))
 
@@ -67,7 +68,7 @@ class Jotted {
 
     // DOM
     var $container = this._set('$container', $jottedContainer)
-    $container.innerHTML = template.container()
+    $container.innerHTML = template.container(options.container)
     util.addClass($container, template.containerClass())
 
     // default pane

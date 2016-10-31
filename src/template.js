@@ -1,8 +1,8 @@
 /* template
  */
 
-export function container () {
-  return `
+const CONTAINERS = {
+  default: `
     <ul class="jotted-nav">
       <li class="jotted-nav-item jotted-nav-item-result">
         <a href="#" data-jotted-type="result">
@@ -29,7 +29,43 @@ export function container () {
     <div class="jotted-pane jotted-pane-html"></div>
     <div class="jotted-pane jotted-pane-css"></div>
     <div class="jotted-pane jotted-pane-js"></div>
+  `,
+
+  flex: `
+    <div class="jotted-pane jotted-pane-result">
+      <div class="jotted-nav-item jotted-nav-item-result">
+        <a href="#" data-jotted-type="result">
+          Result
+        </a>
+      </div>
+      <iframe></iframe>
+    </div>
+    <div class="jotted-pane jotted-pane-html">
+      <div class="jotted-nav-item jotted-nav-item-html">
+        <a href="#" data-jotted-type="html">
+          HTML
+        </a>
+      </div>
+    </div>
+    <div class="jotted-pane jotted-pane-css">
+      <div class="jotted-nav-item jotted-nav-item-css">
+        <a href="#" data-jotted-type="css">
+          CSS
+        </a>
+      </div>
+    </div>
+    <div class="jotted-pane jotted-pane-js">
+      <div class="jotted-nav-item jotted-nav-item-js">
+        <a href="#" data-jotted-type="js">
+          JavaScript
+        </a>
+      </div>
+    </div>
   `
+}
+
+export function container (name) {
+  return CONTAINERS[name]
 }
 
 export function paneActiveClass (type) {

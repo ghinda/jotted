@@ -1,0 +1,73 @@
+.jotted.jotted-theme-flex
+  display: flex
+  flex-flow: row wrap
+
+  &.jotted-medium-demo
+    height: 22em
+
+  &.jotted-large-demo
+    height: 32em
+
+  > *
+    flex: 1 100%
+
+  .jotted-editor
+    height: calc(100% - 39px)
+
+.jotted-theme-flex
+  .jotted-pane
+    padding-top: 0
+    height: 50%
+
+    &.jotted-pane-result
+      position: relative
+      visibility: visible
+
+    .jotted-nav-item
+      pointer-events: none
+      border-width: 0 1px 0 0
+      border-style: solid
+      border-color: #ddd
+      text-align: center
+      background: rgba(51,51,51,0.08)
+      border-bottom: 1px solid rgba(51,51,51,0.2)
+
+    .jotted-nav-item-result
+      display: none
+
+  &.jotted-has-html .jotted-pane-html,
+  &.jotted-has-css .jotted-pane-css,
+  &.jotted-has-js .jotted-pane-js
+    position: relative
+    visibility: visible
+
+  for type in html js css
+    .jotted-pane-{type}
+      flex: 0 0 33.3333%
+
+    .jotted-nav-item
+      float: none
+
+// widths
+//
+.jotted-theme-flex.jotted-has-html .jotted-pane,
+.jotted-theme-flex.jotted-has-css .jotted-pane,
+.jotted-theme-flex.jotted-has-js .jotted-pane {
+  flex: 0 0 100%
+}
+
+.jotted-theme-flex.jotted-has-html.jotted-has-css .jotted-pane-html,
+.jotted-theme-flex.jotted-has-html.jotted-has-css .jotted-pane-css,
+.jotted-theme-flex.jotted-has-html.jotted-has-js .jotted-pane-html,
+.jotted-theme-flex.jotted-has-html.jotted-has-js .jotted-pane-js,
+.jotted-theme-flex.jotted-has-css.jotted-has-js .jotted-pane-css,
+.jotted-theme-flex.jotted-has-css.jotted-has-js .jotted-pane-js {
+  flex: 0 0 50%
+}
+
+.jotted-theme-flex.jotted-has-html.jotted-has-css.jotted-has-js .jotted-pane-html,
+.jotted-theme-flex.jotted-has-html.jotted-has-css.jotted-has-js .jotted-pane-js,
+.jotted-theme-flex.jotted-has-html.jotted-has-css.jotted-has-js .jotted-pane-css {
+  flex: 0 0 33.3333%
+}
+

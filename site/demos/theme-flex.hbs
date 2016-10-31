@@ -1,0 +1,35 @@
+---
+layout: demo.html
+title: Flex Theme
+demo: true
+---
+<p>
+  Set the <code>jotted-theme-flex</code> class on the container and add an `container: flex` option to jotted to use the <strong>flex</strong> theme.
+</p>
+
+<link rel="stylesheet" href="../bower_components/codemirror/lib/codemirror.css">
+<script src="../bower_components/codemirror/lib/codemirror.js"></script>
+
+<div id="jotted-demo-flex" class="jotted-theme-flex"></div>
+
+<link href="../jotted.css" rel="stylesheet">
+<script src="../jotted.js"></script>
+<script>
+  new Jotted(document.querySelector('#jotted-demo-flex'), {
+    files: [
+      {
+        type: 'html',
+        content: '<h1>Flex Container</h1>'
+      },
+      {
+        type: 'css',
+        content: 'body {\n  background: #abcdef;\n}'
+      }
+    ],
+    pane: 'css',
+    container: 'flex',
+    plugins: [
+      'codemirror'
+    ]
+  });
+</script>

@@ -7,29 +7,49 @@ demo: true
   Set the <code>jotted-theme-flex</code> class on the container and add an `container: flex` option to jotted to use the <strong>flex</strong> theme.
 </p>
 
+<p>You can also use the customisation classes: `jotted-theme-flex-medium-demo` and `jotted-theme-flex-medium-demo`</p>
+
+<p>
+</p>
+
 <link rel="stylesheet" href="../bower_components/codemirror/lib/codemirror.css">
 <script src="../bower_components/codemirror/lib/codemirror.js"></script>
 
 <div id="jotted-demo-flex" class="jotted-theme-flex"></div>
+<div id="jotted-colexpand-flex-demo" class="jotted-theme-flex"></div>
 
 <link href="../jotted.css" rel="stylesheet">
+<style>
+  .jotted-theme-flex { margin-bottom: 2em; }
+</style>
+
 <script src="../jotted.js"></script>
+
 <script>
-  new Jotted(document.querySelector('#jotted-demo-flex'), {
-    files: [
-      {
-        type: 'html',
-        content: '<h1>Flex Container</h1>'
-      },
-      {
-        type: 'css',
-        content: 'body {\n  background: #abcdef;\n}'
-      }
-    ],
-    pane: 'css',
+  var jottedOptions = {
     container: 'flex',
-    plugins: [
-      'codemirror'
-    ]
-  });
+
+    files: [
+      { type: 'html' , content: '<h1>Flex Container</h1>' },
+      { type: 'css'  , content: 'body {\n  background: #abcdef;\n}' }
+    ],
+
+    plugins: [ 'codemirror' ]
+  };
+
+  new Jotted(document.querySelector('#jotted-demo-flex'), jottedOptions);
+
+  var colexpandOpts = {
+    container: 'flex',
+
+    files: [
+      { type: 'html' , content: '<p>Try to expand and shrink the code panes</p>' },
+      { type: 'css'  , content: 'body {\n  background: #fedcba;\n}' },
+      { type: 'js'  , content: 'console.log("Hello buddy!")' }
+    ],
+
+    plugins: [ 'codemirror', 'colexpand' ]
+  };
+
+  new Jotted(document.querySelector('#jotted-colexpand-flex-demo'), colexpandOpts);
 </script>

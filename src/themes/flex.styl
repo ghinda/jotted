@@ -1,12 +1,8 @@
 .jotted.jotted-theme-flex
   display: flex
   flex-flow: row wrap
-
-  &.jotted-medium-demo
-    height: 22em
-
-  &.jotted-large-demo
-    height: 32em
+  user-select: none;
+  -webkit-user-select: none;
 
   > *
     flex: 1 100%
@@ -15,6 +11,13 @@
     height: calc(100% - 39px)
 
 .jotted-theme-flex
+
+  &-medium-demo
+    height: 22em
+
+  &-large-demo
+    height: 32em
+
   .jotted-pane
     padding-top: 0
     height: 50%
@@ -41,10 +44,6 @@
     position: relative
     visibility: visible
 
-  for type in html js css
-    .jotted-pane-{type}
-      flex: 0 0 33.3333%
-
     .jotted-nav-item
       float: none
 
@@ -54,6 +53,7 @@
 .jotted-theme-flex.jotted-has-css .jotted-pane,
 .jotted-theme-flex.jotted-has-js .jotted-pane {
   flex: 0 0 100%
+  max-width: 100%
 }
 
 .jotted-theme-flex.jotted-has-html.jotted-has-css .jotted-pane-html,
@@ -63,11 +63,13 @@
 .jotted-theme-flex.jotted-has-css.jotted-has-js .jotted-pane-css,
 .jotted-theme-flex.jotted-has-css.jotted-has-js .jotted-pane-js {
   flex: 0 0 50%
+  max-width: 50%
 }
 
 .jotted-theme-flex.jotted-has-html.jotted-has-css.jotted-has-js .jotted-pane-html,
 .jotted-theme-flex.jotted-has-html.jotted-has-css.jotted-has-js .jotted-pane-js,
 .jotted-theme-flex.jotted-has-html.jotted-has-css.jotted-has-js .jotted-pane-css {
   flex: 0 0 33.3333%
+  max-width: 33.3333%
 }
 

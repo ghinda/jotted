@@ -15,7 +15,8 @@ export default class PluginColExpand {
     this._querySelectorAll = jotted.$container.querySelectorAll.bind(jotted.$container)
 
     // insert expander elements
-    Array.prototype.slice.call(this._querySelectorAll('.jotted-editor')).forEach(function (editor) {
+    // splice: skips first pane as it should not have a expander
+    Array.prototype.slice.call(this._querySelectorAll('.jotted-editor')).splice(1).forEach(function (editor) {
       let $colexpandElement = document.createElement('div')
       $colexpandElement.classList.add('jotted-col-expand')
 
@@ -41,7 +42,8 @@ export default class PluginColExpand {
 
       this.panes.push($pane)
 
-      $pane.expander.addEventListener('mousedown', this.startExpand.bind(this, jotted))
+      if ($pane.expander)
+        $pane.expander.addEventListener('mousedown', this.startExpand.bind(this, jotted))
     }
 
     jotted.$container.style.display = ''
@@ -58,17 +60,17 @@ export default class PluginColExpand {
       .filter((pane) => { return pane !== $pane && pane !== $previousPane })
       .pop()
 
-    let $relativePixel = 100 / parseInt(getComputedStyle($pane.container.parentNode)['width'], 10);
+    let $relativePixel = 100 / parseInt(getComputedStyle($pane.container.parentNode)['width'], 10)
 
     // ugly but reliable/cross-browser way of getting height/width as percentage.
-    $pane.container.parentNode.style.display = 'none';
+    $pane.container.parentNode.style.display = 'none'
 
     $pane.startX = event.clientX
     $pane.startWidth = parseFloat(getComputedStyle($pane.container)['width'], 10)
     $previousPane.startWidth = parseFloat(getComputedStyle($previousPane.container)['width'], 10)
     $fixedSizePane.startWidth = parseFloat(getComputedStyle($fixedSizePane.container)['width'], 10)
 
-    $pane.container.parentNode.style.display = '';
+    $pane.container.parentNode.style.display = ''
 
     $pane.mousemove = this.doDrag.bind(this, $pane, $previousPane, $fixedSizePane, $relativePixel)
     $pane.mouseup = this.stopDrag.bind(this, $pane)
@@ -86,7 +88,7 @@ export default class PluginColExpand {
     let cpNewWidth = pane.startWidth - ((event.clientX - pane.startX) * relativePixel)
     console.log(`current: ${ pane.startWidth } - ((${ event.clientX } - ${ pane.startX }) * ${ relativePixel }) = ${cpNewWidth}`)
 
-    const PANE_MIN_SIZE = 10; // percent
+    const PANE_MIN_SIZE = 10 // percent
 
     // contracting a pane are restricted to a min-size of 10% the space.
     if (ppNewWidth >= PANE_MIN_SIZE && cpNewWidth >= PANE_MIN_SIZE) {

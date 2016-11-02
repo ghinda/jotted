@@ -3,22 +3,22 @@
   flex-flow: row wrap
   user-select: none;
   -webkit-user-select: none;
-
-  > *
-    flex: 1 100%
-
-  .jotted-editor
-    height: calc(100% - 39px)
-
-.jotted-theme-flex
-  .jotted-nav
-    display: none;
+  -moz-user-select: none;
 
   &-md-demo
     height: 22em
 
   &-lg-demo
     height: 32em
+
+  > .jotted-pane-result
+    flex: 1 100%
+
+  .jotted-editor
+    height: calc(100% - 39px)
+
+  .jotted-nav
+    display: none;
 
   .jotted-pane
     padding-top: 0

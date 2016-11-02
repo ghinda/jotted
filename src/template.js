@@ -1,71 +1,36 @@
 /* template
  */
 
-const CONTAINERS = {
-  default: `
+export function container (name) {
+  return `
     <ul class="jotted-nav">
       <li class="jotted-nav-item jotted-nav-item-result">
-        <a href="#" data-jotted-type="result">
-          Result
-        </a>
+        <a href="#" data-jotted-type="result">Result</a>
       </li>
       <li class="jotted-nav-item jotted-nav-item-html">
-        <a href="#" data-jotted-type="html">
-          HTML
-        </a>
+        <a href="#" data-jotted-type="html">HTML</a>
       </li>
       <li class="jotted-nav-item jotted-nav-item-css">
-        <a href="#" data-jotted-type="css">
-          CSS
-        </a>
+        <a href="#" data-jotted-type="css">CSS</a>
       </li>
       <li class="jotted-nav-item jotted-nav-item-js">
-        <a href="#" data-jotted-type="js">
-          JavaScript
-        </a>
+        <a href="#" data-jotted-type="js">JavaScript</a>
       </li>
     </ul>
-    <div class="jotted-pane jotted-pane-result"><iframe></iframe></div>
-    <div class="jotted-pane jotted-pane-html"></div>
-    <div class="jotted-pane jotted-pane-css"></div>
-    <div class="jotted-pane jotted-pane-js"></div>
-  `,
-
-  flex: `
     <div class="jotted-pane jotted-pane-result">
-      <div class="jotted-nav-item jotted-nav-item-result">
-        <a href="#" data-jotted-type="result">
-          Result
-        </a>
-      </div>
+      <div class="jotted-pane-title jotted-pane-title-result">Result</div>
       <iframe></iframe>
     </div>
     <div class="jotted-pane jotted-pane-html">
-      <div class="jotted-nav-item jotted-nav-item-html">
-        <a href="#" data-jotted-type="html">
-          HTML
-        </a>
-      </div>
+      <div class="jotted-pane-title jotted-pane-title-html">HTML</div>
     </div>
     <div class="jotted-pane jotted-pane-css">
-      <div class="jotted-nav-item jotted-nav-item-css">
-        <a href="#" data-jotted-type="css">
-          CSS
-        </a>
-      </div>
+      <div class="jotted-pane-title jotted-pane-title-css">CSS</div>
     </div>
     <div class="jotted-pane jotted-pane-js">
-      <div class="jotted-nav-item jotted-nav-item-js">
-        <a href="#" data-jotted-type="js">
-          JavaScript
-        </a>
-      </div>
+      <div class="jotted-pane-title jotted-pane-title-js">JavaScript</div>
     </div>
   `
-}
-
-export function container (name) {
-  return CONTAINERS[name]
 }
 
 export function paneActiveClass (type) {

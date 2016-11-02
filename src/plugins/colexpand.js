@@ -19,13 +19,13 @@ export default class PluginColExpand {
       let $colexpandElement = document.createElement('div')
       $colexpandElement.classList.add('jotted-col-expand')
 
-      let $paneNavItem = editor.parentElement.querySelector('.jotted-nav-item')
+      let $paneNavItem = editor.parentElement.querySelector('.jotted-pane-title')
       editor.parentElement.insertBefore($colexpandElement, $paneNavItem)
     })
 
     // first: result pane
     this.panes = [{
-      nav: this._querySelector('.jotted-nav-item-result'),
+      nav: this._querySelector('.jotted-pane-title-result'),
       pane: this._querySelector('.jotted-pane-result'),
       expander: undefined
     }]
@@ -34,7 +34,7 @@ export default class PluginColExpand {
     for (let type of [ 'html', 'css', 'js' ]) {
       let $paneType = this._querySelector(`.jotted-pane-${type}`)
       let $pane = {
-        nav: this._querySelector(`.jotted-nav-item-${type}`),
+        nav: this._querySelector(`.jotted-pane-title-${type}`),
         container: this._querySelector(`.jotted-pane-${type}`),
         expander: $paneType.querySelector('.jotted-col-expand')
       }

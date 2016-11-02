@@ -11,41 +11,34 @@
     height: calc(100% - 39px)
 
 .jotted-theme-flex
+  .jotted-nav
+    display: none;
 
-  &-medium-demo
+  &-md-demo
     height: 22em
 
-  &-large-demo
+  &-lg-demo
     height: 32em
 
   .jotted-pane
     padding-top: 0
     height: 50%
 
-    &.jotted-pane-result
-      position: relative
-      visibility: visible
+    .jotted-pane-title
+      display: block;
+      background: rgba(51,51,51,0.08);
+      border-bottom: 1px solid rgba(51,51,51,0.2);
+      padding: 0 0.8em;
+      line-height: 2.4em;
 
-    .jotted-nav-item
-      pointer-events: none
-      border-width: 0 1px 0 0
-      border-style: solid
-      border-color: #ddd
-      text-align: center
-      background: rgba(51,51,51,0.08)
-      border-bottom: 1px solid rgba(51,51,51,0.2)
-
-    .jotted-nav-item-result
-      display: none
+      &-result
+        display: none
 
   &.jotted-has-html .jotted-pane-html,
   &.jotted-has-css .jotted-pane-css,
   &.jotted-has-js .jotted-pane-js
     position: relative
     visibility: visible
-
-    .jotted-nav-item
-      float: none
 
 // widths
 //

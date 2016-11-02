@@ -11,7 +11,7 @@
   &-lg-demo
     height: 32em
 
-  > .jotted-pane-result
+  .jotted-pane-result
     flex: 1 100%
 
   .jotted-editor
@@ -36,7 +36,8 @@
 
   &.jotted-has-html .jotted-pane-html,
   &.jotted-has-css .jotted-pane-css,
-  &.jotted-has-js .jotted-pane-js
+  &.jotted-has-js .jotted-pane-js,
+  &.jotted-plugin-console .jotted-pane-console
     position: relative
     visibility: visible
 
@@ -65,4 +66,31 @@
   max-width: 33.3333%
   width: 33.3333%
 }
+
+// support console plugin
+//
+.jotted-plugin-console.jotted-theme-flex
+  .jotted-pane-title-console
+    font-family: sans-serif;
+
+  .jotted-console-clear
+    top: 4.3em
+
+.jotted-plugin-console.jotted-theme-flex.jotted-has-html .jotted-pane,
+.jotted-plugin-console.jotted-theme-flex.jotted-has-css .jotted-pane,
+.jotted-plugin-console.jotted-theme-flex.jotted-has-js .jotted-pane
+  width: 50%;
+
+.jotted-plugin-console.jotted-theme-flex.jotted-has-html.jotted-has-css .jotted-pane,
+.jotted-plugin-console.jotted-theme-flex.jotted-has-html.jotted-has-js .jotted-pane,
+.jotted-plugin-console.jotted-theme-flex.jotted-has-css.jotted-has-js .jotted-pane
+  width: 33.33%;
+
+.jotted-plugin-console.jotted-theme-flex.jotted-has-html.jotted-has-css.jotted-has-js .jotted-pane
+  width: 25%;
+
+// suport colexpand plugin
+//
+.jotted-plugin-colexpand.jotted-theme-flex .jotted-col-expand
+  border-left: 1px solid #ddd;
 

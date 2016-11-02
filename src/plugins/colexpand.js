@@ -3,112 +3,92 @@
 /* colexpand plugin
  * adds a column expand functionality to the panes
  */
-import * as util from '../util.js'
-
 export default class PluginColExpand {
   constructor (jotted, options) {
     this.jotted = jotted
 
-    options = util.extend(options, {})
-
     this._querySelector = jotted.$container.querySelector.bind(jotted.$container)
-    this._querySelectorAll = jotted.$container.querySelectorAll.bind(jotted.$container)
 
-    // insert expander elements
-    // splice: skips first pane as it should not have a expander
-    Array.prototype.slice.call(this._querySelectorAll('.jotted-editor')).splice(1).forEach(function (editor) {
-      let $colexpandElement = document.createElement('div')
-      $colexpandElement.classList.add('jotted-col-expand')
+    // define available panes
+    let $availablePanes = []
+    if (this.jotted.$container.classList.contains('jotted-has-html')) $availablePanes.push('html')
+    if (this.jotted.$container.classList.contains('jotted-has-css')) $availablePanes.push('css')
+    if (this.jotted.$container.classList.contains('jotted-has-js')) $availablePanes.push('js')
 
-      let $paneNavItem = editor.parentElement.querySelector('.jotted-pane-title')
-      editor.parentElement.insertBefore($colexpandElement, $paneNavItem)
-    })
-
-    // first: result pane
-    this.panes = [{
-      nav: this._querySelector('.jotted-pane-title-result'),
-      container: this._querySelector('.jotted-pane-result'),
-      expander: undefined
-    }]
-
-    // code panes
-    for (let type of [ 'html', 'css', 'js' ]) {
-      let $paneType = this._querySelector(`.jotted-pane-${type}`)
+    this.resizablePanes = []
+    for (let i = 0; i < $availablePanes.length; i++) {
+      let $type = $availablePanes[i]
       let $pane = {
-        nav: this._querySelector(`.jotted-pane-title-${type}`),
-        container: this._querySelector(`.jotted-pane-${type}`),
-        expander: $paneType.querySelector('.jotted-col-expand')
+        nav: this._querySelector(`.jotted-pane-title-${$type}`),
+        container: this._querySelector(`.jotted-pane-${$type}`),
+        expander: undefined
       }
 
-      this.panes.push($pane)
+      this.resizablePanes.push($pane)
 
-      if ($pane.expander)
+      // insert expander element.
+      // only panes which have an expander can be shrunk or expanded
+      // first pane must not have a expander
+      if (i > 0) {
+        let editor = this._querySelector(`.jotted-pane-${$type} .jotted-editor`)
+        let $colexpandElement = document.createElement('div')
+        $colexpandElement.classList.add('jotted-col-expand')
+
+        let $paneNavItem = editor.parentElement.querySelector('.jotted-pane-title')
+        editor.parentElement.insertBefore($colexpandElement, $paneNavItem)
+
+        $pane.expander = $colexpandElement
         $pane.expander.addEventListener('mousedown', this.startExpand.bind(this, jotted))
+      }
     }
-
-    jotted.$container.style.display = ''
   }
 
   startExpand (jotted, event) {
-    let $pane = this.panes
+    let $pane = this.resizablePanes
       .filter((pane) => { return pane.expander === event.target })
       .shift()
 
-    let $previousPane = this.panes[this.panes.indexOf($pane) - 1]
-
-    let $fixedSizePane = this.panes
-      .filter((pane) => { return pane !== $pane && pane !== $previousPane })
-      .pop()
+    let $previousPane = this.resizablePanes[this.resizablePanes.indexOf($pane) - 1]
 
     let $relativePixel = 100 / parseInt(getComputedStyle($pane.container.parentNode)['width'], 10)
 
-    // ugly but reliable/cross-browser way of getting height/width as percentage.
+    // ugly but reliable & cross-browser way of getting height/width as percentage.
     $pane.container.parentNode.style.display = 'none'
 
     $pane.startX = event.clientX
     $pane.startWidth = parseFloat(getComputedStyle($pane.container)['width'], 10)
     $previousPane.startWidth = parseFloat(getComputedStyle($previousPane.container)['width'], 10)
-    $fixedSizePane.startWidth = parseFloat(getComputedStyle($fixedSizePane.container)['width'], 10)
 
     $pane.container.parentNode.style.display = ''
 
-    $pane.mousemove = this.doDrag.bind(this, $pane, $previousPane, $fixedSizePane, $relativePixel)
+    $pane.mousemove = this.doDrag.bind(this, $pane, $previousPane, $relativePixel)
     $pane.mouseup = this.stopDrag.bind(this, $pane)
 
     document.addEventListener('mousemove', $pane.mousemove, false)
     document.addEventListener('mouseup', $pane.mouseup, false)
   }
 
-  doDrag (pane, previousPane, fixedSizePane, relativePixel, event) {
-    // previous pane
+  doDrag (pane, previousPane, relativePixel, event) {
+    // previous pane new width
     let ppNewWidth = previousPane.startWidth + ((event.clientX - pane.startX) * relativePixel)
-    console.log(`previous: ${ previousPane.startWidth } + ((${ event.clientX } - ${ pane.startX }) * ${ relativePixel }) = ${ppNewWidth}`)
 
-    // current pane
+    // current pane new width
     let cpNewWidth = pane.startWidth - ((event.clientX - pane.startX) * relativePixel)
-    console.log(`current: ${ pane.startWidth } - ((${ event.clientX } - ${ pane.startX }) * ${ relativePixel }) = ${cpNewWidth}`)
 
-    const PANE_MIN_SIZE = 10 // percent
-
-    // contracting a pane are restricted to a min-size of 10% the space.
+    // contracting a pane is restricted to a min-size of 10% the container's space.
+    const PANE_MIN_SIZE = 10 // percentage %
     if (ppNewWidth >= PANE_MIN_SIZE && cpNewWidth >= PANE_MIN_SIZE) {
-      [pane, previousPane, fixedSizePane]
-        .forEach((p) => { this.overrideFixedSizeAttributes(p) })
+      pane.container.style.maxWidth = 'none'
+      previousPane.container.style.maxWidth = 'none'
 
       previousPane.container.style.width = `${ppNewWidth}%`
       pane.container.style.width = `${cpNewWidth}%`
-      fixedSizePane.container.style.width = `${fixedSizePane.startWidth}%`
     }
   }
 
   stopDrag (pane, event) {
     document.removeEventListener('mousemove', pane.mousemove, false)
     document.removeEventListener('mouseup', pane.mouseup, false)
-  }
-
-  overrideFixedSizeAttributes (pane) {
-    pane.container.style.flex = '0 0 auto'
-    pane.container.style.maxWidth = 'none'
   }
 }
 

@@ -26,7 +26,7 @@ export default class PluginColExpand {
     // first: result pane
     this.panes = [{
       nav: this._querySelector('.jotted-pane-title-result'),
-      pane: this._querySelector('.jotted-pane-result'),
+      container: this._querySelector('.jotted-pane-result'),
       expander: undefined
     }]
 
@@ -58,37 +58,44 @@ export default class PluginColExpand {
       .filter((pane) => { return pane !== $pane && pane !== $previousPane })
       .pop()
 
+    let $relativePixel = 100 / parseInt(getComputedStyle($pane.container.parentNode)['width'], 10);
+
+    // ugly but reliable/cross-browser way of getting height/width as percentage.
+    $pane.container.parentNode.style.display = 'none';
+
     $pane.startX = event.clientX
-    $pane.startWidth = parseFloat(getComputedStyle($pane.container).getPropertyValue('width'), 10)
+    $pane.startWidth = parseFloat(getComputedStyle($pane.container)['width'], 10)
+    $previousPane.startWidth = parseFloat(getComputedStyle($previousPane.container)['width'], 10)
+    $fixedSizePane.startWidth = parseFloat(getComputedStyle($fixedSizePane.container)['width'], 10)
 
-    $previousPane.startX = event.clientX
-    $previousPane.startWidth = parseFloat(getComputedStyle($previousPane.container).getPropertyValue('width'), 10)
+    $pane.container.parentNode.style.display = '';
 
-    $fixedSizePane.startWidth = parseFloat(getComputedStyle($fixedSizePane.container).getPropertyValue('width'), 10)
-
-    $pane.mousemove = this.doDrag.bind(this, $pane, $previousPane, $fixedSizePane)
+    $pane.mousemove = this.doDrag.bind(this, $pane, $previousPane, $fixedSizePane, $relativePixel)
     $pane.mouseup = this.stopDrag.bind(this, $pane)
 
     document.addEventListener('mousemove', $pane.mousemove, false)
     document.addEventListener('mouseup', $pane.mouseup, false)
   }
 
-  doDrag (pane, previousPane, fixedSizePane, event) {
+  doDrag (pane, previousPane, fixedSizePane, relativePixel, event) {
     // previous pane
-    let ppNewWidth = (previousPane.startWidth + event.clientX - pane.startX)
+    let ppNewWidth = previousPane.startWidth + ((event.clientX - pane.startX) * relativePixel)
+    console.log(`previous: ${ previousPane.startWidth } + ((${ event.clientX } - ${ pane.startX }) * ${ relativePixel }) = ${ppNewWidth}`)
 
     // current pane
-    let cpNewWidth = (pane.startWidth - event.clientX + pane.startX)
+    let cpNewWidth = pane.startWidth - ((event.clientX - pane.startX) * relativePixel)
+    console.log(`current: ${ pane.startWidth } - ((${ event.clientX } - ${ pane.startX }) * ${ relativePixel }) = ${cpNewWidth}`)
 
-    // contracting a pane are restricted to a min-size of 100px.
-    const PANE_MIN_SIZE = 100
+    const PANE_MIN_SIZE = 10; // percent
+
+    // contracting a pane are restricted to a min-size of 10% the space.
     if (ppNewWidth >= PANE_MIN_SIZE && cpNewWidth >= PANE_MIN_SIZE) {
       [pane, previousPane, fixedSizePane]
         .forEach((p) => { this.overrideFixedSizeAttributes(p) })
 
-      previousPane.container.style.width = `${ppNewWidth}px`
-      pane.container.style.width = `${cpNewWidth}px`
-      fixedSizePane.container.style.width = `${fixedSizePane.startWidth}px`
+      previousPane.container.style.width = `${ppNewWidth}%`
+      pane.container.style.width = `${cpNewWidth}%`
+      fixedSizePane.container.style.width = `${fixedSizePane.startWidth}%`
     }
   }
 

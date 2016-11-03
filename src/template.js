@@ -18,18 +18,11 @@ export function container (name) {
       </li>
     </ul>
     <div class="jotted-pane jotted-pane-result">
-      <div class="jotted-pane-title jotted-pane-title-result">Result</div>
       <iframe></iframe>
     </div>
-    <div class="jotted-pane jotted-pane-html">
-      <div class="jotted-pane-title jotted-pane-title-html">HTML</div>
-    </div>
-    <div class="jotted-pane jotted-pane-css">
-      <div class="jotted-pane-title jotted-pane-title-css">CSS</div>
-    </div>
-    <div class="jotted-pane jotted-pane-js">
-      <div class="jotted-pane-title jotted-pane-title-js">JavaScript</div>
-    </div>
+    <div class="jotted-pane jotted-pane-html"></div>
+    <div class="jotted-pane jotted-pane-css"></div>
+    <div class="jotted-pane jotted-pane-js"></div>
   `
 }
 

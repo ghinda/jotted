@@ -26,16 +26,21 @@ export default class PluginColExpand {
 
       this.resizablePanes.push($pane)
 
+      let $paneTitle = document.createElement('div')
+      $paneTitle.classList.add('jotted-pane-title')
+      $paneTitle.innerHTML = $type === 'js' ? 'JavaScript' : $type.toUpperCase()
+
+      let $paneElement = this._querySelector(`.jotted-pane-${$type} .jotted-editor`)
+      $paneElement.insertBefore($paneTitle, $paneElement.firstChild)
+
       // insert expander element.
       // only panes which have an expander can be shrunk or expanded
       // first pane must not have a expander
       if (i > 0) {
-        let editor = this._querySelector(`.jotted-pane-${$type} .jotted-editor`)
         let $colexpandElement = document.createElement('div')
         $colexpandElement.classList.add('jotted-col-expand')
 
-        let $paneNavItem = editor.parentElement.querySelector('.jotted-pane-title')
-        editor.parentElement.insertBefore($colexpandElement, $paneNavItem)
+        $paneElement.insertBefore($colexpandElement, $paneTitle)
 
         $pane.expander = $colexpandElement
         $pane.expander.addEventListener('mousedown', this.startExpand.bind(this, jotted))

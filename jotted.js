@@ -193,8 +193,8 @@
   /* template
    */
 
-  function container() {
-    return '\n    <ul class="jotted-nav">\n      <li class="jotted-nav-item jotted-nav-item-result">\n        <a href="#" data-jotted-type="result">\n          Result\n        </a>\n      </li>\n      <li class="jotted-nav-item jotted-nav-item-html">\n        <a href="#" data-jotted-type="html">\n          HTML\n        </a>\n      </li>\n      <li class="jotted-nav-item jotted-nav-item-css">\n        <a href="#" data-jotted-type="css">\n          CSS\n        </a>\n      </li>\n      <li class="jotted-nav-item jotted-nav-item-js">\n        <a href="#" data-jotted-type="js">\n          JavaScript\n        </a>\n      </li>\n    </ul>\n    <div class="jotted-pane jotted-pane-result"><iframe></iframe></div>\n    <div class="jotted-pane jotted-pane-html"></div>\n    <div class="jotted-pane jotted-pane-css"></div>\n    <div class="jotted-pane jotted-pane-js"></div>\n  ';
+  function container(name) {
+    return '\n    <ul class="jotted-nav">\n      <li class="jotted-nav-item jotted-nav-item-result">\n        <a href="#" data-jotted-type="result">Result</a>\n      </li>\n      <li class="jotted-nav-item jotted-nav-item-html">\n        <a href="#" data-jotted-type="html">HTML</a>\n      </li>\n      <li class="jotted-nav-item jotted-nav-item-css">\n        <a href="#" data-jotted-type="css">CSS</a>\n      </li>\n      <li class="jotted-nav-item jotted-nav-item-js">\n        <a href="#" data-jotted-type="js">JavaScript</a>\n      </li>\n    </ul>\n    <div class="jotted-pane jotted-pane-result">\n      <iframe></iframe>\n    </div>\n    <div class="jotted-pane jotted-pane-html"></div>\n    <div class="jotted-pane jotted-pane-css"></div>\n    <div class="jotted-pane jotted-pane-js"></div>\n  ';
   }
 
   function paneActiveClass(type) {
@@ -1251,7 +1251,7 @@
       var $pane = document.createElement('div');
       addClass($pane, 'jotted-pane jotted-pane-console');
 
-      $pane.innerHTML = '\n      <div class="jotted-console-container">\n        <ul class="jotted-console-output"></ul>\n        <form class="jotted-console-input">\n          <input type="text">\n        </form>\n      </div>\n      <button class="jotted-button jotted-console-clear">Clear</button>\n    ';
+      $pane.innerHTML = '\n      <div class="jotted-console-container">\n        <div class="jotted-pane-title jotted-pane-title-console">Console</div>\n        <ul class="jotted-console-output"></ul>\n        <form class="jotted-console-input">\n          <input type="text">\n        </form>\n      </div>\n      <button class="jotted-button jotted-console-clear">Clear</button>\n    ';
 
       jotted.$container.appendChild($pane);
       jotted.$container.querySelector('.jotted-nav').appendChild($nav);
@@ -1574,6 +1574,113 @@
     return PluginPlay;
   }();
 
+  /* eslint-env browser */
+
+  /* colexpand plugin
+   * adds a column expand functionality to the panes
+   */
+  var PluginColExpand = function () {
+    function PluginColExpand(jotted, options) {
+      classCallCheck(this, PluginColExpand);
+
+      this.jotted = jotted;
+
+      this._querySelector = jotted.$container.querySelector.bind(jotted.$container);
+
+      // define available panes
+      var $availablePanes = [];
+      if (this.jotted.$container.classList.contains('jotted-has-html')) $availablePanes.push('html');
+      if (this.jotted.$container.classList.contains('jotted-has-css')) $availablePanes.push('css');
+      if (this.jotted.$container.classList.contains('jotted-has-js')) $availablePanes.push('js');
+
+      this.resizablePanes = [];
+      for (var i = 0; i < $availablePanes.length; i++) {
+        var $type = $availablePanes[i];
+        var $pane = {
+          nav: this._querySelector('.jotted-pane-title-' + $type),
+          container: this._querySelector('.jotted-pane-' + $type),
+          expander: undefined
+        };
+
+        this.resizablePanes.push($pane);
+
+        var $paneTitle = document.createElement('div');
+        $paneTitle.classList.add('jotted-pane-title');
+        $paneTitle.innerHTML = $type === 'js' ? 'JavaScript' : $type.toUpperCase();
+
+        var $paneElement = this._querySelector('.jotted-pane-' + $type + ' .jotted-editor');
+        $paneElement.insertBefore($paneTitle, $paneElement.firstChild);
+
+        // insert expander element.
+        // only panes which have an expander can be shrunk or expanded
+        // first pane must not have a expander
+        if (i > 0) {
+          var $colexpandElement = document.createElement('div');
+          $colexpandElement.classList.add('jotted-col-expand');
+
+          $paneElement.insertBefore($colexpandElement, $paneTitle);
+
+          $pane.expander = $colexpandElement;
+          $pane.expander.addEventListener('mousedown', this.startExpand.bind(this, jotted));
+        }
+      }
+    }
+
+    createClass(PluginColExpand, [{
+      key: 'startExpand',
+      value: function startExpand(jotted, event) {
+        var $pane = this.resizablePanes.filter(function (pane) {
+          return pane.expander === event.target;
+        }).shift();
+
+        var $previousPane = this.resizablePanes[this.resizablePanes.indexOf($pane) - 1];
+
+        var $relativePixel = 100 / parseInt(getComputedStyle($pane.container.parentNode)['width'], 10);
+
+        // ugly but reliable & cross-browser way of getting height/width as percentage.
+        $pane.container.parentNode.style.display = 'none';
+
+        $pane.startX = event.clientX;
+        $pane.startWidth = parseFloat(getComputedStyle($pane.container)['width'], 10);
+        $previousPane.startWidth = parseFloat(getComputedStyle($previousPane.container)['width'], 10);
+
+        $pane.container.parentNode.style.display = '';
+
+        $pane.mousemove = this.doDrag.bind(this, $pane, $previousPane, $relativePixel);
+        $pane.mouseup = this.stopDrag.bind(this, $pane);
+
+        document.addEventListener('mousemove', $pane.mousemove, false);
+        document.addEventListener('mouseup', $pane.mouseup, false);
+      }
+    }, {
+      key: 'doDrag',
+      value: function doDrag(pane, previousPane, relativePixel, event) {
+        // previous pane new width
+        var ppNewWidth = previousPane.startWidth + (event.clientX - pane.startX) * relativePixel;
+
+        // current pane new width
+        var cpNewWidth = pane.startWidth - (event.clientX - pane.startX) * relativePixel;
+
+        // contracting a pane is restricted to a min-size of 10% the container's space.
+        var PANE_MIN_SIZE = 10; // percentage %
+        if (ppNewWidth >= PANE_MIN_SIZE && cpNewWidth >= PANE_MIN_SIZE) {
+          pane.container.style.maxWidth = 'none';
+          previousPane.container.style.maxWidth = 'none';
+
+          previousPane.container.style.width = ppNewWidth + '%';
+          pane.container.style.width = cpNewWidth + '%';
+        }
+      }
+    }, {
+      key: 'stopDrag',
+      value: function stopDrag(pane, event) {
+        document.removeEventListener('mousemove', pane.mousemove, false);
+        document.removeEventListener('mouseup', pane.mouseup, false);
+      }
+    }]);
+    return PluginColExpand;
+  }();
+
   /* bundle plugins
    */
 
@@ -1591,6 +1698,7 @@
     jotted.plugin('markdown', PluginMarkdown);
     jotted.plugin('console', PluginConsole);
     jotted.plugin('play', PluginPlay);
+    jotted.plugin('colexpand', PluginColExpand);
   }
 
   /* jotted

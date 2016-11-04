@@ -1574,6 +1574,119 @@
     return PluginPlay;
   }();
 
+  /* pen plugin
+   */
+  var PluginPen = function () {
+    function PluginPen(jotted, options) {
+      classCallCheck(this, PluginPen);
+
+      // available panes
+      var $availablePanes = jotted.$container.querySelectorAll('.jotted-pane');
+
+      var titleLabels = {
+        html: 'HTML',
+        css: 'CSS',
+        js: 'JavaScript',
+        console: 'Console'
+      };
+
+      this.resizablePanes = [];
+      for (var i = 0; i < $availablePanes.length; i++) {
+        var type = void 0;
+
+        for (var j = 0; j < $availablePanes[i].classList.length; j++) {
+          if ($availablePanes[i].classList[j].indexOf('jotted-pane-') !== -1) {
+            type = $availablePanes[i].classList[j].replace('jotted-pane-', '');
+            break;
+          }
+        }
+
+        if (!type || type === 'result') {
+          continue;
+        }
+
+        var $pane = {
+          container: $availablePanes[i],
+          expander: undefined
+        };
+
+        this.resizablePanes.push($pane);
+
+        var $paneTitle = document.createElement('div');
+        $paneTitle.classList.add('jotted-pane-title');
+        $paneTitle.innerHTML = titleLabels[type] || type;
+
+        var $paneElement = $availablePanes[i].firstElementChild;
+        $paneElement.insertBefore($paneTitle, $paneElement.firstChild);
+
+        // insert expander element.
+        // only panes which have an expander can be shrunk or expanded
+        // first pane must not have a expander
+        if (i > 1) {
+          $pane.expander = document.createElement('div');
+          $pane.expander.classList.add('jotted-plugin-pen-expander');
+          $pane.expander.addEventListener('mousedown', this.startExpand.bind(this, jotted));
+
+          $paneElement.insertBefore($pane.expander, $paneTitle);
+        }
+      }
+    }
+
+    createClass(PluginPen, [{
+      key: 'startExpand',
+      value: function startExpand(jotted, event) {
+        var $pane = this.resizablePanes.filter(function (pane) {
+          return pane.expander === event.target;
+        }).shift();
+
+        var $previousPane = this.resizablePanes[this.resizablePanes.indexOf($pane) - 1];
+
+        var $relativePixel = 100 / parseInt(window.getComputedStyle($pane.container.parentNode)['width'], 10);
+
+        // ugly but reliable & cross-browser way of getting height/width as percentage.
+        $pane.container.parentNode.style.display = 'none';
+
+        $pane.startX = event.clientX;
+        $pane.startWidth = parseFloat(window.getComputedStyle($pane.container)['width'], 10);
+        $previousPane.startWidth = parseFloat(window.getComputedStyle($previousPane.container)['width'], 10);
+
+        $pane.container.parentNode.style.display = '';
+
+        $pane.mousemove = this.doDrag.bind(this, $pane, $previousPane, $relativePixel);
+        $pane.mouseup = this.stopDrag.bind(this, $pane);
+
+        document.addEventListener('mousemove', $pane.mousemove, false);
+        document.addEventListener('mouseup', $pane.mouseup, false);
+      }
+    }, {
+      key: 'doDrag',
+      value: function doDrag(pane, previousPane, relativePixel, event) {
+        // previous pane new width
+        var ppNewWidth = previousPane.startWidth + (event.clientX - pane.startX) * relativePixel;
+
+        // current pane new width
+        var cpNewWidth = pane.startWidth - (event.clientX - pane.startX) * relativePixel;
+
+        // contracting a pane is restricted to a min-size of 10% the container's space.
+        var PANE_MIN_SIZE = 10; // percentage %
+        if (ppNewWidth >= PANE_MIN_SIZE && cpNewWidth >= PANE_MIN_SIZE) {
+          pane.container.style.maxWidth = 'none';
+          previousPane.container.style.maxWidth = 'none';
+
+          previousPane.container.style.width = ppNewWidth + '%';
+          pane.container.style.width = cpNewWidth + '%';
+        }
+      }
+    }, {
+      key: 'stopDrag',
+      value: function stopDrag(pane, event) {
+        document.removeEventListener('mousemove', pane.mousemove, false);
+        document.removeEventListener('mouseup', pane.mouseup, false);
+      }
+    }]);
+    return PluginPen;
+  }();
+
   /* bundle plugins
    */
 
@@ -1591,6 +1704,7 @@
     jotted.plugin('markdown', PluginMarkdown);
     jotted.plugin('console', PluginConsole);
     jotted.plugin('play', PluginPlay);
+    jotted.plugin('pen', PluginPen);
   }
 
   /* jotted

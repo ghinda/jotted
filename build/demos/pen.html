@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>
-      Stylus &#8212; Jotted
+      Pen Plugin &#8212; Jotted
   </title>
   <meta name="description" content="Environment for showcasing HTML, CSS and JavaScript, with editable source. Like JSFiddle or JS Bin for self-hosted demos.">
   <meta name="keywords" content="jot,jotted,html,css,javascript,editor,client-side,self-hosted,demo,jsfiddle,jsbin,codepen,cssdeck,fiddle">
@@ -127,28 +127,39 @@
 
     <div class="demo-content">
 <pre><code>
+
 &lt;p&gt;
-  Get Stylus with client-side support from &lt;a href=&quot;http://stylus-lang.com/try/stylus.min.js&quot; target=&quot;_blank&quot;&gt;http://stylus-lang.com/try/stylus.min.js&lt;/a&gt;.
+  The &lt;strong&gt;pen&lt;/strong&gt; plugin changes the layout - placing the result on top and the editors side by side. It also allows you to resize the editor columns.
 &lt;/p&gt;
 
-&lt;div id=&quot;jotted-demo-stylus&quot;&gt;&lt;/div&gt;
+&lt;link rel=&quot;stylesheet&quot; href=&quot;../bower_components/codemirror/lib/codemirror.css&quot;&gt;
+&lt;script src=&quot;../bower_components/codemirror/lib/codemirror.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;../bower_components/codemirror/mode/javascript/javascript.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;../bower_components/codemirror/mode/css/css.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;../bower_components/codemirror/mode/xml/xml.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;../bower_components/codemirror/mode/htmlmixed/htmlmixed.js&quot;&gt;&lt;/script&gt;
 
-&lt;script src=&quot;../lib/stylus.min.js&quot;&gt;&lt;/script&gt;
+&lt;div id=&quot;jotted-demo-pen&quot; style=&quot;height: 28em&quot;&gt;&lt;/div&gt;
 
 &lt;link href=&quot;../jotted.css&quot; rel=&quot;stylesheet&quot;&gt;
 &lt;script src=&quot;../jotted.js&quot;&gt;&lt;/script&gt;
 &lt;script&gt;
-  new Jotted(document.querySelector(&#39;#jotted-demo-stylus&#39;), {
+  new Jotted(document.querySelector(&#39;#jotted-demo-pen&#39;), {
     files: [
       {
+        type: &#39;html&#39;,
+        content: &#39;&lt;h1&gt;\n  Pen Plugin\n&lt;/h1&gt;&#39;
+      },
+      {
+        type: &#39;js&#39;,
+        content: &#39;console.log(&quot;Hello World&quot;)&#39;
+      },
+      {
         type: &#39;css&#39;,
-        content: &#39;stylusVar = hotpink;\nbody {\n background: stylusVar; \n}&#39;
+        content: &#39;body {\n  background: yellow;\n}&#39;
       }
     ],
-    pane: &#39;css&#39;,
-    plugins: [
-      &#39;stylus&#39;
-    ]
+    plugins: [ &#39;codemirror&#39;, &#39;console&#39;, &#39;pen&#39; ]
   });
 &lt;/script&gt;</code></pre>
     </div>

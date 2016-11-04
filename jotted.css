@@ -9,12 +9,6 @@
   box-sizing: border-box;
   font-family: sans-serif;
 }
-.jotted-md-demo {
-  height: 22em;
-}
-.jotted-lg-demo {
-  height: 32em;
-}
 /* nav
  */
 .jotted-nav {
@@ -88,9 +82,6 @@ jotted-nav-item,
   box-sizing: border-box;
   background: #fff;
 }
-.jotted-pane-title {
-  display: none;
-}
 .jotted-pane-active-result .jotted-pane-result,
 .jotted-pane-active-html .jotted-pane-html,
 .jotted-pane-active-css .jotted-pane-css,
@@ -101,7 +92,6 @@ jotted-nav-item,
 /* editor
  */
 .jotted-editor {
-  position: relative;
   height: 100%;
 }
 .jotted-pane-result iframe,
@@ -116,13 +106,6 @@ jotted-nav-item,
 .jotted-editor textarea {
   padding: 1em;
   background: #fff;
-}
-.jotted-col-expand {
-  position: absolute;
-  height: 100%;
-  width: 3px;
-  z-index: 5;
-  cursor: col-resize;
 }
 /* status
  */
@@ -201,86 +184,6 @@ jotted-nav-item,
 .jotted-plugin-codemirror .CodeMirror {
   height: 100%;
 }
-.jotted.jotted-plugin-colexpand {
-  display: flex;
-  flex-flow: row wrap;
-  user-select: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-}
-.jotted.jotted-plugin-colexpand .jotted-pane-result {
-  flex: 1 100%;
-}
-.jotted.jotted-plugin-colexpand .jotted-editor .CodeMirror {
-  height: calc(100% - 39px);
-}
-.jotted.jotted-plugin-colexpand .jotted-nav {
-  display: none;
-}
-.jotted.jotted-plugin-colexpand .jotted-pane {
-  padding-top: 0;
-  height: 50%;
-}
-.jotted.jotted-plugin-colexpand .jotted-pane .jotted-pane-title {
-  display: block;
-  background: rgba(51,51,51,0.08);
-  border-bottom: 1px solid rgba(51,51,51,0.2);
-  padding: 0 0.8em;
-  line-height: 2.4em;
-}
-.jotted.jotted-plugin-colexpand .jotted-pane .jotted-pane-title-result {
-  display: none;
-}
-.jotted.jotted-plugin-colexpand.jotted-has-html .jotted-pane-html,
-.jotted.jotted-plugin-colexpand.jotted-has-css .jotted-pane-css,
-.jotted.jotted-plugin-colexpand.jotted-has-js .jotted-pane-js,
-.jotted.jotted-plugin-colexpand.jotted-plugin-console .jotted-pane-console {
-  position: relative;
-  visibility: visible;
-}
-.jotted-plugin-colexpand.jotted-has-html .jotted-pane,
-.jotted-plugin-colexpand.jotted-has-css .jotted-pane,
-.jotted-plugin-colexpand.jotted-has-js .jotted-pane {
-  max-width: 100%;
-  width: 100%;
-}
-.jotted-plugin-colexpand.jotted-has-html.jotted-has-css .jotted-pane-html,
-.jotted-plugin-colexpand.jotted-has-html.jotted-has-css .jotted-pane-css,
-.jotted-plugin-colexpand.jotted-has-html.jotted-has-js .jotted-pane-html,
-.jotted-plugin-colexpand.jotted-has-html.jotted-has-js .jotted-pane-js,
-.jotted-plugin-colexpand.jotted-has-css.jotted-has-js .jotted-pane-css,
-.jotted-plugin-colexpand.jotted-has-css.jotted-has-js .jotted-pane-js {
-  max-width: 50%;
-  width: 50%;
-}
-.jotted-plugin-colexpand.jotted-has-html.jotted-has-css.jotted-has-js .jotted-pane-html,
-.jotted-plugin-colexpand.jotted-has-html.jotted-has-css.jotted-has-js .jotted-pane-js,
-.jotted-plugin-colexpand.jotted-has-html.jotted-has-css.jotted-has-js .jotted-pane-css {
-  max-width: 33.3333%;
-  width: 33.3333%;
-}
-.jotted-plugin-console.jotted-plugin-colexpand .jotted-pane-title-console {
-  font-family: sans-serif;
-}
-.jotted-plugin-console.jotted-plugin-colexpand .jotted-console-clear {
-  top: 4.3em;
-}
-.jotted-plugin-console.jotted-plugin-colexpand.jotted-has-html .jotted-pane,
-.jotted-plugin-console.jotted-plugin-colexpand.jotted-has-css .jotted-pane,
-.jotted-plugin-console.jotted-plugin-colexpand.jotted-has-js .jotted-pane {
-  width: 50%;
-}
-.jotted-plugin-console.jotted-plugin-colexpand.jotted-has-html.jotted-has-css .jotted-pane,
-.jotted-plugin-console.jotted-plugin-colexpand.jotted-has-html.jotted-has-js .jotted-pane,
-.jotted-plugin-console.jotted-plugin-colexpand.jotted-has-css.jotted-has-js .jotted-pane {
-  width: 33.33%;
-}
-.jotted-plugin-console.jotted-plugin-colexpand.jotted-has-html.jotted-has-css.jotted-has-js .jotted-pane {
-  width: 25%;
-}
-.jotted-plugin-colexpand.jotted-plugin-colexpand .jotted-col-expand {
-  border-left: 1px solid #ddd;
-}
 .jotted-nav-item-console {
   display: block;
 }
@@ -351,6 +254,87 @@ jotted-nav-item,
   position: absolute;
   top: 3.3em;
   right: 1.4em;
+}
+.jotted-plugin-pen {
+  display: flex;
+  flex-flow: row wrap;
+  user-select: none;
+}
+.jotted-plugin-pen .jotted-pane-result {
+  flex: 1 100%;
+}
+.jotted-plugin-pen .jotted-editor .CodeMirror {
+  height: calc(100% - 39px);
+}
+.jotted-plugin-pen .jotted-nav {
+  display: none;
+}
+.jotted-plugin-pen .jotted-pane {
+  padding-top: 0;
+  height: 50%;
+}
+.jotted-plugin-pen .jotted-pane-title {
+  display: block;
+  background: rgba(51,51,51,0.08);
+  border-bottom: 1px solid rgba(51,51,51,0.2);
+  padding: 0 0.8em;
+  line-height: 2.4em;
+  font-family: sans-serif;
+}
+.jotted-plugin-pen .jotted-pane-title-result {
+  display: none;
+}
+.jotted-plugin-pen.jotted-has-html .jotted-pane-html,
+.jotted-plugin-pen.jotted-has-css .jotted-pane-css,
+.jotted-plugin-pen.jotted-has-js .jotted-pane-js,
+.jotted-plugin-pen.jotted-plugin-console .jotted-pane-console {
+  position: relative;
+  visibility: visible;
+}
+.jotted-plugin-pen.jotted-has-html .jotted-pane,
+.jotted-plugin-pen.jotted-has-css .jotted-pane,
+.jotted-plugin-pen.jotted-has-js .jotted-pane {
+  max-width: 100%;
+  width: 100%;
+}
+.jotted-plugin-pen.jotted-has-html.jotted-has-css .jotted-pane-html,
+.jotted-plugin-pen.jotted-has-html.jotted-has-css .jotted-pane-css,
+.jotted-plugin-pen.jotted-has-html.jotted-has-js .jotted-pane-html,
+.jotted-plugin-pen.jotted-has-html.jotted-has-js .jotted-pane-js,
+.jotted-plugin-pen.jotted-has-css.jotted-has-js .jotted-pane-css,
+.jotted-plugin-pen.jotted-has-css.jotted-has-js .jotted-pane-js {
+  max-width: 50%;
+  width: 50%;
+}
+.jotted-plugin-pen.jotted-has-html.jotted-has-css.jotted-has-js .jotted-pane-html,
+.jotted-plugin-pen.jotted-has-html.jotted-has-css.jotted-has-js .jotted-pane-js,
+.jotted-plugin-pen.jotted-has-html.jotted-has-css.jotted-has-js .jotted-pane-css {
+  max-width: 33.3333%;
+  width: 33.3333%;
+}
+.jotted-plugin-pen.jotted-plugin-console .jotted-console-clear {
+  top: 4.3em;
+}
+.jotted-plugin-console.jotted-plugin-pen.jotted-has-html .jotted-pane,
+.jotted-plugin-console.jotted-plugin-pen.jotted-has-css .jotted-pane,
+.jotted-plugin-console.jotted-plugin-pen.jotted-has-js .jotted-pane {
+  width: 50%;
+}
+.jotted-plugin-console.jotted-plugin-pen.jotted-has-html.jotted-has-css .jotted-pane,
+.jotted-plugin-console.jotted-plugin-pen.jotted-has-html.jotted-has-js .jotted-pane,
+.jotted-plugin-console.jotted-plugin-pen.jotted-has-css.jotted-has-js .jotted-pane {
+  width: 33.33%;
+}
+.jotted-plugin-console.jotted-plugin-pen.jotted-has-html.jotted-has-css.jotted-has-js .jotted-pane {
+  width: 25%;
+}
+.jotted-plugin-pen-expander {
+  position: absolute;
+  height: 100%;
+  width: 3px;
+  z-index: 5;
+  cursor: col-resize;
+  border-left: 1px solid #ddd;
 }
 .jotted-button-play {
   position: absolute;

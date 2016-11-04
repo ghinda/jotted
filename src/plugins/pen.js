@@ -1,26 +1,34 @@
-/* eslint-env browser */
-
-/* colexpand plugin
- * adds a column expand functionality to the panes
+/* pen plugin
  */
-export default class PluginColExpand {
+export default class PluginPen {
   constructor (jotted, options) {
-    this.jotted = jotted
+    // available panes
+    let $availablePanes = jotted.$container.querySelectorAll('.jotted-pane')
 
-    this._querySelector = jotted.$container.querySelector.bind(jotted.$container)
-
-    // define available panes
-    let $availablePanes = []
-    if (this.jotted.$container.classList.contains('jotted-has-html')) $availablePanes.push('html')
-    if (this.jotted.$container.classList.contains('jotted-has-css')) $availablePanes.push('css')
-    if (this.jotted.$container.classList.contains('jotted-has-js')) $availablePanes.push('js')
+    let titleLabels = {
+      html: 'HTML',
+      css: 'CSS',
+      js: 'JavaScript',
+      console: 'Console'
+    }
 
     this.resizablePanes = []
     for (let i = 0; i < $availablePanes.length; i++) {
-      let $type = $availablePanes[i]
+      let type
+
+      for (let j = 0; j < $availablePanes[i].classList.length; j++) {
+        if ($availablePanes[i].classList[j].indexOf('jotted-pane-') !== -1) {
+          type = $availablePanes[i].classList[j].replace('jotted-pane-', '')
+          break
+        }
+      }
+
+      if (!type || type === 'result') {
+        continue
+      }
+
       let $pane = {
-        nav: this._querySelector(`.jotted-pane-title-${$type}`),
-        container: this._querySelector(`.jotted-pane-${$type}`),
+        container: $availablePanes[i],
         expander: undefined
       }
 
@@ -28,22 +36,20 @@ export default class PluginColExpand {
 
       let $paneTitle = document.createElement('div')
       $paneTitle.classList.add('jotted-pane-title')
-      $paneTitle.innerHTML = $type === 'js' ? 'JavaScript' : $type.toUpperCase()
+      $paneTitle.innerHTML = titleLabels[type] || type
 
-      let $paneElement = this._querySelector(`.jotted-pane-${$type} .jotted-editor`)
+      let $paneElement = $availablePanes[i].firstElementChild
       $paneElement.insertBefore($paneTitle, $paneElement.firstChild)
 
       // insert expander element.
       // only panes which have an expander can be shrunk or expanded
       // first pane must not have a expander
-      if (i > 0) {
-        let $colexpandElement = document.createElement('div')
-        $colexpandElement.classList.add('jotted-col-expand')
-
-        $paneElement.insertBefore($colexpandElement, $paneTitle)
-
-        $pane.expander = $colexpandElement
+      if (i > 1) {
+        $pane.expander = document.createElement('div')
+        $pane.expander.classList.add('jotted-plugin-pen-expander')
         $pane.expander.addEventListener('mousedown', this.startExpand.bind(this, jotted))
+
+        $paneElement.insertBefore($pane.expander, $paneTitle)
       }
     }
   }
@@ -55,14 +61,14 @@ export default class PluginColExpand {
 
     let $previousPane = this.resizablePanes[this.resizablePanes.indexOf($pane) - 1]
 
-    let $relativePixel = 100 / parseInt(getComputedStyle($pane.container.parentNode)['width'], 10)
+    let $relativePixel = 100 / parseInt(window.getComputedStyle($pane.container.parentNode)['width'], 10)
 
     // ugly but reliable & cross-browser way of getting height/width as percentage.
     $pane.container.parentNode.style.display = 'none'
 
     $pane.startX = event.clientX
-    $pane.startWidth = parseFloat(getComputedStyle($pane.container)['width'], 10)
-    $previousPane.startWidth = parseFloat(getComputedStyle($previousPane.container)['width'], 10)
+    $pane.startWidth = parseFloat(window.getComputedStyle($pane.container)['width'], 10)
+    $previousPane.startWidth = parseFloat(window.getComputedStyle($previousPane.container)['width'], 10)
 
     $pane.container.parentNode.style.display = ''
 

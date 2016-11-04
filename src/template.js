@@ -1,25 +1,31 @@
 /* template
  */
 
-export function container (name) {
+export function container () {
   return `
     <ul class="jotted-nav">
       <li class="jotted-nav-item jotted-nav-item-result">
-        <a href="#" data-jotted-type="result">Result</a>
+        <a href="#" data-jotted-type="result">
+          Result
+        </a>
       </li>
       <li class="jotted-nav-item jotted-nav-item-html">
-        <a href="#" data-jotted-type="html">HTML</a>
+        <a href="#" data-jotted-type="html">
+          HTML
+        </a>
       </li>
       <li class="jotted-nav-item jotted-nav-item-css">
-        <a href="#" data-jotted-type="css">CSS</a>
+        <a href="#" data-jotted-type="css">
+          CSS
+        </a>
       </li>
       <li class="jotted-nav-item jotted-nav-item-js">
-        <a href="#" data-jotted-type="js">JavaScript</a>
+        <a href="#" data-jotted-type="js">
+          JavaScript
+        </a>
       </li>
     </ul>
-    <div class="jotted-pane jotted-pane-result">
-      <iframe></iframe>
-    </div>
+    <div class="jotted-pane jotted-pane-result"><iframe></iframe></div>
     <div class="jotted-pane jotted-pane-html"></div>
     <div class="jotted-pane jotted-pane-css"></div>
     <div class="jotted-pane jotted-pane-js"></div>

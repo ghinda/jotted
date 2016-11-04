@@ -29,7 +29,6 @@ export default class PluginConsole {
 
     $pane.innerHTML = `
       <div class="jotted-console-container">
-        <div class="jotted-pane-title jotted-pane-title-console">Console</div>
         <ul class="jotted-console-output"></ul>
         <form class="jotted-console-input">
           <input type="text">

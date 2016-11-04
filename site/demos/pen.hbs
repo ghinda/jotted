@@ -1,11 +1,11 @@
 ---
 layout: demo.html
-title: Play Plugin
+title: Pen Plugin
 demo: true
 ---
 
 <p>
-  The <strong>play</strong> plugin disables auto-run and adds a <strong>Run</strong> button that manually updates the preview iframe.
+  The <strong>pen</strong> plugin changes the layout - placing the result on top and the editors side by side. It also allows you to resize the editor columns.
 </p>
 
 <link rel="stylesheet" href="../bower_components/codemirror/lib/codemirror.css">
@@ -15,16 +15,16 @@ demo: true
 <script src="../bower_components/codemirror/mode/xml/xml.js"></script>
 <script src="../bower_components/codemirror/mode/htmlmixed/htmlmixed.js"></script>
 
-<div id="jotted-demo-play" class="jotted-md-demo"></div>
+<div id="jotted-demo-pen" style="height: 28em"></div>
 
 <link href="../jotted.css" rel="stylesheet">
 <script src="../jotted.js"></script>
 <script>
-  new Jotted(document.querySelector('#jotted-demo-play'), {
+  new Jotted(document.querySelector('#jotted-demo-pen'), {
     files: [
       {
         type: 'html',
-        content: '<h1>\n  Colexpand Plugin\n</h1>'
+        content: '<h1>\n  Pen Plugin\n</h1>'
       },
       {
         type: 'js',
@@ -35,6 +35,6 @@ demo: true
         content: 'body {\n  background: yellow;\n}'
       }
     ],
-    plugins: [ 'codemirror', 'console', 'colexpand' ]
+    plugins: [ 'codemirror', 'console', 'pen' ]
   });
 </script>

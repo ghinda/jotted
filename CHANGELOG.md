@@ -1,4 +1,8 @@
 
+## [1.5.0] - 2016-11-04
+
+* New `Pen` plugin - different layout with the result on top, and side by side, resizable columns.
+
 ## [1.4.5] - 2016-10-18
 
 * Fix issues with loading scripts multiple times on changes. Caused by the iframe not removing them from memory when using document.write. Fixed by re-creating the iframe on each change.

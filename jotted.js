@@ -1581,14 +1581,19 @@
       classCallCheck(this, PluginPen);
 
       // available panes
-      var $availablePanes = jotted.$container.querySelectorAll('.jotted-pane');
-
-      var titleLabels = {
-        html: 'HTML',
-        css: 'CSS',
-        js: 'JavaScript',
-        console: 'Console'
+      var panes = {
+        html: { title: 'HTML', classChecker: 'jotted-has-html' },
+        css: { title: 'CSS', classChecker: 'jotted-has-css' },
+        js: { title: 'JavaScript', classChecker: 'jotted-has-js' },
+        console: { title: 'Console', classChecker: 'jotted-plugin-console' }
       };
+
+      var $availablePanes = [];
+      for (var p in panes) {
+        if (jotted.$container.classList.contains(panes[p].classChecker)) {
+          $availablePanes.push(jotted.$container.querySelector('.jotted-pane-' + p));
+        }
+      }
 
       this.resizablePanes = [];
       for (var i = 0; i < $availablePanes.length; i++) {
@@ -1601,7 +1606,7 @@
           }
         }
 
-        if (!type || type === 'result') {
+        if (!type) {
           continue;
         }
 
@@ -1614,7 +1619,7 @@
 
         var $paneTitle = document.createElement('div');
         $paneTitle.classList.add('jotted-pane-title');
-        $paneTitle.innerHTML = titleLabels[type] || type;
+        $paneTitle.innerHTML = panes[type].title || type;
 
         var $paneElement = $availablePanes[i].firstElementChild;
         $paneElement.insertBefore($paneTitle, $paneElement.firstChild);
@@ -1622,7 +1627,7 @@
         // insert expander element.
         // only panes which have an expander can be shrunk or expanded
         // first pane must not have a expander
-        if (i > 1) {
+        if (i > 0) {
           $pane.expander = document.createElement('div');
           $pane.expander.classList.add('jotted-plugin-pen-expander');
           $pane.expander.addEventListener('mousedown', this.startExpand.bind(this, jotted));

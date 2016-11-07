@@ -1,4 +1,8 @@
 
+## [1.5.1] - 2016-11-07
+
+* Fix issues with generating the resize handler for non-resizable panes, in the Pen plugin.
+
 ## [1.5.0] - 2016-11-04
 
 * New `Pen` plugin - different layout with the result on top, and side by side, resizable columns.

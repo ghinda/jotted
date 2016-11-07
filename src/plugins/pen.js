@@ -3,13 +3,18 @@
 export default class PluginPen {
   constructor (jotted, options) {
     // available panes
-    let $availablePanes = jotted.$container.querySelectorAll('.jotted-pane')
+    let panes = {
+      html: { title: 'HTML', classChecker: 'jotted-has-html' },
+      css: { title: 'CSS', classChecker: 'jotted-has-css' },
+      js: { title: 'JavaScript', classChecker: 'jotted-has-js' },
+      console: { title: 'Console', classChecker: 'jotted-plugin-console' }
+    }
 
-    let titleLabels = {
-      html: 'HTML',
-      css: 'CSS',
-      js: 'JavaScript',
-      console: 'Console'
+    let $availablePanes = []
+    for (let p in panes) {
+      if (jotted.$container.classList.contains(panes[p].classChecker)) {
+        $availablePanes.push(jotted.$container.querySelector(`.jotted-pane-${p}`))
+      }
     }
 
     this.resizablePanes = []
@@ -23,7 +28,7 @@ export default class PluginPen {
         }
       }
 
-      if (!type || type === 'result') {
+      if (!type) {
         continue
       }
 
@@ -36,7 +41,7 @@ export default class PluginPen {
 
       let $paneTitle = document.createElement('div')
       $paneTitle.classList.add('jotted-pane-title')
-      $paneTitle.innerHTML = titleLabels[type] || type
+      $paneTitle.innerHTML = panes[type].title || type
 
       let $paneElement = $availablePanes[i].firstElementChild
       $paneElement.insertBefore($paneTitle, $paneElement.firstChild)
@@ -44,7 +49,7 @@ export default class PluginPen {
       // insert expander element.
       // only panes which have an expander can be shrunk or expanded
       // first pane must not have a expander
-      if (i > 1) {
+      if (i > 0) {
         $pane.expander = document.createElement('div')
         $pane.expander.classList.add('jotted-plugin-pen-expander')
         $pane.expander.addEventListener('mousedown', this.startExpand.bind(this, jotted))

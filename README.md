@@ -11,8 +11,8 @@ Environment for showcasing HTML, CSS and JavaScript, with editable source. It's 
 * [jsDelivr](https://www.jsdelivr.com/projects/jotted):
 
 ``` html
-<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/jotted/latest/jotted.min.css">
-<script src="https://cdn.jsdelivr.net/jotted/latest/jotted.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/jotted@latest/jotted.min.css">
+<script src="https://cdn.jsdelivr.net/npm/jotted@latest/jotted.min.js"></script>
 ```
 
 ## Features

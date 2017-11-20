@@ -1,3 +1,6 @@
+## [1.5.2] - 2017-11-20
+
+* Fix issues with the results pane disappearing in some cases (eg. when not using CodeMirror), in the Pen plugin.
 
 ## [1.5.1] - 2016-11-07
 

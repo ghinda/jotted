@@ -138,10 +138,6 @@ module.exports = function (grunt) {
               browserName: 'firefox',
               platform: 'Linux'
             }, {
-              browserName: 'android',
-              platform: 'Linux',
-              version: '5.1'
-            }, {
               browserName: 'internet explorer',
               platform: 'Windows 7',
               version: '9.0'
